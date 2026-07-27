@@ -1,10 +1,10 @@
 # Render Blueprint Configuration for Portfolio SaaS Backend
+# Runs from REPO ROOT - delegates to backend/ via root server.js
 services:
   - type: web
     name: portfolio-saas-backend
     env: node
-    rootDir: backend
-    buildCommand: npm install
+    buildCommand: npm run build
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:
