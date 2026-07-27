@@ -106,7 +106,7 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
   console.log(`📡 API Base URL: http://localhost:${PORT}/api`);
 
@@ -119,4 +119,13 @@ app.listen(PORT, () => {
       }).on('error', () => {});
     } catch (e) {}
   }, 5 * 60 * 1000);
+});
+
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    console.warn(`⚠️ Port ${PORT} is currently in use.`);
+    console.warn(`👉 The backend server is already running and active on http://localhost:${PORT}`);
+  } else {
+    console.error('💥 Server error:', error.message);
+  }
 });
