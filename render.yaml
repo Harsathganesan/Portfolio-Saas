@@ -1,0 +1,16 @@
+# Render Blueprint Configuration for Portfolio SaaS Backend
+services:
+  - type: web
+    name: portfolio-saas-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: CLIENT_URL
+        value: https://portfolio-saas-henna.vercel.app
+      - key: JWT_EXPIRE
+        value: 30d
