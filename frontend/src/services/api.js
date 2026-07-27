@@ -1,8 +1,11 @@
 import axios from 'axios';
 
 const getBaseURL = () => {
-  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
-  // Default to local Node backend on port 5002
+  let envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && envUrl.trim()) {
+    let clean = envUrl.trim().replace(/\/+$/, '');
+    return clean.endsWith('/api') ? clean : `${clean}/api`;
+  }
   return 'http://localhost:5002/api';
 };
 
