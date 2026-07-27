@@ -2,10 +2,7 @@ import axios from 'axios';
 
 const getBaseURL = () => {
   if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
-  // If running on external device or deployed host (not localhost), use relative /api
-  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    return '/api';
-  }
+  // Always default to local Node backend on 5001 during development/testing
   return 'http://localhost:5001/api';
 };
 
