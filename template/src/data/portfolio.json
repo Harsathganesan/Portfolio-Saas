@@ -1,0 +1,62 @@
+{
+  "name": "Alex Rivera",
+  "title": "Senior Full Stack Engineer",
+  "tagline": "WELCOME TO MY PORTFOLIO",
+  "bio": "I build modern, responsive, and high-performance web applications with clean code and intuitive user experiences.",
+  "email": "alex@example.com",
+  "phone": "+1 (555) 234-5678",
+  "location": "San Francisco, CA",
+  "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80",
+  "resumeUrl": "",
+  "socialLinks": {
+    "github": "https://github.com",
+    "linkedin": "https://linkedin.com",
+    "twitter": "https://twitter.com",
+    "instagram": "https://instagram.com"
+  },
+  "skills": [
+    { "name": "React.js", "category": "Frontend", "proficiencyLevel": 95 },
+    { "name": "Node.js", "category": "Backend", "proficiencyLevel": 90 },
+    { "name": "MongoDB", "category": "Database", "proficiencyLevel": 85 }
+  ],
+  "projects": [
+    {
+      "title": "Enterprise AI Gateway",
+      "description": "High-throughput LLM middleware routing requests with caching across cloud providers.",
+      "techStack": ["Node.js", "React", "MongoDB", "TailwindCSS"],
+      "githubUrl": "https://github.com",
+      "liveUrl": "https://example.com",
+      "thumbnail": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80"
+    }
+  ],
+  "education": [
+    {
+      "degree": "Master of Computer Applications",
+      "institution": "Nehru Institute of Information Technology and Management",
+      "duration": "2022 - 2024",
+      "cgpa": "8.9"
+    },
+    {
+      "degree": "Bachelor of Computer Applications",
+      "institution": "JJ College of Arts and Science",
+      "duration": "2019 - 2022",
+      "cgpa": "8.5"
+    }
+  ],
+  "experience": [
+    {
+      "position": "Senior Full Stack Engineer",
+      "company": "TechCorp Systems",
+      "duration": "2023 - Present",
+      "location": "San Francisco, CA",
+      "description": "Architected microservices & web clients."
+    }
+  ],
+  "certificates": [
+    {
+      "title": "AWS Certified Solutions Architect",
+      "organization": "Amazon Web Services",
+      "issueDate": "2023"
+    }
+  ]
+}
