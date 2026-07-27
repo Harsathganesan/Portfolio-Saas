@@ -40,7 +40,7 @@ const Sidebar = () => {
   const { user, logout } = useAuth();
   const { portfolio } = usePortfolio();
 
-  const publicUrl = portfolio?.username ? `/${portfolio.username}` : '#';
+  const publicUrl = portfolio?.username ? `/u/${portfolio.username}` : '#';
 
   return (
     <aside className="w-64 bg-slate-950 border-r border-slate-800/80 flex flex-col h-screen sticky top-0 z-30">
