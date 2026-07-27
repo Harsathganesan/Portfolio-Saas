@@ -2,8 +2,8 @@ import axios from 'axios';
 
 const getBaseURL = () => {
   if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
-  // Always default to local Node backend on 5001 during development/testing
-  return 'http://localhost:5001/api';
+  // Default to local Node backend on port 5002
+  return 'http://localhost:5002/api';
 };
 
 const API = axios.create({
