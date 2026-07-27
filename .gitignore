@@ -4,10 +4,13 @@ backend/node_modules/
 frontend/node_modules/
 template/node_modules/
 
-# Environment Variables
+# Environment Variables (secrets - never commit)
 .env
-*.env
 backend/.env
+frontend/.env
+frontend/.env.local
+# Allow .env.production - only contains public Render URL, no secrets
+!frontend/.env.production
 
 # Build outputs
 dist/
