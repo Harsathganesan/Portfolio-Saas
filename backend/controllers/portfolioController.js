@@ -362,17 +362,22 @@ export const checkUsernameAvailability = async (req, res) => {
 export const getPublicUserPortfolio = async (req, res) => {
   try {
     const { username } = req.params;
-    const cleanUsername = username.toLowerCase().trim();
+    const cleanUsername = username ? username.toLowerCase().trim() : '';
+
+    console.log('🔍 [Backend] Requested Username:', cleanUsername);
 
     if (isInMemoryFallback) {
       const portfolio = await mockStore.findPortfolioByUsername(cleanUsername);
       if (!portfolio) {
-        return res.status(404).json({ success: false, message: '404 Portfolio Not Found' });
+        console.log('❌ [Backend] Portfolio Not Found in MockStore for:', cleanUsername);
+        return res.status(404).json({ success: false, message: 'Portfolio Not Found' });
       }
       if (!portfolio.published && !portfolio.isPublished) {
-        return res.status(404).json({ success: false, message: '404 Portfolio Not Published' });
+        console.log('⚠️ [Backend] Portfolio Not Published for:', cleanUsername);
+        return res.status(404).json({ success: false, message: 'Portfolio Not Published' });
       }
       if (portfolio.visibility === 'private') {
+        console.log('🔒 [Backend] Portfolio Private for:', cleanUsername);
         return res.status(403).json({ success: false, message: 'This portfolio is private.' });
       }
 
@@ -396,17 +401,32 @@ export const getPublicUserPortfolio = async (req, res) => {
       });
     }
 
-    const portfolio = await Portfolio.findOne({ username: cleanUsername });
+    // MongoDB Case-Insensitive Username & Slug Query
+    console.log('🍃 [Backend] Querying MongoDB Atlas for:', cleanUsername);
+    const portfolio = await Portfolio.findOne({
+      $or: [
+        { username: cleanUsername },
+        { username: new RegExp('^' + cleanUsername + '$', 'i') },
+        { slug: cleanUsername },
+      ],
+    });
 
     if (!portfolio) {
-      return res.status(404).json({ success: false, message: '404 Portfolio Not Found' });
+      console.log('❌ [Backend] Portfolio Not Found in MongoDB Atlas for:', cleanUsername);
+      return res.status(404).json({ success: false, message: 'Portfolio Not Found' });
     }
 
-    if (!portfolio.published && !portfolio.isPublished) {
-      return res.status(404).json({ success: false, message: '404 Portfolio Not Published' });
+    console.log('📦 [Backend] Found Portfolio in MongoDB Atlas:', portfolio._id);
+
+    // Check publication status (allows published OR isPublished for backwards compatibility)
+    const isLive = portfolio.published || portfolio.isPublished;
+    if (!isLive) {
+      console.log('⚠️ [Backend] Portfolio is draft/unpublished for:', cleanUsername);
+      return res.status(404).json({ success: false, message: 'Portfolio Not Published' });
     }
 
     if (portfolio.visibility === 'private') {
+      console.log('🔒 [Backend] Portfolio is set to private for:', cleanUsername);
       return res.status(403).json({ success: false, message: 'This portfolio is private.' });
     }
 
@@ -423,6 +443,7 @@ export const getPublicUserPortfolio = async (req, res) => {
     analytics.totalViews += 1;
     await analytics.save();
 
+    console.log('✅ [Backend] Successfully returning public portfolio JSON for:', cleanUsername);
     res.json({
       success: true,
       portfolio: {
@@ -439,7 +460,8 @@ export const getPublicUserPortfolio = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('💥 [Backend Error] Exception in getPublicUserPortfolio:', error);
+    res.status(500).json({ success: false, message: error.message || 'Internal Server Error' });
   }
 };
 

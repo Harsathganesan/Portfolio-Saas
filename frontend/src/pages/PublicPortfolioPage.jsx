@@ -15,15 +15,14 @@ const PublicPortfolioPage = () => {
     const fetchPublicData = async () => {
       setLoading(true);
       setError(null);
+      
+      console.log('🔍 [Frontend] Requested Username from URL:', username);
+      
       try {
-        let res;
-        try {
-          res = await portfolioService.getUserPublicPortfolio(username);
-        } catch (e) {
-          res = await portfolioService.getPublicPortfolio(username);
-        }
+        const res = await portfolioService.getUserPublicPortfolio(username);
+        console.log('✅ [Frontend] API Response Received:', res);
 
-        if (res.success) {
+        if (res.success && res.portfolio) {
           const p = res.portfolio;
           setData(p);
 
@@ -60,7 +59,28 @@ const PublicPortfolioPage = () => {
           ogImg.setAttribute('content', p.seo?.ogImage || p.personalInfo?.avatar || '');
         }
       } catch (err) {
-        setError(err.response?.data?.message || '404 Portfolio Not Found');
+        const status = err.response?.status;
+        const msg = err.response?.data?.message;
+
+        console.error('❌ [Frontend Axios Error]:', {
+          requestedUsername: username,
+          httpStatus: status,
+          serverMessage: msg,
+          requestUrl: err.config?.url,
+          error: err,
+        });
+
+        if (status === 404 && msg?.includes('Not Published')) {
+          setError('Portfolio Not Published - The owner has not published this portfolio yet.');
+        } else if (status === 404) {
+          setError(`Portfolio Not Found - No public portfolio exists for @${username}`);
+        } else if (status === 403) {
+          setError('This portfolio is private.');
+        } else if (status === 500) {
+          setError(`Server Error (500): ${msg || 'Internal Server Failure'}`);
+        } else {
+          setError(msg || 'Portfolio Unavailable');
+        }
       } finally {
         setLoading(false);
       }
