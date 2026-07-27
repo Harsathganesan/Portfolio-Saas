@@ -7,10 +7,8 @@
     "start": "node server.js",
     "build": "cd backend && npm install",
     "dev": "npx concurrently -k -p \"[{name}]\" -n \"BACKEND,FRONTEND\" -c \"cyan,magenta\" \"npm run backend\" \"npm run frontend\"",
-    "server": "npm run backend",
     "backend": "cd backend && npm run dev",
     "frontend": "cd frontend && npm run dev",
-    "client": "npm run frontend",
     "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install"
   },
   "devDependencies": {
