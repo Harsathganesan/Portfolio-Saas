@@ -6,8 +6,14 @@ const getBaseURL = () => {
     let clean = envUrl.trim().replace(/\/+$/, '');
     return clean.endsWith('/api') ? clean : `${clean}/api`;
   }
-  const host = typeof window !== 'undefined' && window.location.hostname ? window.location.hostname : '127.0.0.1';
-  return `http://${host}:5002/api`;
+  if (typeof window !== 'undefined' && window.location.hostname) {
+    const host = window.location.hostname;
+    if (host !== 'localhost' && host !== '127.0.0.1') {
+      return 'https://portfolio-saas-mvjq.vercel.app/api';
+    }
+    return `http://${host}:5002/api`;
+  }
+  return 'https://portfolio-saas-mvjq.vercel.app/api';
 };
 
 const API = axios.create({

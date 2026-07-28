@@ -62,6 +62,7 @@ app.use(
     credentials: true,
   })
 );
+app.options('*', cors());
 
 // ─── Core Body Middlewares ──────────────────────────────────────────
 app.use(express.json({ limit: '10mb' }));
