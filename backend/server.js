@@ -73,6 +73,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ─── Connect Database ───────────────────────────────────────────────
 connectDB();
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
 
 // ─── Root & API Base Endpoints ─────────────────────────────────────
 app.get(['/', '/api', '/api/'], (req, res) => {

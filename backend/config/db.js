@@ -1,24 +1,38 @@
 import mongoose from 'mongoose';
 
 export let isInMemoryFallback = false;
+let isConnecting = false;
 
 const connectDB = async () => {
+  // If already connected to MongoDB Atlas, return immediately
+  if (mongoose.connection.readyState === 1) {
+    isInMemoryFallback = false;
+    return;
+  }
+
+  if (isConnecting) {
+    return;
+  }
+
   try {
-    if (!process.env.MONGODB_URI) {
-      console.warn(`⚠️ MONGODB_URI environment variable is not defined on Vercel.`);
-      console.warn(`👉 Switching to memory-fallback mode so the SaaS application runs seamlessly!`);
+    const uri = process.env.MONGODB_URI;
+    if (!uri) {
+      console.warn(`⚠️ MONGODB_URI environment variable is not defined.`);
       isInMemoryFallback = true;
       return;
     }
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
-      serverSelectionTimeoutMS: 5000,
+
+    isConnecting = true;
+    const conn = await mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 8000,
     });
-    console.log(`✅ MongoDB Atlas Connected: ${conn.connection.host}`);
+    console.log(`✅ MongoDB Atlas Connected Successfully: ${conn.connection.host}`);
     isInMemoryFallback = false;
   } catch (error) {
-    console.warn(`⚠️ MongoDB connection warning: ${error.message}`);
-    console.warn(`👉 Switching to memory-fallback mode so the SaaS application runs seamlessly!`);
+    console.error(`💥 MongoDB connection error: ${error.message}`);
     isInMemoryFallback = true;
+  } finally {
+    isConnecting = false;
   }
 };
 
