@@ -146,3 +146,5 @@ server.on('error', (error) => {
     console.error('💥 Server error:', error.message);
   }
 });
+
+export default app;
