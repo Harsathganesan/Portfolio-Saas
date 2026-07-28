@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import fse from 'fs-extra';
-import archiver from 'archiver';
+import * as archiverModule from 'archiver';
+const archiver = archiverModule.default || archiverModule;
 import Portfolio from '../models/Portfolio.js';
 import Project from '../models/Project.js';
 import Skill from '../models/Skill.js';
