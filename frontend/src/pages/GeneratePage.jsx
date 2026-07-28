@@ -62,7 +62,7 @@ const GeneratePage = () => {
       window.URL.revokeObjectURL(url);
       toast('ZIP file downloaded successfully!', 'success');
     } catch (err) {
-      window.open(`http://localhost:5001/api/generate/download/${result.zipFileName}`, '_blank');
+      window.open(result.downloadUrl || `/api/generate/download/${result.zipFileName}`, '_blank');
     }
   };
 

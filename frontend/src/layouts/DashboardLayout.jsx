@@ -39,10 +39,16 @@ const DashboardLayout = () => {
         {/* Top Navbar */}
         <header className="h-16 bg-slate-950/80 border-b border-slate-800/80 px-6 flex items-center justify-between backdrop-blur-md z-20">
           <div className="flex items-center space-x-3">
-            <span className="text-xs font-semibold text-slate-400">Public Slug:</span>
-            <span className="text-xs font-mono bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-lg text-indigo-400">
-              portfolio-app.com/{portfolio?.username || 'username'}
-            </span>
+            <span className="text-xs font-semibold text-slate-400">Public Link:</span>
+            <Link
+              to={`/${portfolio?.username || 'username'}`}
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs font-mono bg-slate-900 hover:bg-slate-800 border border-slate-800 px-2.5 py-1 rounded-lg text-indigo-400 hover:text-indigo-300 transition flex items-center gap-1"
+            >
+              <span>@{portfolio?.username || 'username'}</span>
+              <ExternalLink className="w-3 h-3 text-slate-500" />
+            </Link>
           </div>
 
           <div className="flex items-center space-x-3">

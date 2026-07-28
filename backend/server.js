@@ -121,7 +121,7 @@ app.use(errorHandler);
 // ─── Start Server ────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5002;
 
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
   console.log(`📡 API Base URL: http://localhost:${PORT}/api`);
   console.log(`🌐 Health Check: http://localhost:${PORT}/api/health`);

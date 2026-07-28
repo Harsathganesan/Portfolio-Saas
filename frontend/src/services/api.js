@@ -6,7 +6,8 @@ const getBaseURL = () => {
     let clean = envUrl.trim().replace(/\/+$/, '');
     return clean.endsWith('/api') ? clean : `${clean}/api`;
   }
-  return 'http://localhost:5002/api';
+  const host = typeof window !== 'undefined' && window.location.hostname ? window.location.hostname : '127.0.0.1';
+  return `http://${host}:5002/api`;
 };
 
 const API = axios.create({

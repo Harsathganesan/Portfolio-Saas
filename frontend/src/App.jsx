@@ -81,6 +81,7 @@ const App = () => {
         <Route path="resume" element={<ResumeUploadPage />} />
         <Route path="templates" element={<TemplatesPage />} />
         <Route path="analytics" element={<AnalyticsPage />} />
+        <Route path="generate" element={<GeneratePage />} />
         <Route path="inbox" element={<MessagesPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>

@@ -58,7 +58,19 @@ const PersonalInfoPage = () => {
       const res = await uploadService.uploadFile(file);
       if (res.success) {
         setForm((prev) => ({ ...prev, avatar: res.url }));
-        toast('Profile photo uploaded!', 'success');
+        // Auto-save avatar URL to database immediately for live portfolio display
+        await updatePortfolio({
+          personalInfo: {
+            fullName: form.fullName || portfolio?.personalInfo?.fullName || '',
+            title: form.title || portfolio?.personalInfo?.title || '',
+            bio: form.bio || portfolio?.personalInfo?.bio || '',
+            email: form.email || portfolio?.personalInfo?.email || '',
+            phone: form.phone || portfolio?.personalInfo?.phone || '',
+            location: form.location || portfolio?.personalInfo?.location || '',
+            avatar: res.url,
+          },
+        });
+        toast('Profile photo uploaded and saved live!', 'success');
       }
     } catch (err) {
       toast('Failed to upload profile photo', 'error');
@@ -129,13 +141,21 @@ const PersonalInfoPage = () => {
               )}
 
               <label className="absolute inset-0 bg-slate-950/70 rounded-2xl opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition text-white text-[10px] font-semibold gap-1">
-                <Upload className="w-3.5 h-3.5" />
-                <span>Upload</span>
+                {uploadingAvatar ? <Loader2 className="w-4 h-4 animate-spin text-indigo-400" /> : <Upload className="w-3.5 h-3.5" />}
+                <span>{uploadingAvatar ? 'Uploading...' : 'Upload'}</span>
                 <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
               </label>
             </div>
 
             <div className="flex-1 w-full space-y-3">
+              <div className="flex items-center gap-3">
+                <label className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl cursor-pointer flex items-center gap-2 font-semibold transition shadow-md shadow-indigo-600/30">
+                  {uploadingAvatar ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                  <span>{uploadingAvatar ? 'Uploading Image...' : 'Choose Profile Photo'}</span>
+                  <input type="file" accept="image/*" onChange={handleAvatarUpload} disabled={uploadingAvatar} className="hidden" />
+                </label>
+              </div>
+
               <div>
                 <label className="block text-slate-400 mb-1 font-medium">Avatar Image URL (or upload above)</label>
                 <input

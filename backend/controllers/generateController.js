@@ -64,7 +64,10 @@ export const generatePortfolioZip = async (req, res) => {
     };
 
     const rootDir = process.cwd();
-    const templatePath = path.join(rootDir, 'template');
+    let templatePath = path.join(rootDir, 'template');
+    if (!fs.existsSync(templatePath)) {
+      templatePath = path.resolve(__dirname, '../../template');
+    }
     const generatedBaseDir = path.join(rootDir, 'generated');
     await fse.ensureDir(generatedBaseDir);
 

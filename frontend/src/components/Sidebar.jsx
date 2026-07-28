@@ -16,6 +16,7 @@ import {
   ExternalLink,
   Sparkles,
   LogOut,
+  Download,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { usePortfolio } from '../context/PortfolioContext';
@@ -31,6 +32,7 @@ const menuItems = [
   { id: 'resume', label: 'Resume', icon: FileText, path: '/dashboard/resume' },
   { id: 'templates', label: 'Templates', icon: Palette, path: '/dashboard/templates' },
   { id: 'analytics', label: 'Analytics', icon: BarChart3, path: '/dashboard/analytics' },
+  { id: 'generate', label: 'Export & Download ZIP', icon: Download, path: '/dashboard/generate' },
   { id: 'inbox', label: 'Messages', icon: Mail, path: '/dashboard/inbox' },
   { id: 'settings', label: 'Settings & SEO', icon: Settings, path: '/dashboard/settings' },
 ];

@@ -10,21 +10,26 @@ export const uploadFile = async (req, res) => {
     }
 
     let fileUrl = '';
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
 
     if (isCloudinaryConfigured) {
-      // Upload to Cloudinary
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: 'portfolio_saas',
-        resource_type: 'auto',
-      });
-      fileUrl = result.secure_url;
-      // Clean up local temp file
-      if (fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
+      try {
+        // Upload to Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path, {
+          folder: 'portfolio_saas',
+          resource_type: 'auto',
+        });
+        fileUrl = result.secure_url;
+        // Clean up local temp file
+        if (fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+        }
+      } catch (cloudinaryErr) {
+        console.warn('⚠️ Cloudinary upload warning (using local file fallback):', cloudinaryErr.message);
+        fileUrl = `${baseUrl}/uploads/${req.file.filename}`;
       }
     } else {
       // Served via local static folder
-      const baseUrl = `${req.protocol}://${req.get('host')}`;
       fileUrl = `${baseUrl}/uploads/${req.file.filename}`;
     }
 
