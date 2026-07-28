@@ -1,9 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import fse from 'fs-extra';
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const archiver = require('archiver');
+import archiver from 'archiver';
 import Portfolio from '../models/Portfolio.js';
 import Project from '../models/Project.js';
 import Skill from '../models/Skill.js';
