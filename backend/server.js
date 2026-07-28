@@ -74,18 +74,18 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // ─── Connect Database ───────────────────────────────────────────────
 connectDB();
 
-// ─── Root Health Check (for Render) ────────────────────────────────
-app.get('/', (req, res) => {
+// ─── Root & API Base Endpoints ─────────────────────────────────────
+app.get(['/', '/api', '/api/'], (req, res) => {
   res.json({
     status: 'ok',
+    success: true,
     message: 'Portfolio SaaS Backend API is running',
     version: '1.0.0',
     time: new Date().toISOString(),
   });
 });
 
-// ─── API Health Check ───────────────────────────────────────────────
-app.get('/api/health', (req, res) => {
+app.get(['/api/health', '/health'], (req, res) => {
   res.json({
     status: 'ok',
     service: 'Portfolio SaaS Backend API',
@@ -97,21 +97,26 @@ app.get('/api/health', (req, res) => {
 // ─── REST API Routes ────────────────────────────────────────────────
 console.log('📋 Registering API routes...');
 
-app.use('/api/auth', authRoutes);
-app.use('/api/portfolio', portfolioRoutes);
-app.get('/api/user/:username', getPublicUserPortfolio);
-app.use('/api/projects', projectRoutes);
-app.use('/api/skills', skillRoutes);
-app.use('/api/education', educationRoutes);
-app.use('/api/experience', experienceRoutes);
-app.use('/api/certificates', certificateRoutes);
-app.use('/api/analytics', analyticsRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/ai', aiRoutes);
-app.use('/api/upload', uploadRoutes);
-app.use('/api/messages', messageRoutes);
-app.use('/api/public', publicRoutes);
-app.use('/api/generate', generateRoutes);
+const mountApiRoute = (pathSuffix, routeHandler) => {
+  app.use(`/api${pathSuffix}`, routeHandler);
+  app.use(pathSuffix, routeHandler);
+};
+
+mountApiRoute('/auth', authRoutes);
+mountApiRoute('/portfolio', portfolioRoutes);
+app.get(['/api/user/:username', '/user/:username'], getPublicUserPortfolio);
+mountApiRoute('/projects', projectRoutes);
+mountApiRoute('/skills', skillRoutes);
+mountApiRoute('/education', educationRoutes);
+mountApiRoute('/experience', experienceRoutes);
+mountApiRoute('/certificates', certificateRoutes);
+mountApiRoute('/analytics', analyticsRoutes);
+mountApiRoute('/admin', adminRoutes);
+mountApiRoute('/ai', aiRoutes);
+mountApiRoute('/upload', uploadRoutes);
+mountApiRoute('/messages', messageRoutes);
+mountApiRoute('/public', publicRoutes);
+mountApiRoute('/generate', generateRoutes);
 
 console.log('✅ All API routes registered successfully');
 
