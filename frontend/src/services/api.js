@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const getBaseURL = () => {
   let envUrl = import.meta.env.VITE_API_URL;
-  if (envUrl && envUrl.trim()) {
+  if (envUrl && envUrl.trim() && !envUrl.includes('onrender.com')) {
     let clean = envUrl.trim().replace(/\/+$/, '');
     return clean.endsWith('/api') ? clean : `${clean}/api`;
   }
