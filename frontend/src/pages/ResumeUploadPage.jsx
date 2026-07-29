@@ -44,25 +44,25 @@ const ResumeUploadPage = () => {
   };
 
   return (
-    <div className="space-y-8 animate-fade-in max-w-3xl">
-      <div className="border-b border-slate-800 pb-5">
-        <h1 className="text-2xl font-extrabold text-white flex items-center gap-2">
-          <FileText className="w-6 h-6 text-indigo-400" /> Resume Upload (PDF)
+    <div className="space-y-8 animate-fade-in max-w-3xl pb-12">
+      <div className="border-b border-slate-200 pb-5">
+        <h1 className="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+          <FileText className="w-6 h-6 text-indigo-600" /> Resume Upload (PDF)
         </h1>
-        <p className="text-xs text-slate-400">Upload your PDF resume to display direct download buttons on your portfolio</p>
+        <p className="text-xs text-slate-500">Upload your PDF resume to display direct download buttons on your live portfolio</p>
       </div>
 
-      <div className="glass-card p-8 rounded-3xl border border-slate-800 space-y-6">
-        <div className="border-2 border-dashed border-slate-800 rounded-3xl p-8 text-center space-y-4 hover:border-indigo-500/50 transition">
-          <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto text-indigo-400">
+      <div className="glass-card p-8 rounded-3xl border border-slate-200 bg-white space-y-6 shadow-sm">
+        <div className="border-2 border-dashed border-slate-200 rounded-3xl p-8 text-center space-y-4 hover:border-indigo-500 transition bg-slate-50/50">
+          <div className="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center mx-auto text-indigo-600">
             <Upload className="w-7 h-7" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-sm font-bold text-white">Upload New PDF Resume</h3>
-            <p className="text-xs text-slate-400">Supports PDF format up to 10MB</p>
+            <h3 className="text-sm font-bold text-slate-900">Upload New PDF Resume</h3>
+            <p className="text-xs text-slate-500">Supports PDF format up to 10MB</p>
           </div>
 
-          <label className="inline-block gradient-btn px-6 py-2.5 rounded-xl font-semibold text-xs cursor-pointer shadow-lg shadow-indigo-500/20">
+          <label className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-semibold text-xs cursor-pointer shadow-sm transition">
             {uploading ? (
               <span className="flex items-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin" /> Uploading PDF...
@@ -75,25 +75,25 @@ const ResumeUploadPage = () => {
         </div>
 
         {/* Existing Resume Link */}
-        <form onSubmit={handleManualSave} className="space-y-4 pt-4 border-t border-slate-800 text-xs">
+        <form onSubmit={handleManualSave} className="space-y-4 pt-4 border-t border-slate-100 text-xs">
           <div>
-            <label className="block text-slate-400 mb-1 font-medium">Or Paste External PDF URL (Google Drive, Dropbox, etc.)</label>
+            <label className="block text-slate-600 mb-1 font-semibold">Or Paste External PDF URL (Google Drive, Dropbox, etc.)</label>
             <input
               type="url"
               value={resumeUrl}
               onChange={(e) => setResumeUrl(e.target.value)}
               placeholder="https://example.com/my-resume.pdf"
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-200 outline-none focus:border-indigo-500"
+              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-indigo-600 font-medium"
             />
           </div>
 
           {portfolio?.resumeUrl && (
-            <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center justify-between">
+            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                 <div>
-                  <p className="text-xs font-semibold text-emerald-300">Resume Attached</p>
-                  <p className="text-[10px] text-slate-400 truncate max-w-xs">{portfolio.resumeUrl}</p>
+                  <p className="text-xs font-bold text-emerald-900">Resume Attached</p>
+                  <p className="text-[10px] text-slate-500 truncate max-w-xs">{portfolio.resumeUrl}</p>
                 </div>
               </div>
 
@@ -101,7 +101,7 @@ const ResumeUploadPage = () => {
                 href={portfolio.resumeUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="px-3 py-1.5 bg-slate-900 border border-slate-700 hover:bg-slate-800 rounded-lg text-slate-200 font-semibold flex items-center gap-1.5"
+                className="px-3.5 py-1.5 bg-white border border-emerald-300 hover:bg-emerald-100 rounded-xl text-emerald-800 font-bold flex items-center gap-1.5 shadow-xs"
               >
                 <span>View PDF</span>
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -112,7 +112,7 @@ const ResumeUploadPage = () => {
           <button
             type="submit"
             disabled={saving}
-            className="gradient-btn px-6 py-2.5 rounded-xl font-semibold flex items-center gap-2"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 transition shadow-sm"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <span>Save Resume Link</span>}
           </button>
@@ -121,5 +121,6 @@ const ResumeUploadPage = () => {
     </div>
   );
 };
+
 
 export default ResumeUploadPage;

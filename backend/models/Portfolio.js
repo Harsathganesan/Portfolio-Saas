@@ -20,10 +20,11 @@ const portfolioSchema = new mongoose.Schema(
       bio: { type: String, default: '' },
       email: { type: String, default: '' },
       phone: { type: String, default: '' },
-      location: { type: String, default: '' },
       avatar: { type: String, default: '' },
+      aboutBio: { type: String, default: '' },
       aboutMeHtml: { type: String, default: '' },
     },
+
     socialLinks: {
       github: { type: String, default: '' },
       linkedin: { type: String, default: '' },
@@ -67,6 +68,7 @@ const portfolioSchema = new mongoose.Schema(
       ogImage: { type: String, default: '' },
     },
     sectionsEnabled: {
+      personal: { type: Boolean, default: true },
       projects: { type: Boolean, default: true },
       skills: { type: Boolean, default: true },
       education: { type: Boolean, default: true },
@@ -77,7 +79,9 @@ const portfolioSchema = new mongoose.Schema(
       analytics: { type: Boolean, default: true },
       generate: { type: Boolean, default: true },
       inbox: { type: Boolean, default: true },
+      about: { type: Boolean, default: true },
     },
+
     customDomain: { type: String, default: '' },
     published: { type: Boolean, default: false },
     slug: { type: String, lowercase: true, default: '' },

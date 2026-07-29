@@ -35,8 +35,14 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// ─── Security Middlewares ───────────────────────────────────────────
-app.use(helmet({ contentSecurityPolicy: false }));
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    crossOriginEmbedderPolicy: false,
+  })
+);
+
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -46,30 +52,25 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 // ─── CORS Configuration ─────────────────────────────────────────────
-const allowedOrigins = [
-  'https://portfolio-saas-henna.vercel.app',
-  'http://localhost:5173',
-  'http://localhost:3000',
-  process.env.CLIENT_URL,
-].filter(Boolean);
-
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // Allow all origins for multi-tenant SaaS public portfolio pages
-      callback(null, true);
-    },
+    origin: true,
     credentials: true,
   })
 );
 app.options('*', cors());
 
+
 // ─── Core Body Middlewares ──────────────────────────────────────────
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// ─── Static Files ───────────────────────────────────────────────────
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+}, express.static(path.join(__dirname, 'uploads')));
+
 
 // ─── Connect Database ───────────────────────────────────────────────
 connectDB();

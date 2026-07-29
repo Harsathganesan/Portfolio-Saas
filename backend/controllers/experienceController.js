@@ -53,8 +53,29 @@ export const createExperience = async (req, res) => {
 };
 
 export const updateExperience = async (req, res) => {
-  res.json({ success: true, message: 'Experience updated' });
+  try {
+    const { company, position, role, duration, location, description, isCurrent } = req.body;
+    const updateData = {
+      company,
+      position: position || role,
+      duration,
+      location,
+      description,
+      isCurrent,
+    };
+
+    if (isInMemoryFallback) {
+      const item = await mockStore.updateExperience(req.params.id, updateData);
+      return res.json({ success: true, message: 'Experience updated', experience: item });
+    }
+
+    const item = await Experience.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    res.json({ success: true, message: 'Experience updated', experience: item });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
+
 
 export const deleteExperience = async (req, res) => {
   try {

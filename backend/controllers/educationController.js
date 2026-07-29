@@ -51,8 +51,30 @@ export const createEducation = async (req, res) => {
 };
 
 export const updateEducation = async (req, res) => {
-  res.json({ success: true, message: 'Education updated' });
+  try {
+    const { institution, degree, fieldOfStudy, duration, cgpa, grade, description } = req.body;
+    const updateData = {
+      institution,
+      degree,
+      fieldOfStudy,
+      duration,
+      cgpa: cgpa || grade,
+      grade: cgpa || grade,
+      description,
+    };
+
+    if (isInMemoryFallback) {
+      const item = await mockStore.updateEducation(req.params.id, updateData);
+      return res.json({ success: true, message: 'Education updated', education: item });
+    }
+
+    const item = await Education.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    res.json({ success: true, message: 'Education updated', education: item });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
+
 
 export const deleteEducation = async (req, res) => {
   try {

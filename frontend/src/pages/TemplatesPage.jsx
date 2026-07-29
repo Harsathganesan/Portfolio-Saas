@@ -1,14 +1,14 @@
 import React from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
 import { useToast } from '../components/Toast';
-import { Palette, Check, Sun, Moon, Sparkles } from 'lucide-react';
+import { Palette, Check, Sun, Moon } from 'lucide-react';
 
 const templatesList = [
   {
     id: 'minimalist',
-    name: 'Minimalist Developer',
-    description: 'Clean typography, high contrast, smooth timeline navigation.',
-    tag: 'Clean & Fast',
+    name: 'Template 1: Abi.dev Full Portfolio',
+    description: 'Complete developer layout with top header navbar tabs (Home, About, Education, Experience, Skills, Projects, Certifications, Awards, Contact), timeline, stat counters, and newsletter footer.',
+    tag: 'Template 1 (Featured)',
     img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80',
   },
   {
@@ -17,27 +17,6 @@ const templatesList = [
     description: 'Vibrant glassmorphic cards, glowing accents, particle aesthetics.',
     tag: 'Glassmorphism',
     img: 'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?auto=format&fit=crop&w=600&q=80',
-  },
-  {
-    id: 'corporate',
-    name: 'Executive Corporate',
-    description: 'Structured corporate layout, sidebar profile, clear metric cards.',
-    tag: 'Executive',
-    img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80',
-  },
-  {
-    id: 'cyber',
-    name: 'Cyber Grid',
-    description: 'Cyberpunk terminal design with interactive skill chips and matrix feel.',
-    tag: 'Cyber Terminal',
-    img: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80',
-  },
-  {
-    id: 'sleek',
-    name: 'Sleek Modern',
-    description: 'Soft shadows, dual mode dual theme switcher, masonry grid layout.',
-    tag: 'Modern Soft',
-    img: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=600&q=80',
   },
 ];
 
@@ -71,31 +50,9 @@ const TemplatesPage = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-5">
         <div>
           <h1 className="text-2xl font-extrabold text-white flex items-center gap-2">
-            <Palette className="w-6 h-6 text-indigo-400" /> Portfolio Templates (5 Available)
+            <Palette className="w-6 h-6 text-indigo-400" /> Portfolio Templates (2 Available)
           </h1>
-          <p className="text-xs text-slate-400">Choose your portfolio layout and default theme mode</p>
-        </div>
-
-        {/* Theme Mode Toggle */}
-        <div className="flex items-center bg-slate-900 border border-slate-800 p-1 rounded-2xl">
-          <button
-            onClick={() => handleToggleThemeMode('dark')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition ${
-              currentThemeMode === 'dark' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Moon className="w-3.5 h-3.5" />
-            <span>Dark</span>
-          </button>
-          <button
-            onClick={() => handleToggleThemeMode('light')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition ${
-              currentThemeMode === 'light' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Sun className="w-3.5 h-3.5" />
-            <span>Light</span>
-          </button>
+          <p className="text-xs text-slate-400">Choose your active portfolio layout</p>
         </div>
       </div>
 

@@ -38,6 +38,7 @@ const CreativeTemplate = ({ data }) => {
     education = [],
     experience = [],
     certificates = [],
+    sectionsEnabled = {},
     username,
     resumeUrl,
   } = data;
@@ -50,14 +51,52 @@ const CreativeTemplate = ({ data }) => {
 
   const isDark = theme === 'dark';
 
-  const handleResumeClick = () => {
-    if (resumeUrl) {
-      analyticsService.trackEvent(username, 'resume_download');
-      window.open(resumeUrl, '_blank');
-    } else {
+  const defaultSections = {
+    personal: true,
+    about: true,
+    education: true,
+    experience: true,
+    skills: true,
+    projects: true,
+    certificates: true,
+    inbox: true,
+  };
+
+  const isEnabled = (key) => {
+    const active = { ...defaultSections, ...(sectionsEnabled || {}) };
+    return active[key] === true;
+  };
+
+  const handleResumeClick = async () => {
+    if (!resumeUrl) {
       toast('Resume file not uploaded yet', 'info');
+      return;
+    }
+    analyticsService.trackEvent(username, 'resume_download');
+
+    try {
+      const response = await fetch(resumeUrl);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = `${personalInfo.fullName || username || 'Resume'}_Resume.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(blobUrl);
+      toast('Resume PDF download started!', 'success');
+    } catch (err) {
+      const a = document.createElement('a');
+      a.href = resumeUrl;
+      a.target = '_blank';
+      a.download = `${personalInfo.fullName || username || 'Resume'}_Resume.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
   };
+
 
   const handleContactSubmit = async (e) => {
     e.preventDefault();
@@ -65,8 +104,20 @@ const CreativeTemplate = ({ data }) => {
     setSending(true);
     try {
       const res = await portfolioService.sendMessage({ username, ...contactForm });
+
+      const userPhone = (personalInfo.phone || '').replace(/[^0-9]/g, '');
+      if (userPhone) {
+        const waMessage = encodeURIComponent(
+          `*New Contact Message from Portfolio*\n\n` +
+          `👤 *Name:* ${contactForm.senderName}\n` +
+          `📧 *Email:* ${contactForm.senderEmail}\n` +
+          `💬 *Message:* ${contactForm.message}`
+        );
+        window.open(`https://wa.me/${userPhone}?text=${waMessage}`, '_blank');
+      }
+
       if (res.success) {
-        toast('Message sent to ' + (personalInfo.fullName || username) + '!', 'success');
+        toast('Message saved to inbox & opening WhatsApp!', 'success');
         setContactForm({ senderName: '', senderEmail: '', subject: '', message: '' });
       }
     } catch (err) {
@@ -75,6 +126,7 @@ const CreativeTemplate = ({ data }) => {
       setSending(false);
     }
   };
+
 
   return (
     <div className={`min-h-screen relative font-sans transition-colors duration-300 ${isDark ? 'bg-[#0b0f19] text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
@@ -89,34 +141,37 @@ const CreativeTemplate = ({ data }) => {
           {/* Centered Navigation Tabs */}
           <nav className="hidden md:flex items-center space-x-8 text-sm font-semibold">
             {[
-              { id: 'home', label: 'Home' },
-              { id: 'about', label: 'About' },
-              { id: 'skills', label: 'Skills' },
-              { id: 'projects', label: 'Projects' },
-              { id: 'awards', label: 'Awards' },
-              { id: 'contact', label: 'Contact' },
-            ].map((tab) => {
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`relative py-1 transition-colors ${
-                    isActive
-                      ? isDark ? 'text-purple-400 font-bold' : 'text-purple-600 font-bold'
-                      : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  <span>{tab.label}</span>
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeTabUnderline"
-                      className="absolute left-0 right-0 -bottom-1 h-0.5 bg-purple-600 rounded-full"
-                    />
-                  )}
-                </button>
-              );
-            })}
+              { id: 'home', label: 'Home', show: true },
+              { id: 'about', label: 'About', show: isEnabled('personal') || isEnabled('about') || isEnabled('education') || isEnabled('experience') },
+              { id: 'skills', label: 'Skills', show: isEnabled('skills') && skills.length > 0 },
+              { id: 'projects', label: 'Projects', show: isEnabled('projects') && projects.length > 0 },
+              { id: 'awards', label: 'Awards', show: isEnabled('certificates') && certificates.length > 0 },
+              { id: 'contact', label: 'Contact', show: isEnabled('inbox') },
+            ]
+
+              .filter((tab) => tab.show)
+              .map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`relative py-1 transition-colors ${
+                      isActive
+                        ? isDark ? 'text-purple-400 font-bold' : 'text-purple-600 font-bold'
+                        : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <span>{tab.label}</span>
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeTabUnderline"
+                        className="absolute left-0 right-0 -bottom-1 h-0.5 bg-purple-600 rounded-full"
+                      />
+                    )}
+                  </button>
+                );
+              })}
           </nav>
 
           {/* Actions: Admin Button & Theme Toggle */}
@@ -151,24 +206,26 @@ const CreativeTemplate = ({ data }) => {
         {navOpen && (
           <div className={`md:hidden px-6 py-4 space-y-3 border-b text-sm font-semibold ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200'}`}>
             {[
-              { id: 'home', label: 'Home' },
-              { id: 'about', label: 'About' },
-              { id: 'skills', label: 'Skills' },
-              { id: 'projects', label: 'Projects' },
-              { id: 'awards', label: 'Awards' },
-              { id: 'contact', label: 'Contact' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => {
-                  setActiveTab(tab.id);
-                  setNavOpen(false);
-                }}
-                className={`block w-full text-left py-2 px-3 rounded-lg ${activeTab === tab.id ? 'bg-purple-600 text-white font-bold' : 'text-slate-400'}`}
-              >
-                {tab.label}
-              </button>
-            ))}
+              { id: 'home', label: 'Home', show: true },
+              { id: 'about', label: 'About', show: isEnabled('education') || isEnabled('experience') || isEnabled('personal') },
+              { id: 'skills', label: 'Skills', show: isEnabled('skills') },
+              { id: 'projects', label: 'Projects', show: isEnabled('projects') },
+              { id: 'awards', label: 'Awards', show: isEnabled('certificates') },
+              { id: 'contact', label: 'Contact', show: isEnabled('inbox') },
+            ]
+              .filter((tab) => tab.show)
+              .map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    setNavOpen(false);
+                  }}
+                  className={`block w-full text-left py-2 px-3 rounded-lg ${activeTab === tab.id ? 'bg-purple-600 text-white font-bold' : 'text-slate-400'}`}
+                >
+                  {tab.label}
+                </button>
+              ))}
           </div>
         )}
       </header>
@@ -303,9 +360,9 @@ const CreativeTemplate = ({ data }) => {
           )}
 
           {/* ============================================================ */}
-          {/* TAB 2: ABOUT PAGE (MATCHES USER SCREENSHOT EXACTLY)          */}
+          {/* TAB 2: ABOUT PAGE                                             */}
           {/* ============================================================ */}
-          {activeTab === 'about' && (
+          {activeTab === 'about' && (isEnabled('education') || isEnabled('experience') || isEnabled('personal')) && (
             <motion.div key="about" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="space-y-12 py-6 max-w-5xl mx-auto">
               {/* Centered Main Header: About Me + Accent Line */}
               <div className="text-center space-y-3">
@@ -316,105 +373,109 @@ const CreativeTemplate = ({ data }) => {
               </div>
 
               {/* 1. Education Sub-heading */}
-              <section className="space-y-6">
-                <div className="flex items-center space-x-2 text-2xl font-extrabold text-purple-600">
-                  <GraduationCap className="w-7 h-7" />
-                  <span>Education</span>
-                </div>
+              {isEnabled('education') && (
+                <section className="space-y-6">
+                  <div className="flex items-center space-x-2 text-2xl font-extrabold text-purple-600">
+                    <GraduationCap className="w-7 h-7" />
+                    <span>Education</span>
+                  </div>
 
-                {education.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {education.map((edu) => (
-                      <div
-                        key={edu._id || edu.degree}
-                        className={`p-6 sm:p-7 rounded-3xl border transition duration-300 flex justify-between items-start ${
-                          isDark
-                            ? 'bg-slate-900/80 border-slate-800 hover:border-purple-500/40 shadow-xl'
-                            : 'bg-white border-slate-100 shadow-md hover:shadow-lg'
-                        }`}
-                      >
-                        <div className="space-y-2 max-w-[85%]">
-                          <h3 className={`font-extrabold text-lg sm:text-xl leading-snug ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                            {edu.degree}
-                          </h3>
-                          <p className="text-xs sm:text-sm font-semibold text-purple-600">
-                            {edu.institution}
-                          </p>
-                          {edu.duration && (
-                            <p className="text-[11px] font-mono text-slate-400">
-                              {edu.duration} {edu.cgpa ? `• CGPA: ${edu.cgpa}` : ''}
+                  {education.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {education.map((edu) => (
+                        <div
+                          key={edu._id || edu.degree}
+                          className={`p-6 sm:p-7 rounded-3xl border transition duration-300 flex justify-between items-start ${
+                            isDark
+                              ? 'bg-slate-900/80 border-slate-800 hover:border-purple-500/40 shadow-xl'
+                              : 'bg-white border-slate-100 shadow-md hover:shadow-lg'
+                          }`}
+                        >
+                          <div className="space-y-2 max-w-[85%]">
+                            <h3 className={`font-extrabold text-lg sm:text-xl leading-snug ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                              {edu.degree}
+                            </h3>
+                            <p className="text-xs sm:text-sm font-semibold text-purple-600">
+                              {edu.institution}
                             </p>
-                          )}
-                        </div>
+                            {edu.duration && (
+                              <p className="text-[11px] font-mono text-slate-400">
+                                {edu.duration} {edu.cgpa ? `• CGPA: ${edu.cgpa}` : ''}
+                              </p>
+                            )}
+                          </div>
 
-                        {/* Calendar Icon Badge */}
-                        <div className={`p-2.5 rounded-xl border flex items-center justify-center ${isDark ? 'bg-slate-800 border-slate-700 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
-                          <Award className="w-4 h-4" />
+                          {/* Calendar Icon Badge */}
+                          <div className={`p-2.5 rounded-xl border flex items-center justify-center ${isDark ? 'bg-slate-800 border-slate-700 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
+                            <Award className="w-4 h-4" />
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className={`p-8 rounded-2xl border text-center ${isDark ? 'bg-slate-900/40 border-slate-800 text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-600'} text-xs`}>
-                    <GraduationCap className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                    <span>No education records added yet. Add degrees in your Dashboard to display qualifications.</span>
-                  </div>
-                )}
-              </section>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className={`p-8 rounded-2xl border text-center ${isDark ? 'bg-slate-900/40 border-slate-800 text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-600'} text-xs`}>
+                      <GraduationCap className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                      <span>No education records added yet. Add degrees in your Dashboard to display qualifications.</span>
+                    </div>
+                  )}
+                </section>
+              )}
 
               {/* 2. Experience Sub-heading */}
-              <section className="space-y-6 pt-4">
-                <div className="flex items-center space-x-2 text-2xl font-extrabold text-purple-600">
-                  <Briefcase className="w-7 h-7" />
-                  <span>Experience</span>
-                </div>
-
-                {experience.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {experience.map((exp) => (
-                      <div
-                        key={exp._id || exp.company}
-                        className={`p-6 sm:p-7 rounded-3xl border transition duration-300 flex justify-between items-start ${
-                          isDark
-                            ? 'bg-slate-900/80 border-slate-800 hover:border-purple-500/40 shadow-xl'
-                            : 'bg-white border-slate-100 shadow-md hover:shadow-lg'
-                        }`}
-                      >
-                        <div className="space-y-2 max-w-[85%]">
-                          <h3 className={`font-extrabold text-lg sm:text-xl leading-snug ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                            {exp.position}
-                          </h3>
-                          <p className="text-xs sm:text-sm font-semibold text-purple-600">
-                            {exp.company} {exp.location ? `• ${exp.location}` : ''}
-                          </p>
-                          {exp.duration && (
-                            <p className="text-[11px] font-mono text-slate-400">{exp.duration}</p>
-                          )}
-                          {exp.description && (
-                            <p className="text-xs text-slate-500 leading-relaxed pt-1">{exp.description}</p>
-                          )}
-                        </div>
-
-                        <div className={`p-2.5 rounded-xl border flex items-center justify-center ${isDark ? 'bg-slate-800 border-slate-700 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
-                          <Briefcase className="w-4 h-4" />
-                        </div>
-                      </div>
-                    ))}
+              {isEnabled('experience') && (
+                <section className="space-y-6 pt-4">
+                  <div className="flex items-center space-x-2 text-2xl font-extrabold text-purple-600">
+                    <Briefcase className="w-7 h-7" />
+                    <span>Experience</span>
                   </div>
-                ) : (
-                  <div className={`p-8 rounded-2xl border text-center ${isDark ? 'bg-slate-900/40 border-slate-800 text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-600'} text-xs`}>
-                    <Briefcase className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                    <span>No experience records added yet. Add work experience in your Dashboard.</span>
-                  </div>
-                )}
-              </section>
+
+                  {experience.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {experience.map((exp) => (
+                        <div
+                          key={exp._id || exp.company}
+                          className={`p-6 sm:p-7 rounded-3xl border transition duration-300 flex justify-between items-start ${
+                            isDark
+                              ? 'bg-slate-900/80 border-slate-800 hover:border-purple-500/40 shadow-xl'
+                              : 'bg-white border-slate-100 shadow-md hover:shadow-lg'
+                          }`}
+                        >
+                          <div className="space-y-2 max-w-[85%]">
+                            <h3 className={`font-extrabold text-lg sm:text-xl leading-snug ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                              {exp.position}
+                            </h3>
+                            <p className="text-xs sm:text-sm font-semibold text-purple-600">
+                              {exp.company} {exp.location ? `• ${exp.location}` : ''}
+                            </p>
+                            {exp.duration && (
+                              <p className="text-[11px] font-mono text-slate-400">{exp.duration}</p>
+                            )}
+                            {exp.description && (
+                              <p className="text-xs text-slate-500 leading-relaxed pt-1">{exp.description}</p>
+                            )}
+                          </div>
+
+                          <div className={`p-2.5 rounded-xl border flex items-center justify-center ${isDark ? 'bg-slate-800 border-slate-700 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
+                            <Briefcase className="w-4 h-4" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className={`p-8 rounded-2xl border text-center ${isDark ? 'bg-slate-900/40 border-slate-800 text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-600'} text-xs`}>
+                      <Briefcase className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                      <span>No experience records added yet. Add work experience in your Dashboard.</span>
+                    </div>
+                  )}
+                </section>
+              )}
             </motion.div>
           )}
 
           {/* ============================================================ */}
           {/* TAB 3: SKILLS PAGE                                           */}
           {/* ============================================================ */}
-          {activeTab === 'skills' && (
+          {activeTab === 'skills' && isEnabled('skills') && (
             <motion.section key="skills" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="space-y-10 py-6 max-w-5xl mx-auto">
               <div className="text-center space-y-3">
                 <h2 className={`text-4xl sm:text-5xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -445,7 +506,7 @@ const CreativeTemplate = ({ data }) => {
           {/* ============================================================ */}
           {/* TAB 4: PROJECTS PAGE                                         */}
           {/* ============================================================ */}
-          {activeTab === 'projects' && (
+          {activeTab === 'projects' && isEnabled('projects') && (
             <motion.section key="projects" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="space-y-10 py-6 max-w-5xl mx-auto">
               <div className="text-center space-y-3">
                 <h2 className={`text-4xl sm:text-5xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -516,7 +577,7 @@ const CreativeTemplate = ({ data }) => {
           {/* ============================================================ */}
           {/* TAB 5: AWARDS / CERTIFICATES PAGE                            */}
           {/* ============================================================ */}
-          {activeTab === 'awards' && (
+          {activeTab === 'awards' && isEnabled('certificates') && (
             <motion.section key="awards" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="space-y-10 py-6 max-w-5xl mx-auto">
               <div className="text-center space-y-3">
                 <h2 className={`text-4xl sm:text-5xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -540,72 +601,120 @@ const CreativeTemplate = ({ data }) => {
           {/* ============================================================ */}
           {/* TAB 6: CONTACT PAGE                                          */}
           {/* ============================================================ */}
-          {activeTab === 'contact' && (
-            <motion.section key="contact" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="max-w-2xl mx-auto space-y-8 py-6">
+          {activeTab === 'contact' && isEnabled('inbox') && (
+            <motion.section key="contact" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="max-w-5xl mx-auto space-y-8 py-6">
               <div className="text-center space-y-3">
                 <h2 className={`text-4xl sm:text-5xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Contact
+                  Contact Me
                 </h2>
                 <div className="w-16 h-1.5 bg-purple-600 rounded-full mx-auto" />
               </div>
 
-              <form onSubmit={handleContactSubmit} className={`p-8 rounded-3xl border space-y-4 text-xs ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-100 shadow-sm'}`}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                {/* Left Info Card */}
+                <div className={`lg:col-span-5 p-8 rounded-3xl border space-y-6 ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-100 shadow-xl shadow-slate-200/40'}`}>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-bold text-purple-600">Let's Build Something</h3>
+                    <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                      Have an exciting project in mind or want to collaborate? Fill out the form below to message me directly on WhatsApp or reach out via email.
+                    </p>
+                  </div>
+
+                  <div className="space-y-3.5 pt-2">
+                    <div className={`p-3.5 rounded-2xl border flex items-center gap-3.5 ${isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
+                      <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center flex-shrink-0">
+                        <Mail className="w-4.5 h-4.5" />
+                      </div>
+                      <div className="min-w-0">
+                        <span className="text-[11px] text-slate-400 font-bold block">Email</span>
+                        <span className="text-xs font-bold truncate block">{personalInfo.email || 'harsath137@gmail.com'}</span>
+                      </div>
+                    </div>
+
+                    <div className={`p-3.5 rounded-2xl border flex items-center gap-3.5 ${isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
+                      <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center flex-shrink-0">
+                        <Mail className="w-4.5 h-4.5" />
+                      </div>
+                      <div className="min-w-0">
+                        <span className="text-[11px] text-slate-400 font-bold block">Phone / WhatsApp</span>
+                        <span className="text-xs font-bold truncate block">{personalInfo.phone || '+91 6382245266'}</span>
+                      </div>
+                    </div>
+
+                    <div className={`p-3.5 rounded-2xl border flex items-center gap-3.5 ${isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
+                      <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center flex-shrink-0">
+                        <MapPin className="w-4.5 h-4.5" />
+                      </div>
+                      <div className="min-w-0">
+                        <span className="text-[11px] text-slate-400 font-bold block">Location</span>
+                        <span className="text-xs font-bold truncate block">{personalInfo.location || 'Pudukkottai, Tamil Nadu, India'}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Form Card */}
+                <form onSubmit={handleContactSubmit} className={`lg:col-span-7 p-8 rounded-3xl border space-y-4 text-xs ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-100 shadow-xl shadow-slate-200/40'}`}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block font-semibold text-slate-500 mb-1">Name</label>
+                      <input
+                        type="text"
+                        required
+                        value={contactForm.senderName}
+                        onChange={(e) => setContactForm({ ...contactForm, senderName: e.target.value })}
+                        placeholder="Enter your name"
+                        className={`w-full border rounded-xl px-4 py-3 outline-none focus:border-purple-600 ${isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'}`}
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-semibold text-slate-500 mb-1">Email</label>
+                      <input
+                        type="email"
+                        required
+                        value={contactForm.senderEmail}
+                        onChange={(e) => setContactForm({ ...contactForm, senderEmail: e.target.value })}
+                        placeholder="Enter your email"
+                        className={`w-full border rounded-xl px-4 py-3 outline-none focus:border-purple-600 ${isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'}`}
+                      />
+                    </div>
+                  </div>
                   <div>
-                    <label className="block font-medium text-slate-400 mb-1">Your Name</label>
+                    <label className="block font-semibold text-slate-500 mb-1">Subject</label>
                     <input
                       type="text"
-                      required
-                      value={contactForm.senderName}
-                      onChange={(e) => setContactForm({ ...contactForm, senderName: e.target.value })}
-                      placeholder="Jane Doe"
-                      className={`w-full border rounded-xl px-4 py-2.5 outline-none focus:border-purple-600 ${isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`}
+                      value={contactForm.subject}
+                      onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
+                      placeholder="What is this regarding?"
+                      className={`w-full border rounded-xl px-4 py-3 outline-none focus:border-purple-600 ${isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'}`}
                     />
                   </div>
                   <div>
-                    <label className="block font-medium text-slate-400 mb-1">Your Email</label>
-                    <input
-                      type="email"
+                    <label className="block font-semibold text-slate-500 mb-1">Message</label>
+                    <textarea
                       required
-                      value={contactForm.senderEmail}
-                      onChange={(e) => setContactForm({ ...contactForm, senderEmail: e.target.value })}
-                      placeholder="jane@example.com"
-                      className={`w-full border rounded-xl px-4 py-2.5 outline-none focus:border-purple-600 ${isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`}
+                      rows={4}
+                      value={contactForm.message}
+                      onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                      placeholder="Write your message here..."
+                      className={`w-full border rounded-xl px-4 py-3 outline-none focus:border-purple-600 leading-relaxed ${isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'}`}
                     />
                   </div>
-                </div>
-                <div>
-                  <label className="block font-medium text-slate-400 mb-1">Subject</label>
-                  <input
-                    type="text"
-                    value={contactForm.subject}
-                    onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
-                    placeholder="Project Inquiry"
-                    className={`w-full border rounded-xl px-4 py-2.5 outline-none focus:border-purple-600 ${isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`}
-                  />
-                </div>
-                <div>
-                  <label className="block font-medium text-slate-400 mb-1">Message</label>
-                  <textarea
-                    required
-                    rows={4}
-                    value={contactForm.message}
-                    onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                    placeholder="Hi! I'd love to discuss..."
-                    className={`w-full border rounded-xl px-4 py-2.5 outline-none focus:border-purple-600 ${isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`}
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={sending}
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-xl shadow-purple-600/30 transition"
-                >
-                  <Send className="w-4 h-4" />
-                  <span>{sending ? 'Sending Message...' : 'Send Message'}</span>
-                </button>
-              </form>
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={sending}
+                      className="bg-purple-600 hover:bg-purple-700 text-white px-7 py-3 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 shadow-xl shadow-purple-600/30 transition"
+                    >
+                      <span>{sending ? 'Sending Message...' : 'Send Message'}</span>
+                      <Send className="w-4 h-4" />
+                    </button>
+                  </div>
+                </form>
+              </div>
             </motion.section>
           )}
+
         </AnimatePresence>
       </main>
     </div>

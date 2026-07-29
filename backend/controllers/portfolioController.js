@@ -94,7 +94,7 @@ export const updateMyPortfolio = async (req, res) => {
         portfolio = await mockStore.createPortfolio({ userId: req.user._id, username: req.user.username });
       }
 
-      const { personalInfo, socialLinks, templateId, themeMode, resumeUrl, seo, isPublished } = req.body;
+      const { personalInfo, socialLinks, templateId, themeMode, resumeUrl, seo, isPublished, sectionsEnabled } = req.body;
       if (personalInfo) portfolio.personalInfo = { ...portfolio.personalInfo, ...personalInfo };
       if (socialLinks) portfolio.socialLinks = { ...portfolio.socialLinks, ...socialLinks };
       if (templateId) portfolio.templateId = templateId;
@@ -102,6 +102,7 @@ export const updateMyPortfolio = async (req, res) => {
       if (resumeUrl !== undefined) portfolio.resumeUrl = resumeUrl;
       if (seo) portfolio.seo = { ...portfolio.seo, ...seo };
       if (isPublished !== undefined) portfolio.isPublished = isPublished;
+      if (sectionsEnabled) portfolio.sectionsEnabled = { ...portfolio.sectionsEnabled, ...sectionsEnabled };
 
       return res.json({
         success: true,
@@ -127,6 +128,7 @@ export const updateMyPortfolio = async (req, res) => {
       languages,
       interests,
       seo,
+      sectionsEnabled,
       customDomain,
       isPublished,
       username,
@@ -142,8 +144,14 @@ export const updateMyPortfolio = async (req, res) => {
       await User.findByIdAndUpdate(req.user._id, { username: cleanUsername });
     }
 
-    if (personalInfo) portfolio.personalInfo = { ...portfolio.personalInfo, ...personalInfo };
-    if (socialLinks) portfolio.socialLinks = { ...portfolio.socialLinks, ...socialLinks };
+    if (personalInfo) {
+      portfolio.personalInfo = { ...portfolio.personalInfo, ...personalInfo };
+      if (portfolio.markModified) portfolio.markModified('personalInfo');
+    }
+    if (socialLinks) {
+      portfolio.socialLinks = { ...portfolio.socialLinks, ...socialLinks };
+      if (portfolio.markModified) portfolio.markModified('socialLinks');
+    }
     if (templateId) portfolio.templateId = templateId;
     if (themeMode) portfolio.themeMode = themeMode;
     if (primaryColor) portfolio.primaryColor = primaryColor;
@@ -152,6 +160,12 @@ export const updateMyPortfolio = async (req, res) => {
     if (languages) portfolio.languages = languages;
     if (interests) portfolio.interests = interests;
     if (seo) portfolio.seo = { ...portfolio.seo, ...seo };
+    if (sectionsEnabled) {
+      const current = portfolio.sectionsEnabled && portfolio.sectionsEnabled.toObject ? portfolio.sectionsEnabled.toObject() : (portfolio.sectionsEnabled || {});
+      portfolio.sectionsEnabled = { ...current, ...sectionsEnabled };
+      if (portfolio.markModified) portfolio.markModified('sectionsEnabled');
+    }
+
     if (customDomain !== undefined) portfolio.customDomain = customDomain;
     if (isPublished !== undefined) portfolio.isPublished = isPublished;
 

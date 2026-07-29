@@ -17,23 +17,42 @@ const connectDB = async () => {
   try {
     const uri = process.env.MONGODB_URI;
     if (!uri) {
-      console.warn(`⚠️ MONGODB_URI environment variable is not defined.`);
+      console.warn(`⚠️ MONGODB_URI environment variable is not defined. Using in-memory fallback.`);
       isInMemoryFallback = true;
       return;
     }
 
     isConnecting = true;
-    const conn = await mongoose.connect(uri, {
-      serverSelectionTimeoutMS: 8000,
-    });
-    console.log(`✅ MongoDB Atlas Connected Successfully: ${conn.connection.host}`);
-    isInMemoryFallback = false;
+    try {
+      const conn = await mongoose.connect(uri, {
+        serverSelectionTimeoutMS: 5000,
+      });
+      console.log(`✅ MongoDB Atlas Connected Successfully: ${conn.connection.host}`);
+      isInMemoryFallback = false;
+      return;
+    } catch (atlasErr) {
+      console.warn(`⚠️ MongoDB Atlas connection skipped/rejected: ${atlasErr.message}`);
+      console.log(`🔄 Attempting Local MongoDB fallback at mongodb://127.0.0.1:27017/portfolio_saas...`);
+      
+      try {
+        const localConn = await mongoose.connect('mongodb://127.0.0.1:27017/portfolio_saas', {
+          serverSelectionTimeoutMS: 2000,
+        });
+        console.log(`✅ Connected to Local MongoDB: ${localConn.connection.host}`);
+        isInMemoryFallback = false;
+        return;
+      } catch (localErr) {
+        console.log(`ℹ️ Local MongoDB unavailable. Switching seamlessly to In-Memory Database Fallback.`);
+        isInMemoryFallback = true;
+      }
+    }
   } catch (error) {
-    console.error(`💥 MongoDB connection error: ${error.message}`);
+    console.error(`💥 Database connection error: ${error.message}`);
     isInMemoryFallback = true;
   } finally {
     isConnecting = false;
   }
+
 };
 
 export default connectDB;

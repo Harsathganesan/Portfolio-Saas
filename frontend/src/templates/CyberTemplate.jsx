@@ -6,7 +6,7 @@ import { useToast } from '../components/Toast';
 
 const CyberTemplate = ({ data }) => {
   const { toast } = useToast?.() || { toast: (msg) => alert(msg) };
-  const { personalInfo = {}, socialLinks = {}, projects = [], skills = [], education = [], experience = [], certificates = [], username, resumeUrl } = data;
+  const { personalInfo = {}, socialLinks = {}, projects = [], skills = [], education = [], experience = [], certificates = [], sectionsEnabled = {}, username, resumeUrl } = data;
 
   const [activeTab, setActiveTab] = useState('home');
   const [theme, setTheme] = useState(data.themeMode || 'dark');
@@ -15,6 +15,33 @@ const CyberTemplate = ({ data }) => {
   const [navOpen, setNavOpen] = useState(false);
 
   const isDark = theme === 'dark';
+
+  const defaultSections = {
+    personal: true,
+    about: true,
+    education: true,
+    experience: true,
+    skills: true,
+    projects: true,
+    certificates: true,
+    inbox: true,
+  };
+
+  const isEnabled = (key) => {
+    const active = { ...defaultSections, ...(sectionsEnabled || {}) };
+    return active[key] === true;
+  };
+
+  const navTabs = [
+    { id: 'home', label: '> HOME', show: true },
+    { id: 'about', label: '> ABOUT', show: isEnabled('personal') || isEnabled('about') || isEnabled('education') || isEnabled('experience') },
+    { id: 'projects', label: `> PROJECTS (${projects.length})`, show: isEnabled('projects') && projects.length > 0 },
+    { id: 'skills', label: '> SKILLS', show: isEnabled('skills') && skills.length > 0 },
+    { id: 'certificates', label: '> CERTS', show: isEnabled('certificates') && certificates.length > 0 },
+    { id: 'contact', label: '> TRANSMIT', show: isEnabled('inbox') },
+    { id: 'all', label: '> FULL', show: true },
+  ].filter((t) => t.show);
+
 
   const handleContactSubmit = async (e) => {
     e.preventDefault();
@@ -43,15 +70,7 @@ const CyberTemplate = ({ data }) => {
         </button>
 
         <nav className="hidden md:flex items-center space-x-3 text-xs font-bold">
-          {[
-            { id: 'home', label: '> HOME' },
-            { id: 'about', label: '> ABOUT' },
-            { id: 'projects', label: `> PROJECTS (${projects.length})` },
-            { id: 'skills', label: '> SKILLS' },
-            { id: 'certificates', label: '> CERTS' },
-            { id: 'contact', label: '> TRANSMIT' },
-            { id: 'all', label: '> FULL' },
-          ].map((tab) => (
+          {navTabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
@@ -81,15 +100,7 @@ const CyberTemplate = ({ data }) => {
 
       {navOpen && (
         <div className="md:hidden border border-emerald-500/40 bg-black p-4 mb-6 space-y-2 text-xs font-bold">
-          {[
-            { id: 'home', label: '> HOME' },
-            { id: 'about', label: '> ABOUT (LOGS & EDUCATION)' },
-            { id: 'projects', label: '> PROJECTS' },
-            { id: 'skills', label: '> SKILLS' },
-            { id: 'certificates', label: '> CERTS' },
-            { id: 'contact', label: '> TRANSMIT' },
-            { id: 'all', label: '> FULL' },
-          ].map((tab) => (
+          {navTabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => {
@@ -103,6 +114,7 @@ const CyberTemplate = ({ data }) => {
           ))}
         </div>
       )}
+
 
       <div className="max-w-5xl mx-auto space-y-12">
         {/* HOME TAB ONLY */}
@@ -139,17 +151,19 @@ const CyberTemplate = ({ data }) => {
         )}
 
         {/* ABOUT TAB ONLY */}
-        {(activeTab === 'about' || activeTab === 'all') && (
+        {(activeTab === 'about' || activeTab === 'all') && (isEnabled('personal') || isEnabled('about') || isEnabled('education') || isEnabled('experience')) && (
           <div className="space-y-8">
-            <section className="border border-emerald-500/40 rounded-xl bg-black/80 p-6 space-y-3">
-              <div className="flex items-center gap-2 border-b border-emerald-500/30 pb-2">
-                <User className="w-5 h-5" />
-                <h2 className="text-base font-bold">SYSTEM_PROFILE // ABOUT</h2>
-              </div>
-              <p className="text-xs text-slate-300 leading-relaxed">{personalInfo.bio}</p>
-            </section>
+            {(isEnabled('personal') || isEnabled('about')) && (
+              <section className="border border-emerald-500/40 rounded-xl bg-black/80 p-6 space-y-3">
+                <div className="flex items-center gap-2 border-b border-emerald-500/30 pb-2">
+                  <User className="w-5 h-5" />
+                  <h2 className="text-base font-bold">SYSTEM_PROFILE // ABOUT</h2>
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed">{personalInfo.bio}</p>
+              </section>
+            )}
 
-            {experience.length > 0 && (
+            {isEnabled('experience') && experience.length > 0 && (
               <section className="space-y-4">
                 <div className="flex items-center gap-2 border-b border-emerald-500/40 pb-2">
                   <Briefcase className="w-5 h-5" />
@@ -169,7 +183,7 @@ const CyberTemplate = ({ data }) => {
               </section>
             )}
 
-            {education.length > 0 && (
+            {isEnabled('education') && education.length > 0 && (
               <section className="space-y-4">
                 <div className="flex items-center gap-2 border-b border-emerald-500/40 pb-2">
                   <GraduationCap className="w-5 h-5" />
@@ -189,7 +203,7 @@ const CyberTemplate = ({ data }) => {
         )}
 
         {/* PROJECTS TAB ONLY */}
-        {(activeTab === 'projects' || activeTab === 'all') && projects.length > 0 && (
+        {(activeTab === 'projects' || activeTab === 'all') && isEnabled('projects') && projects.length > 0 && (
           <section className="space-y-6">
             <div className="flex items-center gap-2 border-b border-emerald-500/40 pb-2">
               <Cpu className="w-5 h-5" />
@@ -223,7 +237,7 @@ const CyberTemplate = ({ data }) => {
         )}
 
         {/* SKILLS TAB ONLY */}
-        {(activeTab === 'skills' || activeTab === 'all') && skills.length > 0 && (
+        {(activeTab === 'skills' || activeTab === 'all') && isEnabled('skills') && skills.length > 0 && (
           <section className="space-y-4">
             <div className="flex items-center gap-2 border-b border-emerald-500/40 pb-2">
               <Shield className="w-5 h-5" />
@@ -241,7 +255,7 @@ const CyberTemplate = ({ data }) => {
         )}
 
         {/* CERTIFICATES TAB ONLY */}
-        {(activeTab === 'certificates' || activeTab === 'all') && certificates.length > 0 && (
+        {(activeTab === 'certificates' || activeTab === 'all') && isEnabled('certificates') && certificates.length > 0 && (
           <section className="space-y-4">
             <div className="flex items-center gap-2 border-b border-emerald-500/40 pb-2">
               <Award className="w-5 h-5" />
@@ -259,7 +273,8 @@ const CyberTemplate = ({ data }) => {
         )}
 
         {/* CONTACT TAB ONLY */}
-        {(activeTab === 'contact' || activeTab === 'all') && (
+        {(activeTab === 'contact' || activeTab === 'all') && isEnabled('inbox') && (
+
           <section className="space-y-4 border border-emerald-500/40 rounded-xl bg-black/90 p-6">
             <div className="flex items-center gap-2 border-b border-emerald-500/30 pb-2">
               <Mail className="w-5 h-5" />

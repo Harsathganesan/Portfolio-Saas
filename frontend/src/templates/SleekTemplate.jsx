@@ -6,7 +6,7 @@ import { useToast } from '../components/Toast';
 
 const SleekTemplate = ({ data }) => {
   const { toast } = useToast?.() || { toast: (msg) => alert(msg) };
-  const { personalInfo = {}, socialLinks = {}, projects = [], skills = [], education = [], experience = [], certificates = [], username, resumeUrl } = data;
+  const { personalInfo = {}, socialLinks = {}, projects = [], skills = [], education = [], experience = [], certificates = [], sectionsEnabled = {}, username, resumeUrl } = data;
 
   const [activeTab, setActiveTab] = useState('home');
   const [theme, setTheme] = useState(data.themeMode || 'dark');
@@ -16,14 +16,53 @@ const SleekTemplate = ({ data }) => {
 
   const isDark = theme === 'dark';
 
+  const defaultSections = {
+    personal: true,
+    about: true,
+    education: true,
+    experience: true,
+    skills: true,
+    projects: true,
+    certificates: true,
+    inbox: true,
+  };
+
+  const isEnabled = (key) => {
+    const active = { ...defaultSections, ...(sectionsEnabled || {}) };
+    return active[key] === true;
+  };
+
+  const navTabs = [
+    { id: 'home', label: 'Home', show: true },
+    { id: 'about', label: 'About', show: isEnabled('personal') || isEnabled('about') || isEnabled('education') || isEnabled('experience') },
+    { id: 'projects', label: `Projects (${projects.length})`, show: isEnabled('projects') && projects.length > 0 },
+    { id: 'skills', label: 'Skills', show: isEnabled('skills') && skills.length > 0 },
+    { id: 'certificates', label: 'Certificates', show: isEnabled('certificates') && certificates.length > 0 },
+    { id: 'contact', label: 'Contact', show: isEnabled('inbox') },
+    { id: 'all', label: 'Full View', show: true },
+  ].filter((t) => t.show);
+
+
   const handleContactSubmit = async (e) => {
     e.preventDefault();
     if (!contactForm.senderName || !contactForm.senderEmail || !contactForm.message) return;
     setSending(true);
     try {
       const res = await portfolioService.sendMessage({ username, ...contactForm });
+
+      const userPhone = (personalInfo.phone || '').replace(/[^0-9]/g, '');
+      if (userPhone) {
+        const waMessage = encodeURIComponent(
+          `*New Contact Message from Portfolio*\n\n` +
+          `👤 *Name:* ${contactForm.senderName}\n` +
+          `📧 *Email:* ${contactForm.senderEmail}\n` +
+          `💬 *Message:* ${contactForm.message}`
+        );
+        window.open(`https://wa.me/${userPhone}?text=${waMessage}`, '_blank');
+      }
+
       if (res.success) {
-        toast('Message sent!', 'success');
+        toast('Message saved to inbox & opening WhatsApp!', 'success');
         setContactForm({ senderName: '', senderEmail: '', message: '' });
       }
     } catch (err) {
@@ -32,6 +71,7 @@ const SleekTemplate = ({ data }) => {
       setSending(false);
     }
   };
+
 
   return (
     <div className={`min-h-screen font-sans transition-colors duration-300 ${isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
@@ -42,15 +82,7 @@ const SleekTemplate = ({ data }) => {
         </button>
 
         <nav className="hidden md:flex items-center space-x-2 text-xs font-semibold">
-          {[
-            { id: 'home', label: 'Home' },
-            { id: 'about', label: 'About' },
-            { id: 'projects', label: `Projects (${projects.length})` },
-            { id: 'skills', label: 'Skills' },
-            { id: 'certificates', label: 'Certificates' },
-            { id: 'contact', label: 'Contact' },
-            { id: 'all', label: 'Full View' },
-          ].map((tab) => (
+          {navTabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
@@ -80,15 +112,7 @@ const SleekTemplate = ({ data }) => {
 
       {navOpen && (
         <div className={`md:hidden px-6 py-4 space-y-2 border-b text-xs font-semibold ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-          {[
-            { id: 'home', label: 'Home' },
-            { id: 'about', label: 'About (Education & Experience)' },
-            { id: 'projects', label: 'Projects' },
-            { id: 'skills', label: 'Skills' },
-            { id: 'certificates', label: 'Certificates' },
-            { id: 'contact', label: 'Contact' },
-            { id: 'all', label: 'Full View' },
-          ].map((tab) => (
+          {navTabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => {
@@ -103,6 +127,7 @@ const SleekTemplate = ({ data }) => {
         </div>
       )}
 
+
       <div className="max-w-5xl mx-auto px-6 py-16">
         {/* HOME TAB ONLY */}
         {(activeTab === 'home' || activeTab === 'all') && (
@@ -114,38 +139,70 @@ const SleekTemplate = ({ data }) => {
               <p className="text-lg font-medium text-slate-400">{personalInfo.title || 'Full Stack Engineer'}</p>
               <p className="text-sm text-slate-400 leading-relaxed">{personalInfo.bio}</p>
 
-              {resumeUrl && (
-                <button
-                  onClick={() => {
-                    analyticsService.trackEvent(username, 'resume_download');
-                    window.open(resumeUrl, '_blank');
-                  }}
-                  className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs flex items-center gap-2 shadow-lg shadow-indigo-500/20"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Get Resume PDF</span>
-                </button>
-              )}
+              <div className="flex flex-wrap items-center gap-4 pt-2">
+                {resumeUrl && (
+                  <button
+                    onClick={() => {
+                      analyticsService.trackEvent(username, 'resume_download');
+                      window.open(resumeUrl, '_blank');
+                    }}
+                    className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs flex items-center gap-2 shadow-lg shadow-indigo-500/20"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Get Resume PDF</span>
+                  </button>
+                )}
+
+                <div className="flex items-center space-x-3">
+                  {socialLinks.github && (
+                    <a href={socialLinks.github} target="_blank" rel="noreferrer" className="p-2.5 rounded-xl bg-slate-800/80 text-slate-300 hover:text-white hover:bg-indigo-600 transition">
+                      <Github className="w-4 h-4" />
+                    </a>
+                  )}
+                  {socialLinks.linkedin && (
+                    <a href={socialLinks.linkedin} target="_blank" rel="noreferrer" className="p-2.5 rounded-xl bg-slate-800/80 text-slate-300 hover:text-white hover:bg-indigo-600 transition">
+                      <Linkedin className="w-4 h-4" />
+                    </a>
+                  )}
+                  {personalInfo.email && (
+                    <a href={`mailto:${personalInfo.email}`} className="p-2.5 rounded-xl bg-slate-800/80 text-slate-300 hover:text-white hover:bg-indigo-600 transition" title={personalInfo.email}>
+                      <Mail className="w-4 h-4" />
+                    </a>
+                  )}
+                </div>
+              </div>
+
             </div>
 
             {personalInfo.avatar && (
-              <img src={personalInfo.avatar} alt={personalInfo.fullName} className="w-44 h-44 rounded-3xl object-cover shadow-2xl ring-4 ring-indigo-500/20" />
+              <img
+                src={personalInfo.avatar}
+                alt={personalInfo.fullName}
+                className="w-44 h-44 rounded-3xl object-cover shadow-2xl ring-4 ring-indigo-500/20"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&q=80';
+                }}
+              />
             )}
+
           </section>
         )}
 
         {/* ABOUT TAB ONLY */}
-        {(activeTab === 'about' || activeTab === 'all') && (
+        {(activeTab === 'about' || activeTab === 'all') && (isEnabled('personal') || isEnabled('about') || isEnabled('education') || isEnabled('experience')) && (
           <div className="space-y-10 mb-10">
-            <section className={`p-8 rounded-3xl border ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-sm'} space-y-4`}>
-              <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
-                <User className="w-5 h-5 text-indigo-400" />
-                <h2 className="text-2xl font-bold">About Me</h2>
-              </div>
-              <p className="text-sm text-slate-300 leading-relaxed">{personalInfo.bio}</p>
-            </section>
+            {(isEnabled('personal') || isEnabled('about')) && (
+              <section className={`p-8 rounded-3xl border ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-sm'} space-y-4`}>
+                <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
+                  <User className="w-5 h-5 text-indigo-400" />
+                  <h2 className="text-2xl font-bold">About Me</h2>
+                </div>
+                <p className="text-sm text-slate-300 leading-relaxed">{personalInfo.bio}</p>
+              </section>
+            )}
 
-            {experience.length > 0 && (
+            {isEnabled('experience') && experience.length > 0 && (
               <section className="space-y-6">
                 <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
                   <Briefcase className="w-5 h-5 text-indigo-400" />
@@ -166,7 +223,7 @@ const SleekTemplate = ({ data }) => {
               </section>
             )}
 
-            {education.length > 0 && (
+            {isEnabled('education') && education.length > 0 && (
               <section className="space-y-6">
                 <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
                   <GraduationCap className="w-5 h-5 text-indigo-400" />
@@ -187,7 +244,7 @@ const SleekTemplate = ({ data }) => {
         )}
 
         {/* PROJECTS TAB ONLY */}
-        {(activeTab === 'projects' || activeTab === 'all') && projects.length > 0 && (
+        {(activeTab === 'projects' || activeTab === 'all') && isEnabled('projects') && projects.length > 0 && (
           <section className="space-y-6 mb-10">
             <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
               <FolderGit2 className="w-5 h-5 text-indigo-400" />
@@ -213,7 +270,7 @@ const SleekTemplate = ({ data }) => {
         )}
 
         {/* SKILLS TAB ONLY */}
-        {(activeTab === 'skills' || activeTab === 'all') && skills.length > 0 && (
+        {(activeTab === 'skills' || activeTab === 'all') && isEnabled('skills') && skills.length > 0 && (
           <section className="space-y-6 mb-10">
             <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
               <Code2 className="w-5 h-5 text-indigo-400" />
@@ -230,7 +287,7 @@ const SleekTemplate = ({ data }) => {
         )}
 
         {/* CERTIFICATES TAB ONLY */}
-        {(activeTab === 'certificates' || activeTab === 'all') && certificates.length > 0 && (
+        {(activeTab === 'certificates' || activeTab === 'all') && isEnabled('certificates') && certificates.length > 0 && (
           <section className="space-y-6 mb-10">
             <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
               <Award className="w-5 h-5 text-indigo-400" />
@@ -249,53 +306,121 @@ const SleekTemplate = ({ data }) => {
         )}
 
         {/* CONTACT TAB ONLY */}
-        {(activeTab === 'contact' || activeTab === 'all') && (
-          <section className="space-y-6">
-            <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
-              <Mail className="w-5 h-5 text-indigo-400" />
-              <h2 className="text-2xl font-bold">Contact Me</h2>
+        {(activeTab === 'contact' || activeTab === 'all') && isEnabled('inbox') && (
+
+          <section className="space-y-8">
+            <div className="text-center space-y-2">
+              <h2 className="text-3xl font-extrabold tracking-tight">Contact Me</h2>
+              <div className="w-12 h-1 bg-indigo-500 rounded-full mx-auto" />
             </div>
 
-            <form onSubmit={handleContactSubmit} className={`p-6 rounded-2xl border space-y-4 text-xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              {/* Left Info Card */}
+              <div className={`lg:col-span-5 p-8 rounded-3xl border space-y-6 ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-md'}`}>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold text-indigo-500">Let's Build Something</h3>
+                  <p className="text-xs text-slate-400 leading-relaxed font-medium">
+                    Have an exciting project in mind or want to collaborate? Fill out the form below to message me directly on WhatsApp or reach out via email.
+                  </p>
+                </div>
+
+                <div className="space-y-3.5 pt-2">
+                  <div className={`p-3.5 rounded-2xl border flex items-center gap-3.5 ${isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                    <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center flex-shrink-0">
+                      <Mail className="w-4.5 h-4.5" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-[11px] text-slate-400 font-bold block">Email</span>
+                      <span className="text-xs font-bold truncate block">{personalInfo.email || 'harsath137@gmail.com'}</span>
+                    </div>
+                  </div>
+
+                  <div className={`p-3.5 rounded-2xl border flex items-center gap-3.5 ${isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                    <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center flex-shrink-0">
+                      <Phone className="w-4.5 h-4.5" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-[11px] text-slate-400 font-bold block">Phone / WhatsApp</span>
+                      <span className="text-xs font-bold truncate block">{personalInfo.phone || '+91 6382245266'}</span>
+                    </div>
+                  </div>
+
+                  <div className={`p-3.5 rounded-2xl border flex items-center gap-3.5 ${isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                    <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center flex-shrink-0">
+                      <MapPin className="w-4.5 h-4.5" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-[11px] text-slate-400 font-bold block">Location</span>
+                      <span className="text-xs font-bold truncate block">{personalInfo.location || 'Pudukkottai, Tamil Nadu, India'}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Form Card */}
+              <form
+                onSubmit={handleContactSubmit}
+                className={`lg:col-span-7 p-8 rounded-3xl border space-y-4 text-xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-md'}`}
+              >
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-slate-400 mb-1 font-semibold">Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={contactForm.senderName}
+                      onChange={(e) => setContactForm({ ...contactForm, senderName: e.target.value })}
+                      placeholder="Enter your name"
+                      className={`w-full rounded-xl px-4 py-3 outline-none border transition ${isDark ? 'bg-slate-950 border-slate-800 text-white focus:border-indigo-500' : 'bg-white border-slate-200 text-slate-900 focus:border-indigo-600'}`}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-400 mb-1 font-semibold">Email</label>
+                    <input
+                      type="email"
+                      required
+                      value={contactForm.senderEmail}
+                      onChange={(e) => setContactForm({ ...contactForm, senderEmail: e.target.value })}
+                      placeholder="Enter your email"
+                      className={`w-full rounded-xl px-4 py-3 outline-none border transition ${isDark ? 'bg-slate-950 border-slate-800 text-white focus:border-indigo-500' : 'bg-white border-slate-200 text-slate-900 focus:border-indigo-600'}`}
+                    />
+                  </div>
+                </div>
+
                 <div>
-                  <label className="block text-slate-400 mb-1 font-medium">Your Name</label>
+                  <label className="block text-slate-400 mb-1 font-semibold">Subject</label>
                   <input
                     type="text"
-                    required
-                    value={contactForm.senderName}
-                    onChange={(e) => setContactForm({ ...contactForm, senderName: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none"
+                    value={contactForm.subject || ''}
+                    onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
+                    placeholder="What is this regarding?"
+                    className={`w-full rounded-xl px-4 py-3 outline-none border transition ${isDark ? 'bg-slate-950 border-slate-800 text-white focus:border-indigo-500' : 'bg-white border-slate-200 text-slate-900 focus:border-indigo-600'}`}
                   />
                 </div>
+
                 <div>
-                  <label className="block text-slate-400 mb-1 font-medium">Your Email</label>
-                  <input
-                    type="email"
+                  <label className="block text-slate-400 mb-1 font-semibold">Message</label>
+                  <textarea
                     required
-                    value={contactForm.senderEmail}
-                    onChange={(e) => setContactForm({ ...contactForm, senderEmail: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none"
+                    rows={4}
+                    value={contactForm.message}
+                    onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                    placeholder="Write your message here..."
+                    className={`w-full rounded-xl px-4 py-3 outline-none border transition ${isDark ? 'bg-slate-950 border-slate-800 text-white focus:border-indigo-500' : 'bg-white border-slate-200 text-slate-900 focus:border-indigo-600'}`}
                   />
                 </div>
-              </div>
-              <div>
-                <label className="block text-slate-400 mb-1 font-medium">Message</label>
-                <textarea
-                  required
-                  rows={3}
-                  value={contactForm.message}
-                  onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white outline-none"
-                />
-              </div>
-              <button type="submit" disabled={sending} className="gradient-btn px-6 py-2.5 rounded-xl font-semibold flex items-center gap-2">
-                <Send className="w-4 h-4" />
-                <span>{sending ? 'Sending...' : 'Send Message'}</span>
-              </button>
-            </form>
+
+                <div className="pt-2">
+                  <button type="submit" disabled={sending} className="bg-indigo-600 hover:bg-indigo-500 text-white px-7 py-3 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/25 transition">
+                    <span>{sending ? 'Sending...' : 'Send Message'}</span>
+                    <Send className="w-4 h-4" />
+                  </button>
+                </div>
+              </form>
+            </div>
           </section>
         )}
+
       </div>
     </div>
   );

@@ -14,6 +14,7 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import DashboardLayout from './layouts/DashboardLayout';
 import DashboardOverviewPage from './pages/DashboardOverviewPage';
 import PersonalInfoPage from './pages/PersonalInfoPage';
+import AboutInfoPage from './pages/AboutInfoPage';
 import ProjectsPage from './pages/ProjectsPage';
 import SkillsPage from './pages/SkillsPage';
 import EducationPage from './pages/EducationPage';
@@ -73,6 +74,7 @@ const App = () => {
       >
         <Route index element={<DashboardOverviewPage />} />
         <Route path="personal" element={<PersonalInfoPage />} />
+        <Route path="about" element={<AboutInfoPage />} />
         <Route path="projects" element={<ProjectsPage />} />
         <Route path="skills" element={<SkillsPage />} />
         <Route path="education" element={<EducationPage />} />

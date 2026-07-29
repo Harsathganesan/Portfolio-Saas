@@ -1,26 +1,30 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import {
   Github,
   Linkedin,
-  Twitter,
   Instagram,
+  Twitter,
   Mail,
   MapPin,
   ExternalLink,
   Download,
-  Sparkles,
-  Sun,
-  Moon,
-  User,
-  FolderGit2,
-  Code2,
   Briefcase,
   GraduationCap,
   Award,
   Send,
   Menu,
   X,
+  Phone,
+  Globe,
+  ArrowUp,
+  Sparkles,
+  ArrowRight,
+  Code2,
+  FolderKanban,
+  Users,
+  Trophy,
+  CheckCircle2,
 } from 'lucide-react';
 import { analyticsService } from '../services/analyticsService';
 import { portfolioService } from '../services/portfolioService';
@@ -36,24 +40,80 @@ const MinimalistTemplate = ({ data }) => {
     education = [],
     experience = [],
     certificates = [],
+    achievements = [],
+    sectionsEnabled = {},
     username,
     resumeUrl,
   } = data;
 
-  const [activeTab, setActiveTab] = useState('home');
-  const [theme, setTheme] = useState(data.themeMode || 'dark');
+  const [activeSection, setActiveSection] = useState('home');
   const [contactForm, setContactForm] = useState({ senderName: '', senderEmail: '', subject: '', message: '' });
   const [sending, setSending] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
 
-  const isDark = theme === 'dark';
+  const defaultSections = {
+    personal: true,
+    about: true,
+    education: true,
+    experience: true,
+    skills: true,
+    projects: true,
+    certificates: true,
+    inbox: true,
+  };
 
-  const handleResumeClick = () => {
-    if (resumeUrl) {
-      analyticsService.trackEvent(username, 'resume_download');
-      window.open(resumeUrl, '_blank');
+  const isEnabled = (key) => {
+    const active = { ...defaultSections, ...(sectionsEnabled || {}) };
+    return active[key] === true;
+  };
+
+  const scrollToSection = (id) => {
+    setActiveSection(id);
+    const element = document.getElementById(id);
+    if (element) {
+      const offset = 80;
+      const bodyRect = document.body.getBoundingClientRect().top;
+      const elementRect = element.getBoundingClientRect().top;
+      const elementPosition = elementRect - bodyRect;
+      const offsetPosition = elementPosition - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth',
+      });
     }
   };
+
+  const handleResumeClick = async () => {
+    if (!resumeUrl) {
+      toast('Resume file not uploaded yet', 'info');
+      return;
+    }
+    analyticsService.trackEvent(username, 'resume_download');
+
+    try {
+      const response = await fetch(resumeUrl);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = `${personalInfo.fullName || username || 'Resume'}_Resume.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(blobUrl);
+      toast('Resume PDF download started!', 'success');
+    } catch (err) {
+      const a = document.createElement('a');
+      a.href = resumeUrl;
+      a.target = '_blank';
+      a.download = `${personalInfo.fullName || username || 'Resume'}_Resume.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  };
+
 
   const handleContactSubmit = async (e) => {
     e.preventDefault();
@@ -61,8 +121,20 @@ const MinimalistTemplate = ({ data }) => {
     setSending(true);
     try {
       const res = await portfolioService.sendMessage({ username, ...contactForm });
+
+      const userPhone = (personalInfo.phone || '').replace(/[^0-9]/g, '');
+      if (userPhone) {
+        const waMessage = encodeURIComponent(
+          `*New Contact Message from Portfolio*\n\n` +
+          `👤 *Name:* ${contactForm.senderName}\n` +
+          `📧 *Email:* ${contactForm.senderEmail}\n` +
+          `💬 *Message:* ${contactForm.message}`
+        );
+        window.open(`https://wa.me/${userPhone}?text=${waMessage}`, '_blank');
+      }
+
       if (res.success) {
-        toast('Message sent to ' + (personalInfo.fullName || username) + '!', 'success');
+        toast('Message saved to inbox & opening WhatsApp!', 'success');
         setContactForm({ senderName: '', senderEmail: '', subject: '', message: '' });
       }
     } catch (err) {
@@ -72,326 +144,752 @@ const MinimalistTemplate = ({ data }) => {
     }
   };
 
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = ['home', 'about', 'education', 'experience', 'skills', 'projects', 'certifications', 'contact'];
+      const scrollPosition = window.scrollY + 180;
+
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const sec = document.getElementById(sections[i]);
+        if (sec && sec.offsetTop <= scrollPosition) {
+          setActiveSection(sections[i]);
+          break;
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const navItems = [
+    { id: 'home', label: 'Home', show: true },
+    { id: 'about', label: 'About', show: isEnabled('personal') || isEnabled('about') },
+    { id: 'education', label: 'Education', show: isEnabled('education') && education.length > 0 },
+    { id: 'experience', label: 'Experience', show: isEnabled('experience') && experience.length > 0 },
+    { id: 'skills', label: 'Skills', show: isEnabled('skills') && skills.length > 0 },
+    { id: 'projects', label: 'Projects', show: isEnabled('projects') && projects.length > 0 },
+    { id: 'certifications', label: 'Certifications', show: isEnabled('certificates') && certificates.length > 0 },
+    { id: 'contact', label: 'Contact', show: isEnabled('inbox') },
+  ].filter((item) => item.show);
+
+
+  const firstName = personalInfo.fullName ? personalInfo.fullName.split(' ')[0] : (username || 'Abi');
+  const lastName = personalInfo.fullName ? personalInfo.fullName.split(' ').slice(1).join(' ') : 'Harsath';
+
   return (
-    <div className={`min-h-screen transition-colors duration-300 font-sans ${isDark ? 'bg-[#0f172a] text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
-      {/* Sticky Header Nav */}
-      <header className={`sticky top-0 z-40 border-b backdrop-blur-md px-6 py-4 flex justify-between items-center ${isDark ? 'bg-[#0f172a]/90 border-slate-800' : 'bg-white/90 border-slate-200 shadow-sm'}`}>
-        <button onClick={() => setActiveTab('home')} className="font-extrabold text-base tracking-tight text-indigo-500">
-          {personalInfo.fullName || username}
-        </button>
+    <div className="min-h-screen bg-[#f8f9ff] text-slate-900 font-sans relative overflow-x-hidden">
+      
+      {/* Background Animated Ambient Purple Glows */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.45, 0.3] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute -top-32 right-0 w-[45rem] h-[45rem] rounded-full bg-indigo-200/60 blur-[140px]"
+        />
+        <motion.div
+          animate={{ scale: [1.2, 1, 1.2], opacity: [0.25, 0.4, 0.25] }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-1/3 -left-32 w-[40rem] h-[40rem] rounded-full bg-purple-200/50 blur-[150px]"
+        />
+      </div>
 
-        <nav className="hidden md:flex items-center space-x-2 text-xs font-semibold">
-          {[
-            { id: 'home', label: 'Home' },
-            { id: 'about', label: 'About' },
-            { id: 'projects', label: `Projects (${projects.length})` },
-            { id: 'skills', label: 'Skills' },
-            { id: 'certificates', label: 'Certificates' },
-            { id: 'contact', label: 'Contact' },
-            { id: 'all', label: 'Full View' },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-3 py-1.5 rounded-lg transition ${
-                activeTab === tab.id
-                  ? 'bg-indigo-600 text-white font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
-              }`}
+      {/* 1. TOP HEADER NAVBAR */}
+      <header className="fixed top-0 left-0 right-0 z-[100] w-full h-16 backdrop-blur-2xl bg-white/95 border-b border-slate-100 shadow-sm transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
+          {/* Brand Logo: Abi. */}
+          <button onClick={() => scrollToSection('home')} className="font-extrabold text-2xl tracking-tight flex items-baseline group">
+            <span className="text-slate-900">
+              {firstName}
+            </span>
+            <span className="text-indigo-600 font-black text-2xl">.</span>
+          </button>
+
+          {/* Desktop Navigation Links */}
+          <nav className="hidden lg:flex items-center space-x-7 text-xs font-semibold">
+            {navItems.map((item) => {
+              const isActive = activeSection === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => scrollToSection(item.id)}
+                  className={`relative py-1 transition-all duration-200 ${
+                    isActive
+                      ? 'text-indigo-600 font-bold'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <span>{item.label}</span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="activePurpleUnderline"
+                      className="absolute left-0 right-0 -bottom-1 h-0.5 bg-indigo-600 rounded-full shadow-md shadow-indigo-500/40"
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Right Controls */}
+          <div className="flex items-center space-x-3">
+            {/* Top Download Resume Button */}
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={handleResumeClick}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md shadow-indigo-500/25 transition"
             >
-              {tab.label}
-            </button>
-          ))}
-        </nav>
+              <Download className="w-3.5 h-3.5" />
+              <span>Download Resume</span>
+            </motion.button>
 
-        <div className="flex items-center space-x-3">
-          <button
-            onClick={() => setTheme(isDark ? 'light' : 'dark')}
-            className={`p-2 rounded-xl border transition ${isDark ? 'bg-slate-800 border-slate-700 text-amber-400' : 'bg-white border-slate-200 text-indigo-600'}`}
-          >
-            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
-          <button onClick={() => setNavOpen(!navOpen)} className="md:hidden p-2 text-slate-400">
-            {navOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+            <button onClick={() => setNavOpen(!navOpen)} className="lg:hidden p-2 text-slate-600 hover:text-slate-900">
+              {navOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Navigation Drawer */}
+        {navOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="lg:hidden px-6 py-4 space-y-2 border-b border-slate-100 bg-white text-xs font-semibold"
+          >
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => {
+                  scrollToSection(item.id);
+                  setNavOpen(false);
+                }}
+                className={`block w-full text-left py-2.5 px-4 rounded-xl transition ${
+                  activeSection === item.id ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-500/20' : 'text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </motion.div>
+        )}
       </header>
 
-      {/* Mobile Drawer */}
-      {navOpen && (
-        <div className={`md:hidden px-6 py-4 space-y-2 border-b text-xs font-semibold ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-          {[
-            { id: 'home', label: 'Home' },
-            { id: 'about', label: 'About (Education & Experience)' },
-            { id: 'projects', label: 'Projects' },
-            { id: 'skills', label: 'Skills' },
-            { id: 'certificates', label: 'Certificates' },
-            { id: 'contact', label: 'Contact' },
-            { id: 'all', label: 'Full View' },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => {
-                setActiveTab(tab.id);
-                setNavOpen(false);
-              }}
-              className={`block w-full text-left py-1.5 px-3 rounded-lg ${activeTab === tab.id ? 'bg-indigo-600 text-white' : 'text-slate-300'}`}
+      {/* 2. MAIN SCROLLABLE CONTAINER */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16 space-y-24 relative z-10">
+        
+        {/* ============================================================ */}
+        {/* SECTION 1: HERO HOME                                         */}
+        {/* ============================================================ */}
+        <section id="home" className="pt-6 pb-12 flex flex-col justify-between gap-12 scroll-mt-28">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+            {/* Left Content */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7 }}
+              className="flex-1 space-y-6 max-w-2xl"
             >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      )}
-
-      <div className="max-w-4xl mx-auto px-6 py-12">
-        <AnimatePresence mode="wait">
-          {/* HOME TAB ONLY */}
-          {(activeTab === 'home' || activeTab === 'all') && (
-            <motion.section key="home" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="space-y-6 border-b pb-12 border-slate-800/60 pt-4">
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                <div className="space-y-2">
-                  <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">{personalInfo.fullName || username}</h1>
-                  <p className="text-xl font-medium text-indigo-500">{personalInfo.title || 'Full Stack Developer'}</p>
-                  {personalInfo.location && (
-                    <p className="flex items-center text-xs text-slate-400 gap-1.5 pt-1">
-                      <MapPin className="w-4 h-4 text-indigo-400" />
-                      {personalInfo.location}
-                    </p>
-                  )}
-                </div>
-
-                {personalInfo.avatar && (
-                  <img
-                    src={personalInfo.avatar}
-                    alt={personalInfo.fullName}
-                    className="w-28 h-28 rounded-2xl object-cover ring-2 ring-indigo-500/40 shadow-xl"
-                  />
-                )}
+              {/* Greeting */}
+              <div className="text-sm font-semibold text-slate-500 flex items-center gap-1.5">
+                <span>Hello, I'm</span>
+                <span className="text-base">👋</span>
               </div>
 
-              <p className="text-sm text-slate-400 leading-relaxed max-w-2xl">
-                {personalInfo.bio || 'Building clean, robust web applications with maximum performance.'}
+              {/* Glowing Name Headline */}
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-none text-slate-900">
+                {firstName}{' '}
+                <span className="text-indigo-600">
+                  {lastName}
+                </span>
+              </h1>
+
+              {/* Subtitle / Role */}
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-700">
+                Full Stack <span className="text-indigo-600">Developer</span>
+              </h2>
+
+              {/* Bio */}
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal max-w-xl">
+                {personalInfo.bio ||
+                  'I build modern, responsive and user-friendly web applications that solve real-world problems with clean code and great design.'}
               </p>
 
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                {socialLinks.github && (
-                  <a href={socialLinks.github} target="_blank" rel="noreferrer" className="p-2.5 rounded-xl border border-slate-800 hover:border-indigo-500 transition">
-                    <Github className="w-4 h-4" />
-                  </a>
-                )}
-                {socialLinks.linkedin && (
-                  <a href={socialLinks.linkedin} target="_blank" rel="noreferrer" className="p-2.5 rounded-xl border border-slate-800 hover:border-indigo-500 transition">
-                    <Linkedin className="w-4 h-4" />
-                  </a>
-                )}
-                {socialLinks.twitter && (
-                  <a href={socialLinks.twitter} target="_blank" rel="noreferrer" className="p-2.5 rounded-xl border border-slate-800 hover:border-indigo-500 transition">
-                    <Twitter className="w-4 h-4" />
-                  </a>
-                )}
-                {resumeUrl && (
-                  <button
-                    onClick={handleResumeClick}
-                    className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs flex items-center gap-2 transition shadow-md"
-                  >
-                    <Download className="w-4 h-4" />
-                    <span>Download Resume</span>
-                  </button>
-                )}
+              {/* Hero Action Buttons */}
+              <div className="flex flex-wrap items-center gap-4 pt-2">
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => scrollToSection('contact')}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-7 py-3.5 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-indigo-500/30 transition"
+                >
+                  <span>Contact Me</span>
+                  <ArrowRight className="w-4 h-4" />
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => scrollToSection('projects')}
+                  className="px-7 py-3.5 rounded-xl text-xs font-bold border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 transition flex items-center gap-2 bg-white"
+                >
+                  <Briefcase className="w-4 h-4 text-indigo-600" />
+                  <span>View My Work</span>
+                </motion.button>
               </div>
-            </motion.section>
-          )}
 
-          {/* ABOUT TAB ONLY */}
-          {(activeTab === 'about' || activeTab === 'all') && (
-            <motion.div key="about" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="space-y-10 py-6">
-              <section className={`p-8 rounded-3xl border ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-sm'} space-y-4`}>
-                <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
-                  <User className="w-5 h-5 text-indigo-400" />
-                  <h2 className="text-xl font-bold">About Me</h2>
+              {/* Connect with me - Social Circle Links */}
+              <div className="space-y-2 pt-4">
+                <span className="text-xs text-slate-400 font-medium block">Connect with me</span>
+                <div className="flex items-center space-x-3">
+                  <motion.a
+                    whileHover={{ scale: 1.1, y: -2 }}
+                    href={socialLinks.github || '#'}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-10 h-10 rounded-full flex items-center justify-center border border-slate-200 bg-white text-slate-600 hover:text-indigo-600 hover:border-indigo-300 shadow-sm transition"
+                  >
+                    <Github className="w-4 h-4" />
+                  </motion.a>
+
+                  <motion.a
+                    whileHover={{ scale: 1.1, y: -2 }}
+                    href={socialLinks.linkedin || '#'}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-10 h-10 rounded-full flex items-center justify-center border border-slate-200 bg-white text-slate-600 hover:text-indigo-600 hover:border-indigo-300 shadow-sm transition"
+                  >
+                    <Linkedin className="w-4 h-4 text-sky-600" />
+                  </motion.a>
+
+                  {personalInfo.email && (
+                    <motion.a
+                      whileHover={{ scale: 1.1, y: -2 }}
+                      href={`mailto:${personalInfo.email}`}
+                      className="w-10 h-10 rounded-full flex items-center justify-center border border-slate-200 bg-white text-slate-600 hover:text-indigo-600 hover:border-indigo-300 shadow-sm transition"
+                      title={personalInfo.email}
+                    >
+                      <Mail className="w-4 h-4 text-indigo-600" />
+                    </motion.a>
+                  )}
+
+
+                  {personalInfo.phone && (
+                    <motion.a
+                      whileHover={{ scale: 1.1, y: -2 }}
+                      href={`https://wa.me/${personalInfo.phone.replace(/[^0-9]/g, '')}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-10 h-10 rounded-full flex items-center justify-center border border-slate-200 bg-white text-slate-600 hover:text-indigo-600 hover:border-indigo-300 shadow-sm transition"
+                    >
+                      <Globe className="w-4 h-4 text-emerald-500" />
+                    </motion.a>
+                  )}
                 </div>
-                <p className="text-xs text-slate-300 leading-relaxed">{personalInfo.bio}</p>
-              </section>
+              </div>
+            </motion.div>
 
-              {experience.length > 0 && (
-                <section className="space-y-6">
-                  <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
-                    <Briefcase className="w-5 h-5 text-indigo-400" />
-                    <h2 className="text-xl font-bold">Work Experience</h2>
-                  </div>
-                  <div className="space-y-6 border-l-2 border-slate-800 ml-2 pl-6">
-                    {experience.map((exp) => (
-                      <div key={exp._id || exp.company} className="relative group space-y-1">
-                        <div className="absolute -left-[31px] top-1.5 w-3 h-3 rounded-full bg-indigo-500 ring-4 ring-[#0f172a]" />
-                        <div className="flex justify-between items-baseline">
-                          <h3 className="font-bold text-sm text-slate-100">{exp.position}</h3>
-                          <span className="text-xs font-mono text-indigo-400">{exp.duration}</span>
-                        </div>
-                        <p className="text-xs font-semibold text-slate-400">{exp.company} {exp.location ? `• ${exp.location}` : ''}</p>
-                        <p className="text-xs text-slate-400 leading-relaxed pt-1">{exp.description}</p>
-                      </div>
+            {/* Right Circular Photo Frame with Orbit Rings */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8 }}
+              className="flex-1 flex justify-center items-center"
+            >
+              <div className="relative w-80 h-80 sm:w-96 sm:h-96 rounded-full flex items-center justify-center">
+                {/* Delicate Outer Orbit Ring */}
+                <div className="absolute inset-0 rounded-full border border-indigo-200/80" />
+                <div className="absolute inset-4 rounded-full border border-indigo-300/60" />
+
+                {/* Floating Orbit Dots */}
+                <div className="absolute top-4 right-16 w-3 h-3 rounded-full bg-indigo-600 shadow-md" />
+                <div className="absolute bottom-16 left-6 w-3.5 h-3.5 rounded-full bg-indigo-400" />
+                <div className="absolute bottom-6 right-20 w-4 h-4 rounded-full bg-purple-400" />
+
+                {/* Soft Lavender Background Aura */}
+                <div className="absolute inset-8 rounded-full bg-gradient-to-tr from-indigo-200/50 via-purple-200/50 to-indigo-300/50 blur-2xl pointer-events-none" />
+
+                {/* Main Circular Avatar Image */}
+                <div className="relative z-10 w-72 h-72 sm:w-84 sm:h-84 rounded-full overflow-hidden shadow-2xl ring-8 ring-indigo-500/10 bg-indigo-50">
+                  {personalInfo.avatar ? (
+                    <img src={personalInfo.avatar} alt={personalInfo.fullName} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-indigo-800 flex items-center justify-center text-white font-black text-6xl">
+                      {firstName?.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ============================================================ */}
+        {/* SECTION 2: ABOUT ME                                          */}
+        {/* ============================================================ */}
+        {(isEnabled('personal') || isEnabled('about')) && (
+          <motion.section
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            id="about"
+            className="space-y-10 pt-6 scroll-mt-28"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+              {/* LEFT COLUMN: About Text + Stat Cards */}
+              <div className="lg:col-span-6 space-y-6">
+                {/* Badge */}
+                <div className="inline-block px-3.5 py-1 rounded-full bg-indigo-50 border border-indigo-200/60 text-indigo-600 text-xs font-bold">
+                  About Me
+                </div>
+
+                {/* Headline */}
+                <div className="space-y-2">
+                  <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+                    Get to know <span className="text-indigo-600">me</span>
+                  </h2>
+                  <div className="w-10 h-1 bg-indigo-600 rounded-full" />
+                </div>
+
+                {/* Bio Description */}
+                <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal whitespace-pre-line max-w-xl">
+                  {personalInfo.aboutBio || personalInfo.bio ||
+                    "I'm a passionate Full Stack Developer who loves building beautiful, functional and user-friendly web applications. I enjoy turning complex problems into simple, elegant solutions that create real value."}
+                </p>
+
+
+
+              </div>
+
+              {/* RIGHT COLUMN: Photo + Floating Overlay Card */}
+              <div className="lg:col-span-6 relative flex justify-center">
+                <div className="relative w-full max-w-lg rounded-3xl overflow-hidden p-6 sm:p-8 bg-gradient-to-tr from-[#f4f5ff] to-[#eef0ff] border border-indigo-100/80">
+                  {/* Dot Grid Pattern in Top Right */}
+                  <div className="absolute top-6 right-6 grid grid-cols-5 gap-2 opacity-30 pointer-events-none">
+                    {[...Array(20)].map((_, i) => (
+                      <div key={i} className="w-1.5 h-1.5 rounded-full bg-indigo-600" />
                     ))}
                   </div>
-                </section>
-              )}
 
-              {education.length > 0 && (
-                <section className="space-y-4">
-                  <div className="flex items-center space-x-2 border-b border-slate-800 pb-2">
-                    <GraduationCap className="w-4 h-4 text-indigo-400" />
-                    <h2 className="text-lg font-bold">Education</h2>
-                  </div>
-                  {education.map((edu) => (
-                    <div key={edu._id || edu.degree} className="p-4 rounded-xl border border-slate-800 bg-slate-900/40">
-                      <h3 className="font-bold text-sm text-slate-200">{edu.degree}</h3>
-                      <p className="text-xs text-indigo-400">{edu.institution}</p>
-                      <span className="text-[10px] text-slate-500 block mt-1">{edu.duration}</span>
-                    </div>
-                  ))}
-                </section>
-              )}
-            </motion.div>
-          )}
+                  {/* Main Portrait Image */}
+                  <div className="relative w-full h-[320px] sm:h-[400px] rounded-2xl overflow-hidden shadow-2xl">
+                    {personalInfo.avatar ? (
+                      <img
+                        src={personalInfo.avatar}
+                        alt="About Me"
+                        className="w-full h-full object-cover object-top"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&q=80';
+                        }}
+                      />
+                    ) : (
 
-          {/* PROJECTS TAB ONLY */}
-          {(activeTab === 'projects' || activeTab === 'all') && (
-            <motion.section key="projects" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="space-y-6 py-6">
-              <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
-                <FolderGit2 className="w-5 h-5 text-indigo-400" />
-                <h2 className="text-xl font-bold">Featured Projects ({projects.length})</h2>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {projects.map((proj) => (
-                  <div
-                    key={proj._id || proj.title}
-                    className={`p-6 rounded-2xl border transition group hover:-translate-y-1 ${
-                      isDark ? 'bg-slate-900/60 border-slate-800 hover:border-indigo-500/50' : 'bg-white border-slate-200 shadow-sm'
-                    }`}
-                  >
-                    {proj.thumbnail && (
-                      <img src={proj.thumbnail} alt={proj.title} className="w-full h-44 object-cover rounded-xl mb-4" />
+                      <div className="w-full h-full bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white font-black text-6xl">
+                        {firstName?.charAt(0).toUpperCase()}
+                      </div>
                     )}
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-bold text-base group-hover:text-indigo-400 transition">{proj.title}</h3>
-                      {proj.liveUrl && (
-                        <a href={proj.liveUrl} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-indigo-400">
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
-                      )}
+                  </div>
+
+                  {/* Floating Overlay Badge on Bottom Left */}
+                  <motion.div
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="absolute bottom-8 left-8 sm:bottom-12 sm:left-12 p-4 rounded-2xl shadow-2xl border border-slate-100 bg-white/95 backdrop-blur-md text-slate-900 shadow-indigo-500/10 max-w-xs space-y-1.5 z-20"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2">
+                      <Users className="w-4 h-4" />
                     </div>
-                    <p className="text-xs text-slate-400 mb-4 line-clamp-3">{proj.description}</p>
-                    {proj.techStack && proj.techStack.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {proj.techStack.map((tech) => (
-                          <span key={tech} className="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                    <h4 className="font-extrabold text-sm tracking-tight">{personalInfo.fullName || (firstName + ' ' + lastName)}</h4>
+                    <p className="text-xs font-bold text-indigo-600">{personalInfo.title || 'Full Stack Developer'}</p>
+                    <div className="flex items-center gap-1 text-[11px] text-slate-500 pt-1 font-medium">
+                      <MapPin className="w-3 h-3 text-slate-400" />
+                      <span>{personalInfo.location || 'Chennai, Tamil Nadu, India'}</span>
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
+            </div>
+          </motion.section>
+        )}
+
+        {/* ============================================================ */}
+        {/* SECTION 3: EDUCATION & EXPERIENCE (CAREER 2x2 GRID)           */}
+        {/* ============================================================ */}
+        {isEnabled('education') && education.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            id="education"
+            className="space-y-8 pt-6 scroll-mt-28"
+          >
+            <div className="text-center space-y-2 max-w-2xl mx-auto">
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
+                Education
+              </h2>
+              <div className="w-12 h-1 bg-indigo-600 rounded-full mx-auto" />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {education.map((edu) => (
+                <div key={edu._id || edu.id || edu.degree} className="p-6 rounded-3xl border border-slate-100 bg-white shadow-md shadow-slate-200/40 hover:border-indigo-300 transition flex flex-col justify-between space-y-4">
+                  <div className="flex items-center space-x-3.5">
+                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                      <GraduationCap className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-base text-slate-900">{edu.degree}</h4>
+                      <span className="text-xs text-indigo-600 font-semibold">{edu.institution}</span>
+                    </div>
+                  </div>
+                  {edu.description && (
+                    <p className="text-xs text-slate-600 leading-relaxed font-normal">{edu.description}</p>
+                  )}
+                  <div className="flex justify-between items-center text-xs text-slate-500 pt-3 border-t border-slate-100 font-medium">
+                    <span>{edu.year || edu.duration}</span>
+                    {(edu.cgpa || edu.grade) && (
+                      <span className="font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-xl">
+                        CGPA / Grade: {edu.cgpa || edu.grade}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.section>
+        )}
+
+        {isEnabled('experience') && experience.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            id="experience"
+            className="space-y-8 pt-6 scroll-mt-28"
+          >
+            <div className="text-center space-y-2 max-w-2xl mx-auto">
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
+                Work Experience
+              </h2>
+              <div className="w-12 h-1 bg-indigo-600 rounded-full mx-auto" />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {experience.map((exp) => (
+                <div key={exp._id || exp.id || exp.role || exp.position} className="p-6 rounded-3xl border border-slate-100 bg-white shadow-md shadow-slate-200/40 hover:border-indigo-300 transition flex flex-col justify-between space-y-4">
+                  <div className="flex items-center space-x-3.5">
+                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                      <Briefcase className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-base text-slate-900">{exp.role || exp.position}</h4>
+                      <span className="text-xs text-indigo-600 font-semibold">{exp.company}</span>
+                      {exp.location && <span className="text-xs text-slate-400 block">{exp.location}</span>}
+                    </div>
+                  </div>
+                  {exp.description && (
+                    <p className="text-xs text-slate-600 leading-relaxed font-normal whitespace-pre-line bg-slate-50/80 p-3.5 rounded-2xl border border-slate-100">
+                      {exp.description}
+                    </p>
+                  )}
+                  <div className="text-xs text-slate-500 pt-3 border-t border-slate-100 font-medium">
+                    {exp.duration}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.section>
+        )}
+
+        {/* ============================================================ */}
+        {/* SECTION 4: SKILLS                                            */}
+        {/* ============================================================ */}
+        {isEnabled('skills') && skills.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            id="skills"
+            className="space-y-8 pt-6 scroll-mt-28"
+          >
+            <div className="text-center space-y-2 max-w-2xl mx-auto">
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
+                Skills
+              </h2>
+              <div className="w-12 h-1 bg-indigo-600 rounded-full mx-auto" />
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-3.5 max-w-4xl mx-auto">
+              {skills.map((sk) => {
+                const skillName = typeof sk === 'string' ? sk : sk.name;
+                const skillLevel = typeof sk === 'object' ? sk.level : null;
+                return (
+                  <span
+                    key={skillName}
+                    className="px-6 py-3.5 rounded-2xl text-sm font-extrabold border border-slate-200 bg-white text-indigo-700 shadow-sm hover:border-indigo-400 hover:shadow-md hover:scale-105 transition duration-200 flex items-center gap-2"
+                  >
+                    <span>{skillName}</span>
+                    {skillLevel && <span className="text-xs text-slate-400 font-medium">({skillLevel})</span>}
+                  </span>
+                );
+              })}
+            </div>
+          </motion.section>
+        )}
+
+        {/* ============================================================ */}
+        {/* SECTION 5: PROJECTS                                          */}
+        {/* ============================================================ */}
+        {isEnabled('projects') && projects.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            id="projects"
+            className="space-y-8 pt-6 scroll-mt-28"
+          >
+            <div className="text-center space-y-2 max-w-2xl mx-auto">
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
+                Featured Projects
+              </h2>
+              <div className="w-12 h-1 bg-indigo-600 rounded-full mx-auto" />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {projects.map((p) => (
+                <div key={p._id || p.id || p.title} className="rounded-3xl border border-slate-100 bg-white shadow-md shadow-slate-200/50 overflow-hidden hover:-translate-y-2 hover:shadow-xl transition duration-300 flex flex-col justify-between">
+                  {(p.image || p.thumbnail) && (
+                    <div className="h-48 overflow-hidden relative">
+                      <img src={p.image || p.thumbnail} alt={p.title} className="w-full h-full object-cover hover:scale-105 transition duration-500" />
+                    </div>
+                  )}
+                  <div className="p-6 space-y-3 flex-1 flex flex-col justify-between">
+                    <div className="space-y-2">
+                      <h3 className="font-extrabold text-lg text-slate-900">{p.title}</h3>
+                      <p className="text-xs text-slate-600 leading-relaxed">{p.description}</p>
+                    </div>
+                    {p.techStack && (
+                      <div className="flex flex-wrap gap-1.5 pt-2">
+                        {p.techStack.map((tech) => (
+                          <span key={tech} className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-indigo-50 text-indigo-700">
                             {tech}
                           </span>
                         ))}
                       </div>
                     )}
                   </div>
-                ))}
-              </div>
-            </motion.section>
-          )}
+                </div>
+              ))}
+            </div>
+          </motion.section>
+        )}
 
-          {/* SKILLS TAB ONLY */}
-          {(activeTab === 'skills' || activeTab === 'all') && (
-            <motion.section key="skills" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="space-y-6 py-6">
-              <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
-                <Code2 className="w-5 h-5 text-indigo-400" />
-                <h2 className="text-xl font-bold">Skills & Competencies</h2>
-              </div>
-              <div className="flex flex-wrap gap-2.5">
-                {skills.map((skill) => (
-                  <div
-                    key={skill._id || skill.name}
-                    className={`px-4 py-2 rounded-xl text-xs font-semibold border flex items-center gap-2 ${
-                      isDark ? 'bg-slate-900 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-800 shadow-sm'
-                    }`}
-                  >
-                    <span>{skill.name}</span>
-                    <span className="text-[10px] text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded">
-                      {skill.proficiencyLevel}%
-                    </span>
+        {/* ============================================================ */}
+        {/* SECTION 6: CERTIFICATIONS & AWARDS                            */}
+        {/* ============================================================ */}
+        {isEnabled('certificates') && certificates.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            id="certifications"
+            className="space-y-8 pt-6 scroll-mt-28"
+          >
+            <div className="text-center space-y-2 max-w-2xl mx-auto">
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
+                Certifications & Awards
+              </h2>
+              <div className="w-12 h-1 bg-indigo-600 rounded-full mx-auto" />
+            </div>
+
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {certificates.map((cert) => (
+                <div key={cert._id || cert.id || cert.title} className="p-6 rounded-3xl border border-slate-100 bg-white shadow-md shadow-slate-200/40 flex items-center space-x-4">
+                  <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                    <Award className="w-6 h-6" />
                   </div>
-                ))}
-              </div>
-            </motion.section>
-          )}
-
-          {/* CERTIFICATES TAB ONLY */}
-          {(activeTab === 'certificates' || activeTab === 'all') && (
-            <motion.section key="certificates" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="space-y-4 py-6">
-              <div className="flex items-center space-x-2 border-b border-slate-800 pb-2">
-                <Award className="w-4 h-4 text-indigo-400" />
-                <h2 className="text-lg font-bold">Certificates & Accreditations</h2>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {certificates.map((cert) => (
-                  <div key={cert._id || cert.title} className="p-4 rounded-xl border border-slate-800 bg-slate-900/40 space-y-1">
-                    <h3 className="font-bold text-sm text-slate-200">{cert.title}</h3>
-                    <p className="text-xs text-indigo-400">{cert.organization}</p>
-                    <span className="text-[10px] text-slate-500 block">{cert.issueDate}</span>
+                  <div>
+                    <h4 className="font-bold text-sm text-indigo-600">{cert.title}</h4>
+                    <span className="text-xs text-slate-500">{cert.organization || cert.issuer} • {cert.issueDate || cert.date}</span>
                   </div>
-                ))}
-              </div>
-            </motion.section>
-          )}
+                </div>
+              ))}
+            </div>
+          </motion.section>
+        )}
 
-          {/* CONTACT TAB ONLY */}
-          {(activeTab === 'contact' || activeTab === 'all') && (
-            <motion.section key="contact" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="space-y-6 py-6">
-              <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
-                <Mail className="w-5 h-5 text-indigo-400" />
-                <h2 className="text-xl font-bold">Contact</h2>
+
+        {/* ============================================================ */}
+        {/* SECTION 7: CONTACT ME                                        */}
+        {/* ============================================================ */}
+        {isEnabled('inbox') && (
+          <motion.section
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            id="contact"
+            className="space-y-10 pt-6 scroll-mt-28"
+          >
+            {/* Centered Heading matching Screenshot */}
+            <div className="text-center space-y-2">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                Contact Me
+              </h2>
+              <div className="w-12 h-1 bg-blue-600 rounded-full mx-auto" />
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              {/* Left Side Info Card */}
+              <div className="lg:col-span-5 p-8 rounded-3xl border border-slate-100 bg-white shadow-xl shadow-slate-200/40 space-y-6">
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold text-blue-600">
+                    Let's Build Something
+                  </h3>
+                  <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                    Have an exciting project in mind or want to collaborate? Fill out the form below to message me directly on WhatsApp or reach out via email.
+                  </p>
+                </div>
+
+                <div className="space-y-3.5 pt-2">
+                  {/* Email */}
+                  <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100/80 flex items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                      <Mail className="w-4.5 h-4.5" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-[11px] text-slate-400 font-bold block">Email</span>
+                      <span className="text-xs font-bold text-slate-900 truncate block">
+                        {personalInfo.email || 'harsath137@gmail.com'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Phone / WhatsApp */}
+                  <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100/80 flex items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                      <Phone className="w-4.5 h-4.5" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-[11px] text-slate-400 font-bold block">Phone / WhatsApp</span>
+                      <span className="text-xs font-bold text-slate-900 truncate block">
+                        {personalInfo.phone || '+91 6382245266'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Location */}
+                  <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100/80 flex items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                      <MapPin className="w-4.5 h-4.5" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-[11px] text-slate-400 font-bold block">Location</span>
+                      <span className="text-xs font-bold text-slate-900 truncate block">
+                        {personalInfo.location || 'Pudukkottai, Tamil Nadu, India'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <form onSubmit={handleContactSubmit} className={`p-6 rounded-2xl border space-y-4 text-xs ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200'}`}>
+              {/* Right Side Form Card matching Screenshot */}
+              <form
+                onSubmit={handleContactSubmit}
+                className="lg:col-span-7 p-8 rounded-3xl border border-slate-100 bg-white shadow-xl shadow-slate-200/40 space-y-4"
+              >
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-slate-400 mb-1 font-medium">Your Name</label>
+                    <label className="block text-slate-700 mb-1 font-semibold text-xs">Name</label>
                     <input
                       type="text"
                       required
                       value={contactForm.senderName}
                       onChange={(e) => setContactForm({ ...contactForm, senderName: e.target.value })}
-                      placeholder="Jane Doe"
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-indigo-500"
+                      placeholder="Enter your name"
+                      className="w-full border border-slate-200 bg-white rounded-xl px-4 py-3 text-xs text-slate-900 outline-none focus:border-blue-600 transition font-medium"
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-400 mb-1 font-medium">Your Email</label>
+                    <label className="block text-slate-700 mb-1 font-semibold text-xs">Email</label>
                     <input
                       type="email"
                       required
                       value={contactForm.senderEmail}
                       onChange={(e) => setContactForm({ ...contactForm, senderEmail: e.target.value })}
-                      placeholder="jane@example.com"
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-indigo-500"
+                      placeholder="Enter your email"
+                      className="w-full border border-slate-200 bg-white rounded-xl px-4 py-3 text-xs text-slate-900 outline-none focus:border-blue-600 transition font-medium"
                     />
                   </div>
                 </div>
+
                 <div>
-                  <label className="block text-slate-400 mb-1 font-medium">Message</label>
-                  <textarea
-                    required
-                    rows={3}
-                    value={contactForm.message}
-                    onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                    placeholder="Hello..."
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white outline-none focus:border-indigo-500"
+                  <label className="block text-slate-700 mb-1 font-semibold text-xs">Subject</label>
+                  <input
+                    type="text"
+                    value={contactForm.subject}
+                    onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
+                    placeholder="What is this regarding?"
+                    className="w-full border border-slate-200 bg-white rounded-xl px-4 py-3 text-xs text-slate-900 outline-none focus:border-blue-600 transition font-medium"
                   />
                 </div>
-                <button type="submit" disabled={sending} className="gradient-btn px-6 py-2.5 rounded-xl font-semibold flex items-center gap-2">
-                  <Send className="w-4 h-4" />
-                  <span>{sending ? 'Sending...' : 'Send Message'}</span>
-                </button>
+
+                <div>
+                  <label className="block text-slate-700 mb-1 font-semibold text-xs">Message</label>
+                  <textarea
+                    required
+                    rows={4}
+                    value={contactForm.message}
+                    onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                    placeholder="Write your message here..."
+                    className="w-full border border-slate-200 bg-white rounded-xl px-4 py-3 text-xs text-slate-900 outline-none focus:border-blue-600 transition font-medium leading-relaxed"
+                  />
+                </div>
+
+                <div className="pt-2">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    type="submit"
+                    disabled={sending}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-7 py-3 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-blue-600/25 transition"
+                  >
+                    <span>{sending ? 'Sending Message...' : 'Send Message'}</span>
+                    <Send className="w-4 h-4" />
+                  </motion.button>
+                </div>
               </form>
-            </motion.section>
-          )}
-        </AnimatePresence>
-      </div>
+            </div>
+          </motion.section>
+        )}
+
+      </main>
+
+      {/* 3. FOOTER SECTION */}
+      <footer id="footer" className="border-t border-slate-800 bg-slate-900 text-slate-300 py-12 px-6 relative z-10">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
+          <p>© 2026 {personalInfo.fullName || username}. All rights reserved.</p>
+          <motion.button
+            whileHover={{ scale: 1.1, y: -2 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="flex items-center gap-1.5 text-indigo-400 hover:text-indigo-300 font-semibold transition"
+          >
+            <span>Back to Top</span>
+            <ArrowUp className="w-4 h-4" />
+          </motion.button>
+        </div>
+      </footer>
     </div>
   );
 };

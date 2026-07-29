@@ -6,7 +6,7 @@ import { useToast } from '../components/Toast';
 
 const CorporateTemplate = ({ data }) => {
   const { toast } = useToast?.() || { toast: (msg) => alert(msg) };
-  const { personalInfo = {}, socialLinks = {}, projects = [], skills = [], education = [], experience = [], certificates = [], username, resumeUrl } = data;
+  const { personalInfo = {}, socialLinks = {}, projects = [], skills = [], education = [], experience = [], certificates = [], sectionsEnabled = {}, username, resumeUrl } = data;
 
   const [activeTab, setActiveTab] = useState('home');
   const [theme, setTheme] = useState(data.themeMode || 'dark');
@@ -15,6 +15,33 @@ const CorporateTemplate = ({ data }) => {
   const [navOpen, setNavOpen] = useState(false);
 
   const isDark = theme === 'dark';
+
+  const defaultSections = {
+    personal: true,
+    about: true,
+    education: true,
+    experience: true,
+    skills: true,
+    projects: true,
+    certificates: true,
+    inbox: true,
+  };
+
+  const isEnabled = (key) => {
+    const active = { ...defaultSections, ...(sectionsEnabled || {}) };
+    return active[key] === true;
+  };
+
+  const navTabs = [
+    { id: 'home', label: 'Home', show: true },
+    { id: 'about', label: 'About', show: isEnabled('personal') || isEnabled('about') || isEnabled('education') || isEnabled('experience') },
+    { id: 'projects', label: `Projects (${projects.length})`, show: isEnabled('projects') && projects.length > 0 },
+    { id: 'skills', label: 'Competencies', show: isEnabled('skills') && skills.length > 0 },
+    { id: 'certificates', label: 'Certificates', show: isEnabled('certificates') && certificates.length > 0 },
+    { id: 'contact', label: 'Contact', show: isEnabled('inbox') },
+    { id: 'all', label: 'Full View', show: true },
+  ].filter((tab) => tab.show);
+
 
   const handleContactSubmit = async (e) => {
     e.preventDefault();
@@ -42,15 +69,7 @@ const CorporateTemplate = ({ data }) => {
         </button>
 
         <nav className="hidden md:flex items-center space-x-2 text-xs font-semibold">
-          {[
-            { id: 'home', label: 'Home' },
-            { id: 'about', label: 'About' },
-            { id: 'projects', label: `Projects (${projects.length})` },
-            { id: 'skills', label: 'Competencies' },
-            { id: 'certificates', label: 'Certificates' },
-            { id: 'contact', label: 'Contact' },
-            { id: 'all', label: 'Full View' },
-          ].map((tab) => (
+          {navTabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
@@ -64,6 +83,7 @@ const CorporateTemplate = ({ data }) => {
             </button>
           ))}
         </nav>
+
 
         <div className="flex items-center space-x-3">
           <button
