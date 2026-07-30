@@ -44,6 +44,9 @@ const connectDB = async () => {
       } catch (localErr) {
         console.log(`ℹ️ Local MongoDB unavailable. Switching seamlessly to In-Memory Database Fallback.`);
         isInMemoryFallback = true;
+        if (process.env.VERCEL) {
+          console.error(`🚨 CRITICAL VERCEL ERROR: Database failed to connect to MongoDB Atlas! Serverless functions are stateless so in-memory fallback will not persist user registrations or logins. Please verify MONGODB_URI in Vercel Dashboard and ensure 0.0.0.0/0 IP Access List is enabled in MongoDB Atlas.`);
+        }
       }
     }
   } catch (error) {
