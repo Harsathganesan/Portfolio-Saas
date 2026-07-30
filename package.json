@@ -5,12 +5,22 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "build": "node -e \"if (require('fs').existsSync('frontend')) { require('child_process').execSync('cd frontend && npm run build', {stdio:'inherit'}); } else { require('child_process').execSync('npx vite build', {stdio:'inherit'}); }\"",
-    "build:backend": "cd backend && npm install",
-    "dev": "npx concurrently -k -p \"[{name}]\" -n \"BACKEND,FRONTEND\" -c \"cyan,magenta\" \"npm run backend\" \"npm run frontend\"",
-    "backend": "cd backend && npm run dev",
-    "frontend": "cd frontend && npm run dev",
+    "build": "cd frontend && npm install && npm run build",
     "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  },
+  "dependencies": {
+    "archiver": "^8.0.0",
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^2.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "express-rate-limit": "^8.6.1",
+    "fs-extra": "^11.4.0",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.2.0",
+    "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
