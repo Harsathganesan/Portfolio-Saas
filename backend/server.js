@@ -27,11 +27,11 @@ import generateRoutes from './routes/generateRoutes.js';
 
 import { getPublicUserPortfolio } from './controllers/portfolioController.js';
 
-// Load environment variables FIRST
-dotenv.config();
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Load environment variables FIRST with explicit path fallback
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const app = express();
 
