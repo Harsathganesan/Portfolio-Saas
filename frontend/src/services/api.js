@@ -5,13 +5,17 @@ const getBaseURL = () => {
     return `http://${window.location.hostname}:5002/api`;
   }
   let envUrl = import.meta.env.VITE_API_URL;
-  if (envUrl && envUrl.trim() && !envUrl.includes('onrender.com')) {
+  if (envUrl && envUrl.trim()) {
     let clean = envUrl.trim().replace(/\/+$/, '');
-    return clean.endsWith('/api') ? clean : `${clean}/api`;
+    if (!clean.includes('localhost')) {
+      return clean.endsWith('/api') ? clean : `${clean}/api`;
+    }
   }
-  return 'https://portfolio-saas-mvjq.vercel.app/api';
+  if (typeof window !== 'undefined' && window.location.origin) {
+    return `${window.location.origin}/api`;
+  }
+  return '/api';
 };
-
 
 const API = axios.create({
   baseURL: getBaseURL(),
@@ -41,6 +45,7 @@ API.interceptors.response.use(
       if (window.location.pathname.startsWith('/dashboard') || window.location.pathname.startsWith('/admin')) {
         localStorage.removeItem('portfolio_token');
         localStorage.removeItem('portfolio_user');
+        window.location.href = '/login';
       }
     }
     return Promise.reject(error);

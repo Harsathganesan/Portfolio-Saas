@@ -129,33 +129,36 @@ console.log('✅ All API routes registered successfully');
 app.use(notFound);
 app.use(errorHandler);
 
-// ─── Start Server ────────────────────────────────────────────────────
-const PORT = process.env.PORT || 5002;
+// ─── Start Server (Skip in Vercel Serverless Environment) ──────────────
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 5002;
 
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-  console.log(`📡 API Base URL: http://localhost:${PORT}/api`);
-  console.log(`🌐 Health Check: http://localhost:${PORT}/api/health`);
-  console.log(`✅ All routes ready. Server startup complete.`);
+  const server = app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+    console.log(`📡 API Base URL: http://localhost:${PORT}/api`);
+    console.log(`🌐 Health Check: http://localhost:${PORT}/api/health`);
+    console.log(`✅ All routes ready. Server startup complete.`);
 
-  // Render 5-minute Auto Keep-Alive Ping
-  if (process.env.RENDER_EXTERNAL_URL) {
-    setInterval(() => {
-      const renderUrl = process.env.RENDER_EXTERNAL_URL;
-      http.get(`${renderUrl}/api/health`, (res) => {
-        console.log(`📡 Render Keep-Alive Ping: ${res.statusCode}`);
-      }).on('error', () => {});
-    }, 5 * 60 * 1000);
-    console.log(`🔁 Render Keep-Alive enabled: ${process.env.RENDER_EXTERNAL_URL}/api/health`);
-  }
-});
+    // Render 5-minute Auto Keep-Alive Ping
+    if (process.env.RENDER_EXTERNAL_URL) {
+      setInterval(() => {
+        const renderUrl = process.env.RENDER_EXTERNAL_URL;
+        http.get(`${renderUrl}/api/health`, (res) => {
+          console.log(`📡 Render Keep-Alive Ping: ${res.statusCode}`);
+        }).on('error', () => {});
+      }, 5 * 60 * 1000);
+      console.log(`🔁 Render Keep-Alive enabled: ${process.env.RENDER_EXTERNAL_URL}/api/health`);
+    }
+  });
 
-server.on('error', (error) => {
-  if (error.code === 'EADDRINUSE') {
-    console.warn(`⚠️ Port ${PORT} is already in use. Another server instance may be running.`);
-  } else {
-    console.error('💥 Server error:', error.message);
-  }
-});
+  server.on('error', (error) => {
+    if (error.code === 'EADDRINUSE') {
+      console.warn(`⚠️ Port ${PORT} is already in use. Another server instance may be running.`);
+    } else {
+      console.error('💥 Server error:', error.message);
+    }
+  });
+}
 
 export default app;
+
