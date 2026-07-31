@@ -65,7 +65,7 @@ const ProjectsPage = () => {
       techStack: Array.isArray(proj.techStack) ? proj.techStack.join(', ') : proj.techStack || '',
       githubUrl: proj.githubUrl || '',
       liveUrl: proj.liveUrl || '',
-      thumbnail: proj.thumbnail || '',
+      thumbnail: proj.thumbnail || proj.image || proj.imageUrl || '',
       category: proj.category || 'Web Application',
       isFeatured: proj.isFeatured || false,
     });
@@ -95,11 +95,14 @@ const ProjectsPage = () => {
       toast('Project title is required', 'error');
       return;
     }
+    const imgUrl = ensureUrlProtocol(form.thumbnail);
     const payload = {
       ...form,
       githubUrl: ensureUrlProtocol(form.githubUrl),
       liveUrl: ensureUrlProtocol(form.liveUrl),
-      thumbnail: ensureUrlProtocol(form.thumbnail),
+      thumbnail: imgUrl,
+      image: imgUrl,
+      imageUrl: imgUrl,
     };
     setLoading(true);
     try {

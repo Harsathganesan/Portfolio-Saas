@@ -215,17 +215,30 @@ const mapExperienceFields = (exp) => {
   };
 };
 
+const mapProjectFields = (proj) => {
+  if (!proj) return proj;
+  const obj = proj.toObject ? proj.toObject() : { ...proj };
+  const img = obj.thumbnail || obj.image || obj.imageUrl || obj.image_url || '';
+  return {
+    ...obj,
+    thumbnail: img,
+    image: img,
+    imageUrl: img,
+  };
+};
+
 // ─── Portfolio Routes ─────────────────────────────────────────────────────────
 app.get(['/api/portfolio/me', '/portfolio/me'], protect, async (req, res) => {
   try {
     const p = await getOrCreate(req.user._id, req.user.username);
-    const [projects, skills, education, rawExperience, rawCertificates] = await Promise.all([
+    const [rawProjects, skills, education, rawExperience, rawCertificates] = await Promise.all([
       Project.find({ portfolioId: p._id }).sort({ createdAt: -1 }),
       Skill.find({ portfolioId: p._id }),
       Education.find({ portfolioId: p._id }).sort({ createdAt: -1 }),
       Experience.find({ portfolioId: p._id }).sort({ createdAt: -1 }),
       Certificate.find({ portfolioId: p._id }).sort({ createdAt: -1 }),
     ]);
+    const projects = rawProjects.map(mapProjectFields);
     const certificates = rawCertificates.map(mapCertificateFields);
     const experience = rawExperience.map(mapExperienceFields);
     res.json({ success: true, portfolio: { ...p.toObject(), projects, skills, education, experience, certificates } });
@@ -288,13 +301,14 @@ app.get(['/api/user/:username', '/user/:username'], async (req, res) => {
     const username = req.params.username.toLowerCase().trim();
     const p = await Portfolio.findOne({ $or: [{ username }, { slug: username }] });
     if (!p || (!p.isPublished && !p.published)) return res.status(404).json({ success: false, message: 'Portfolio not found or not published' });
-    const [projects, skills, education, rawExperience, rawCertificates] = await Promise.all([
+    const [rawProjects, skills, education, rawExperience, rawCertificates] = await Promise.all([
       Project.find({ portfolioId: p._id }).sort({ isFeatured: -1, createdAt: -1 }),
       Skill.find({ portfolioId: p._id }),
       Education.find({ portfolioId: p._id }).sort({ createdAt: -1 }),
       Experience.find({ portfolioId: p._id }).sort({ createdAt: -1 }),
       Certificate.find({ portfolioId: p._id }).sort({ createdAt: -1 }),
     ]);
+    const projects = rawProjects.map(mapProjectFields);
     const certificates = rawCertificates.map(mapCertificateFields);
     const experience = rawExperience.map(mapExperienceFields);
     let a = await Analytics.findOne({ portfolioId: p._id });
@@ -305,14 +319,21 @@ app.get(['/api/user/:username', '/user/:username'], async (req, res) => {
 });
 
 // ─── CRUD Factory ─────────────────────────────────────────────────────────────
+const getItemMapped = (prefix, item) => {
+  if (prefix === 'certificates') return mapCertificateFields(item);
+  if (prefix === 'experience') return mapExperienceFields(item);
+  if (prefix === 'projects') return mapProjectFields(item);
+  return item;
+};
+
 const crud = (prefix, Model) => {
   app.get([`/api/${prefix}`, `/${prefix}`], protect, async (req, res) => {
     try {
       const p = await Portfolio.findOne({ userId: req.user._id });
       if (!p) return res.json({ success: true, items: [] });
       const rawItems = await Model.find({ portfolioId: p._id }).sort({ createdAt: -1 });
-      const items = prefix === 'certificates' ? rawItems.map(mapCertificateFields) : rawItems;
-      res.json({ success: true, items, certificates: items });
+      const items = rawItems.map((item) => getItemMapped(prefix, item));
+      res.json({ success: true, items, certificates: items, projects: items });
     } catch (err) { res.status(500).json({ success: false, message: err.message }); }
   });
   app.post([`/api/${prefix}`, `/${prefix}`], protect, async (req, res) => {
@@ -325,9 +346,15 @@ const crud = (prefix, Model) => {
         if (payload.organization && !payload.issuer) payload.issuer = payload.organization;
         if (payload.issuer && !payload.organization) payload.organization = payload.issuer;
       }
+      if (prefix === 'projects') {
+        const img = payload.thumbnail || payload.image || payload.imageUrl || '';
+        payload.thumbnail = img;
+        payload.image = img;
+        payload.imageUrl = img;
+      }
       const rawItem = await Model.create({ portfolioId: p._id, ...payload });
-      const item = prefix === 'certificates' ? mapCertificateFields(rawItem) : rawItem;
-      res.status(201).json({ success: true, item, certificate: item });
+      const item = getItemMapped(prefix, rawItem);
+      res.status(201).json({ success: true, item, certificate: item, project: item });
     } catch (err) { res.status(500).json({ success: false, message: err.message }); }
   });
   app.put([`/api/${prefix}/:id`, `/${prefix}/:id`], protect, async (req, res) => {
