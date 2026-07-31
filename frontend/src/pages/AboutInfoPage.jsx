@@ -189,6 +189,11 @@ const AboutInfoPage = () => {
         onClose={() => setAiModalOpen(false)}
         onApply={handleApplyAiBio}
         type="bio"
+        initialData={{
+          fullName: portfolio?.personalInfo?.fullName || portfolio?.username || '',
+          title: portfolio?.personalInfo?.title || 'Full Stack Engineer',
+          skills: portfolio?.skills,
+        }}
       />
     </div>
   );

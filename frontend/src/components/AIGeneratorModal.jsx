@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Sparkles, X, Loader2, Check, RefreshCw } from 'lucide-react';
 import { aiService } from '../services/aiService';
 import { useToast } from './Toast';
+import { usePortfolio } from '../context/PortfolioContext';
 
 const formatSkillsString = (s) => {
   if (!s) return 'React, Node.js, TypeScript';
@@ -20,6 +21,7 @@ const formatTechStackString = (s) => {
 };
 
 const AIGeneratorModal = ({ isOpen, onClose, type = 'bio', initialData = {}, onApply }) => {
+  const { portfolio } = usePortfolio?.() || {};
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [generatedText, setGeneratedText] = useState('');
@@ -37,14 +39,20 @@ const AIGeneratorModal = ({ isOpen, onClose, type = 'bio', initialData = {}, onA
 
   useEffect(() => {
     if (isOpen) {
-      setName(initialData.fullName || initialData.name || '');
-      setTitle(initialData.title || 'Full Stack Engineer');
-      setSkills(formatSkillsString(initialData.skills));
-      setProjectTitle(initialData.projectTitle || initialData.title || '');
-      setTechStack(formatTechStackString(initialData.techStack));
+      const defaultName = initialData.fullName || initialData.name || portfolio?.personalInfo?.fullName || portfolio?.username || '';
+      const defaultTitle = initialData.title || portfolio?.personalInfo?.title || 'Full Stack Engineer';
+      const defaultSkills = formatSkillsString(initialData.skills || portfolio?.skills);
+      const defaultProjectTitle = initialData.projectTitle || initialData.title || '';
+      const defaultTechStack = formatTechStackString(initialData.techStack);
+
+      setName(defaultName);
+      setTitle(defaultTitle);
+      setSkills(defaultSkills);
+      setProjectTitle(defaultProjectTitle);
+      setTechStack(defaultTechStack);
       setGeneratedText('');
     }
-  }, [isOpen, initialData]);
+  }, [isOpen, initialData, portfolio]);
 
   if (!isOpen) return null;
 
@@ -59,8 +67,8 @@ const AIGeneratorModal = ({ isOpen, onClose, type = 'bio', initialData = {}, onA
           : [];
 
         const res = await aiService.generateBio({
-          name,
-          title,
+          name: name || portfolio?.personalInfo?.fullName || portfolio?.username || 'Developer',
+          title: title || portfolio?.personalInfo?.title || 'Full Stack Engineer',
           skills: skillsArray,
           tone,
         });
@@ -105,7 +113,7 @@ const AIGeneratorModal = ({ isOpen, onClose, type = 'bio', initialData = {}, onA
 
   return (
     <div className="fixed inset-0 z-[99999] top-0 left-0 w-screen h-screen bg-slate-900/50 flex items-center justify-center p-4">
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 max-w-lg w-full shadow-2xl relative text-slate-900">
+      <div className="bg-white border border-slate-200 rounded-3xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl relative text-slate-900">
 
 
         <button
