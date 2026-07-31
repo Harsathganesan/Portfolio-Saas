@@ -1,79 +1,46 @@
 /**
  * uploadService.js
- *
- * Uploads files DIRECTLY from the browser to Cloudinary using an
- * unsigned upload preset. This bypasses the backend entirely — no
- * serverless function involved, no 500 errors from missing env vars.
- *
- * Setup (one-time):
- *  1. Go to https://cloudinary.com → Settings → Upload → Upload Presets
- *  2. Click "Add upload preset" → set Signing Mode to "Unsigned"
- *  3. Note your Cloud Name and the preset name
- *  4. In Vercel dashboard → Environment Variables, add:
- *       VITE_CLOUDINARY_CLOUD_NAME = your_cloud_name
- *       VITE_CLOUDINARY_UPLOAD_PRESET = your_preset_name
+ * Routes all uploads through the backend API which uses Cloudinary server-side.
+ * This avoids the need for an unsigned Cloudinary upload preset.
  */
-
-const CLOUD_NAME   = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
-
-const CLOUDINARY_BASE = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}`;
-
-/**
- * Core upload function — sends directly to Cloudinary from the browser.
- * @param {File}   file        - The File object from an <input type="file">
- * @param {string} resourceType - 'image' | 'raw' (for PDFs)
- * @param {string} folder      - Cloudinary folder path
- * @returns {{ url: string, publicId: string }}
- */
-const cloudinaryUpload = async (file, resourceType = 'image', folder = 'portfolio-saas') => {
-  if (!CLOUD_NAME || !UPLOAD_PRESET) {
-    throw new Error(
-      'Cloudinary is not configured. Add VITE_CLOUDINARY_CLOUD_NAME and ' +
-      'VITE_CLOUDINARY_UPLOAD_PRESET to your Vercel Environment Variables, then redeploy.'
-    );
-  }
-
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', UPLOAD_PRESET);
-  formData.append('folder', folder);
-
-  const endpoint = `${CLOUDINARY_BASE}/${resourceType}/upload`;
-  const response = await fetch(endpoint, { method: 'POST', body: formData });
-
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err?.error?.message || `Upload failed (${response.status})`);
-  }
-
-  const data = await response.json();
-  return { url: data.secure_url, publicId: data.public_id };
-};
+import API from './api';
 
 export const uploadService = {
   /** Upload any image (avatar, project screenshot, certificate, etc.) */
   uploadFile: async (file) => {
-    const { url, publicId } = await cloudinaryUpload(file, 'image', 'portfolio-saas');
-    return { success: true, url, publicId };
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await API.post('/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
   },
 
-  /** Upload image with auto-format/quality optimisation */
+  /** Upload image */
   uploadImage: async (file) => {
-    const { url, publicId } = await cloudinaryUpload(file, 'image', 'portfolio-saas/images');
-    return { success: true, url, publicId };
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await API.post('/upload/image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
   },
 
   /** Upload resume PDF */
   uploadResume: async (file) => {
-    const { url, publicId } = await cloudinaryUpload(file, 'raw', 'portfolio-saas/resumes');
-    return { success: true, url, publicId };
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await API.post('/upload/resume', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
   },
 
-  /** Delete file (calls backend since Cloudinary delete requires API secret) */
+  /** Delete file by publicId */
   deleteFile: async (publicId, resourceType = 'image') => {
-    const { default: API } = await import('./api');
-    const response = await API.delete('/upload/file', { data: { publicId, resourceType } });
+    const response = await API.delete('/upload/file', {
+      data: { publicId, resourceType },
+    });
     return response.data;
   },
 };

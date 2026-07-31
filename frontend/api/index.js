@@ -397,12 +397,6 @@ app.get(['/api/public/explore', '/public/explore'], async (req, res) => {
 });
 
 // ─── Cloudinary Upload (base64 data URI — avoids stream conflicts in serverless)
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key:    process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
 const cloudinaryReady = () =>
   process.env.CLOUDINARY_CLOUD_NAME &&
   process.env.CLOUDINARY_API_KEY &&
@@ -412,13 +406,22 @@ const memUpload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
   fileFilter: (req, file, cb) => {
-    const ok = /jpeg|jpg|png|webp|gif|svg\+xml|pdf/.test(file.mimetype);
-    ok ? cb(null, true) : cb(new Error('Only images and PDF are allowed'));
+    const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp',
+                     'image/gif', 'image/svg+xml', 'application/pdf'];
+    allowed.includes(file.mimetype)
+      ? cb(null, true)
+      : cb(new Error('Only images (jpg/png/webp/gif/svg) and PDF are allowed'));
   },
 });
 
-// Buffer → Cloudinary via base64 data URI (no upload_stream needed)
+// Buffer → Cloudinary via base64 data URI
 const uploadBuffer = async (buffer, mimetype, options = {}) => {
+  // Re-configure on every call so env vars are always fresh in serverless
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key:    process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
   const b64 = buffer.toString('base64');
   const dataUri = `data:${mimetype};base64,${b64}`;
   return cloudinary.uploader.upload(dataUri, options);
