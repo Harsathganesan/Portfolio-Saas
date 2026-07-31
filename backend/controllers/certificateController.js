@@ -20,7 +20,7 @@ export const getCertificates = async (req, res) => {
 
 export const createCertificate = async (req, res) => {
   try {
-    const { title, organization, issueDate, credentialUrl } = req.body;
+    const { title, organization, issueDate, credentialUrl, certificateImage } = req.body;
     if (isInMemoryFallback) {
       const portfolio = await mockStore.findPortfolioByUserId(req.user._id);
       const item = await mockStore.addCertificate({
@@ -30,6 +30,7 @@ export const createCertificate = async (req, res) => {
         organization,
         issueDate,
         credentialUrl,
+        certificateImage,
       });
       return res.status(201).json({ success: true, message: 'Certificate added', certificate: item });
     }
@@ -41,6 +42,7 @@ export const createCertificate = async (req, res) => {
       organization,
       issueDate,
       credentialUrl,
+      certificateImage,
     });
     res.status(201).json({ success: true, message: 'Certificate added', certificate: item });
   } catch (error) {
@@ -49,7 +51,27 @@ export const createCertificate = async (req, res) => {
 };
 
 export const updateCertificate = async (req, res) => {
-  res.json({ success: true, message: 'Certificate updated' });
+  try {
+    const { title, organization, issueDate, credentialUrl, certificateImage } = req.body;
+    if (isInMemoryFallback) {
+      const item = await mockStore.updateCertificate(req.params.id, {
+        title,
+        organization,
+        issueDate,
+        credentialUrl,
+        certificateImage,
+      });
+      return res.json({ success: true, message: 'Certificate updated', certificate: item });
+    }
+    const item = await Certificate.findByIdAndUpdate(
+      req.params.id,
+      { title, organization, issueDate, credentialUrl, certificateImage },
+      { new: true }
+    );
+    res.json({ success: true, message: 'Certificate updated', certificate: item });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 export const deleteCertificate = async (req, res) => {

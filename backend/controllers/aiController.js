@@ -5,7 +5,7 @@ import { generateBio, generateProjectDescription } from '../utils/aiHelper.js';
 export const handleGenerateBio = async (req, res) => {
   try {
     const { name, title, skills, experienceYears, tone } = req.body;
-    const generatedBio = generateBio({ name, title, skills, experienceYears, tone });
+    const generatedBio = await generateBio({ name, title, skills, experienceYears, tone });
 
     res.json({
       success: true,
@@ -21,7 +21,7 @@ export const handleGenerateBio = async (req, res) => {
 export const handleGenerateProjectDesc = async (req, res) => {
   try {
     const { title, techStack, goal, role } = req.body;
-    const generatedDesc = generateProjectDescription({ title, techStack, goal, role });
+    const generatedDesc = await generateProjectDescription({ title, techStack, goal, role });
 
     res.json({
       success: true,

@@ -258,9 +258,17 @@ class MockStore {
       organization: certData.organization,
       issueDate: certData.issueDate || '',
       credentialUrl: certData.credentialUrl || '',
+      certificateImage: certData.certificateImage || '',
       createdAt: new Date(),
     };
     this.certificates.push(cert);
+    return cert;
+  }
+
+  async updateCertificate(id, updates) {
+    const cert = this.certificates.find((c) => c._id.toString() === id.toString());
+    if (!cert) return null;
+    Object.assign(cert, updates);
     return cert;
   }
 

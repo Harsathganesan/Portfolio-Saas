@@ -95,8 +95,8 @@ const CertificatesPage = () => {
         {certificates.map((cert) => (
           <div key={cert._id} className="bg-white border border-slate-100 p-5 rounded-2xl shadow-2xs flex justify-between items-start">
             <div className="space-y-1">
-              <h3 className="font-bold text-sm text-slate-900">{cert.title}</h3>
-              <p className="text-xs font-bold text-blue-600">{cert.organization}</p>
+              <h3 className="font-bold text-sm text-slate-900">{cert.title || cert.name}</h3>
+              <p className="text-xs font-bold text-blue-600">{cert.organization || cert.issuer}</p>
               {cert.issueDate && <p className="text-[11px] text-slate-400 font-mono font-medium">Issued: {cert.issueDate}</p>}
               {cert.credentialUrl && (
                 <a href={cert.credentialUrl} target="_blank" rel="noreferrer" className="text-[11px] text-blue-600 font-bold hover:underline flex items-center gap-1 pt-1">
