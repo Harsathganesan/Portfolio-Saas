@@ -393,39 +393,45 @@ app.get(['/api/public/explore', '/public/explore'], async (req, res) => {
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 
-// ─── Cloudinary Upload (memoryStorage — no disk, works on Vercel) ────────────
+// ─── Cloudinary Upload (base64 data URI — avoids stream conflicts in serverless)
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key:    process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+const cloudinaryReady = () =>
+  process.env.CLOUDINARY_CLOUD_NAME &&
+  process.env.CLOUDINARY_API_KEY &&
+  process.env.CLOUDINARY_API_SECRET;
+
 const memUpload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
   fileFilter: (req, file, cb) => {
-    const ok = /jpeg|jpg|png|webp|gif|svg|pdf/.test(file.mimetype);
+    const ok = /jpeg|jpg|png|webp|gif|svg\+xml|pdf/.test(file.mimetype);
     ok ? cb(null, true) : cb(new Error('Only images and PDF are allowed'));
   },
 });
 
-const uploadToCloudinary = (buffer, options) =>
-  new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(options, (err, result) => {
-      if (err) reject(err); else resolve(result);
-    });
-    stream.end(buffer);
-  });
+// Buffer → Cloudinary via base64 data URI (no upload_stream needed)
+const uploadBuffer = async (buffer, mimetype, options = {}) => {
+  const b64 = buffer.toString('base64');
+  const dataUri = `data:${mimetype};base64,${b64}`;
+  return cloudinary.uploader.upload(dataUri, options);
+};
 
 // Generic upload — images & PDF
 app.post(['/api/upload', '/upload'], protect, memUpload.single('file'), async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ success: false, message: 'No file provided' });
+    if (!cloudinaryReady())
+      return res.status(500).json({ success: false, message: 'Cloudinary is not configured. Add CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET to Vercel Environment Variables.' });
+    if (!req.file)
+      return res.status(400).json({ success: false, message: 'No file provided' });
     const isPdf = req.file.mimetype === 'application/pdf';
-    const result = await uploadToCloudinary(req.file.buffer, {
+    const result = await uploadBuffer(req.file.buffer, req.file.mimetype, {
       folder: 'portfolio-saas',
       resource_type: isPdf ? 'raw' : 'image',
-      format: isPdf ? 'pdf' : undefined,
     });
     res.json({ success: true, url: result.secure_url, publicId: result.public_id });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
@@ -434,8 +440,11 @@ app.post(['/api/upload', '/upload'], protect, memUpload.single('file'), async (r
 // Image-specific (auto WebP optimisation)
 app.post(['/api/upload/image', '/upload/image'], protect, memUpload.single('file'), async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ success: false, message: 'No file provided' });
-    const result = await uploadToCloudinary(req.file.buffer, {
+    if (!cloudinaryReady())
+      return res.status(500).json({ success: false, message: 'Cloudinary is not configured.' });
+    if (!req.file)
+      return res.status(400).json({ success: false, message: 'No file provided' });
+    const result = await uploadBuffer(req.file.buffer, req.file.mimetype, {
       folder: 'portfolio-saas/images',
       resource_type: 'image',
       transformation: [{ quality: 'auto', fetch_format: 'auto' }],
@@ -444,18 +453,20 @@ app.post(['/api/upload/image', '/upload/image'], protect, memUpload.single('file
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 
-// Resume PDF
+// Resume PDF — also saves resumeUrl to portfolio
 app.post(['/api/upload/resume', '/upload/resume'], protect, memUpload.single('file'), async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ success: false, message: 'No file provided' });
+    if (!cloudinaryReady())
+      return res.status(500).json({ success: false, message: 'Cloudinary is not configured.' });
+    if (!req.file)
+      return res.status(400).json({ success: false, message: 'No file provided' });
     if (req.file.mimetype !== 'application/pdf')
       return res.status(400).json({ success: false, message: 'Only PDF files are accepted for resume' });
-    const result = await uploadToCloudinary(req.file.buffer, {
+    const result = await uploadBuffer(req.file.buffer, req.file.mimetype, {
       folder: 'portfolio-saas/resumes',
       resource_type: 'raw',
       format: 'pdf',
     });
-    // Save resumeUrl directly to portfolio
     const p = await Portfolio.findOne({ userId: req.user._id });
     if (p) { p.resumeUrl = result.secure_url; await p.save(); }
     res.json({ success: true, url: result.secure_url, publicId: result.public_id });
