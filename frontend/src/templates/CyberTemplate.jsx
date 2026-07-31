@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Terminal, Cpu, Shield, ExternalLink, Download, Sun, Moon, Mail, Send, Menu, X, User, Briefcase, GraduationCap, Award } from 'lucide-react';
+import { Terminal, Cpu, Shield, ExternalLink, Download, Sun, Moon, Mail, Send, Menu, X, User, Briefcase, GraduationCap, Award, Github, Linkedin, Twitter, Instagram, Globe } from 'lucide-react';
 import { analyticsService } from '../services/analyticsService';
 import { portfolioService } from '../services/portfolioService';
 import { useToast } from '../components/Toast';
@@ -135,18 +135,46 @@ const CyberTemplate = ({ data }) => {
               </p>
             </div>
 
-            {resumeUrl && (
-              <button
-                onClick={() => {
-                  analyticsService.trackEvent(username, 'resume_download');
-                  window.open(resumeUrl, '_blank');
-                }}
-                className="px-4 py-2 border border-emerald-500 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 font-mono text-xs rounded flex items-center gap-2"
-              >
-                <Download className="w-4 h-4" />
-                <span>FETCH_RESUME.PDF</span>
-              </button>
-            )}
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              {resumeUrl && (
+                <button
+                  onClick={() => {
+                    analyticsService.trackEvent(username, 'resume_download');
+                    window.open(resumeUrl, '_blank');
+                  }}
+                  className="px-4 py-2 border border-emerald-500 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 font-mono text-xs rounded flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>FETCH_RESUME.PDF</span>
+                </button>
+              )}
+
+              {socialLinks.github && (
+                <a href={socialLinks.github} target="_blank" rel="noreferrer" className="p-2 border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/30 text-emerald-400 rounded transition" title="GitHub">
+                  <Github className="w-4 h-4" />
+                </a>
+              )}
+              {socialLinks.linkedin && (
+                <a href={socialLinks.linkedin} target="_blank" rel="noreferrer" className="p-2 border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/30 text-emerald-400 rounded transition" title="LinkedIn">
+                  <Linkedin className="w-4 h-4" />
+                </a>
+              )}
+              {socialLinks.twitter && (
+                <a href={socialLinks.twitter} target="_blank" rel="noreferrer" className="p-2 border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/30 text-emerald-400 rounded transition" title="Twitter / X">
+                  <Twitter className="w-4 h-4" />
+                </a>
+              )}
+              {socialLinks.instagram && (
+                <a href={socialLinks.instagram} target="_blank" rel="noreferrer" className="p-2 border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/30 text-emerald-400 rounded transition" title="Instagram">
+                  <Instagram className="w-4 h-4" />
+                </a>
+              )}
+              {(socialLinks.portfolio || socialLinks.website) && (
+                <a href={socialLinks.portfolio || socialLinks.website} target="_blank" rel="noreferrer" className="p-2 border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/30 text-emerald-400 rounded transition" title="Personal Website">
+                  <Globe className="w-4 h-4" />
+                </a>
+              )}
+            </div>
           </section>
         )}
 

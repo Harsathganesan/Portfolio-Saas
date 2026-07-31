@@ -101,6 +101,7 @@ const PersonalInfoPage = () => {
           twitter: form.twitter,
           instagram: form.instagram,
           portfolio: form.portfolioUrl,
+          website: form.portfolioUrl,
         },
         sectionsEnabled: {
           ...(portfolio?.sectionsEnabled || {}),

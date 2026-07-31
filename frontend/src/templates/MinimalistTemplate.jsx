@@ -365,25 +365,70 @@ const MinimalistTemplate = ({ data }) => {
               <div className="space-y-2 pt-4">
                 <span className="text-xs text-slate-400 font-medium block">Connect with me</span>
                 <div className="flex items-center space-x-3">
-                  <motion.a
-                    whileHover={{ scale: 1.1, y: -2 }}
-                    href={socialLinks.github || '#'}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="w-10 h-10 rounded-full flex items-center justify-center border border-slate-200 bg-white text-slate-600 hover:text-indigo-600 hover:border-indigo-300 shadow-sm transition"
-                  >
-                    <Github className="w-4 h-4" />
-                  </motion.a>
+                  {socialLinks.github && (
+                    <motion.a
+                      whileHover={{ scale: 1.1, y: -2 }}
+                      href={socialLinks.github}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-10 h-10 rounded-full flex items-center justify-center border border-slate-200 bg-white text-slate-600 hover:text-indigo-600 hover:border-indigo-300 shadow-sm transition"
+                      title="GitHub"
+                    >
+                      <Github className="w-4 h-4" />
+                    </motion.a>
+                  )}
 
-                  <motion.a
-                    whileHover={{ scale: 1.1, y: -2 }}
-                    href={socialLinks.linkedin || '#'}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="w-10 h-10 rounded-full flex items-center justify-center border border-slate-200 bg-white text-slate-600 hover:text-indigo-600 hover:border-indigo-300 shadow-sm transition"
-                  >
-                    <Linkedin className="w-4 h-4 text-sky-600" />
-                  </motion.a>
+                  {socialLinks.linkedin && (
+                    <motion.a
+                      whileHover={{ scale: 1.1, y: -2 }}
+                      href={socialLinks.linkedin}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-10 h-10 rounded-full flex items-center justify-center border border-slate-200 bg-white text-slate-600 hover:text-indigo-600 hover:border-indigo-300 shadow-sm transition"
+                      title="LinkedIn"
+                    >
+                      <Linkedin className="w-4 h-4 text-sky-600" />
+                    </motion.a>
+                  )}
+
+                  {socialLinks.twitter && (
+                    <motion.a
+                      whileHover={{ scale: 1.1, y: -2 }}
+                      href={socialLinks.twitter}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-10 h-10 rounded-full flex items-center justify-center border border-slate-200 bg-white text-slate-600 hover:text-indigo-600 hover:border-indigo-300 shadow-sm transition"
+                      title="Twitter / X"
+                    >
+                      <Twitter className="w-4 h-4 text-sky-500" />
+                    </motion.a>
+                  )}
+
+                  {socialLinks.instagram && (
+                    <motion.a
+                      whileHover={{ scale: 1.1, y: -2 }}
+                      href={socialLinks.instagram}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-10 h-10 rounded-full flex items-center justify-center border border-slate-200 bg-white text-slate-600 hover:text-indigo-600 hover:border-indigo-300 shadow-sm transition"
+                      title="Instagram"
+                    >
+                      <Instagram className="w-4 h-4 text-pink-600" />
+                    </motion.a>
+                  )}
+
+                  {(socialLinks.portfolio || socialLinks.website) && (
+                    <motion.a
+                      whileHover={{ scale: 1.1, y: -2 }}
+                      href={socialLinks.portfolio || socialLinks.website}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-10 h-10 rounded-full flex items-center justify-center border border-slate-200 bg-white text-slate-600 hover:text-indigo-600 hover:border-indigo-300 shadow-sm transition"
+                      title="Personal Website"
+                    >
+                      <Globe className="w-4 h-4 text-emerald-600" />
+                    </motion.a>
+                  )}
 
                   {personalInfo.email && (
                     <motion.a

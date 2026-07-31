@@ -5,6 +5,7 @@ import {
   Linkedin,
   Twitter,
   Instagram,
+  Globe,
   Mail,
   MapPin,
   ExternalLink,
@@ -302,6 +303,7 @@ const CreativeTemplate = ({ data }) => {
                       href={socialLinks.github}
                       target="_blank"
                       rel="noreferrer"
+                      title="GitHub"
                       className={`w-11 h-11 rounded-full flex items-center justify-center border transition ${
                         isDark ? 'bg-slate-900 border-slate-800 text-slate-300 hover:text-purple-400' : 'bg-slate-100 border-slate-200 text-slate-600 hover:text-purple-600'
                       }`}
@@ -314,11 +316,51 @@ const CreativeTemplate = ({ data }) => {
                       href={socialLinks.linkedin}
                       target="_blank"
                       rel="noreferrer"
+                      title="LinkedIn"
                       className={`w-11 h-11 rounded-full flex items-center justify-center border transition ${
                         isDark ? 'bg-slate-900 border-slate-800 text-slate-300 hover:text-purple-400' : 'bg-slate-100 border-slate-200 text-slate-600 hover:text-purple-600'
                       }`}
                     >
                       <Linkedin className="w-5 h-5" />
+                    </a>
+                  )}
+                  {socialLinks.twitter && (
+                    <a
+                      href={socialLinks.twitter}
+                      target="_blank"
+                      rel="noreferrer"
+                      title="Twitter / X"
+                      className={`w-11 h-11 rounded-full flex items-center justify-center border transition ${
+                        isDark ? 'bg-slate-900 border-slate-800 text-slate-300 hover:text-purple-400' : 'bg-slate-100 border-slate-200 text-slate-600 hover:text-purple-600'
+                      }`}
+                    >
+                      <Twitter className="w-5 h-5" />
+                    </a>
+                  )}
+                  {socialLinks.instagram && (
+                    <a
+                      href={socialLinks.instagram}
+                      target="_blank"
+                      rel="noreferrer"
+                      title="Instagram"
+                      className={`w-11 h-11 rounded-full flex items-center justify-center border transition ${
+                        isDark ? 'bg-slate-900 border-slate-800 text-slate-300 hover:text-purple-400' : 'bg-slate-100 border-slate-200 text-slate-600 hover:text-purple-600'
+                      }`}
+                    >
+                      <Instagram className="w-5 h-5" />
+                    </a>
+                  )}
+                  {(socialLinks.portfolio || socialLinks.website) && (
+                    <a
+                      href={socialLinks.portfolio || socialLinks.website}
+                      target="_blank"
+                      rel="noreferrer"
+                      title="Personal Website"
+                      className={`w-11 h-11 rounded-full flex items-center justify-center border transition ${
+                        isDark ? 'bg-slate-900 border-slate-800 text-slate-300 hover:text-purple-400' : 'bg-slate-100 border-slate-200 text-slate-600 hover:text-purple-600'
+                      }`}
+                    >
+                      <Globe className="w-5 h-5" />
                     </a>
                   )}
                   {personalInfo.email && (

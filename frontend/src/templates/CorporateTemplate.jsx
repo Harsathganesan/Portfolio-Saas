@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, MapPin, Phone, ExternalLink, Download, Briefcase, GraduationCap, Award, ShieldCheck, Sun, Moon, User, Code2, Send, Menu, X, FolderGit2 } from 'lucide-react';
+import { Mail, MapPin, Phone, ExternalLink, Download, Briefcase, GraduationCap, Award, ShieldCheck, Sun, Moon, User, Code2, Send, Menu, X, FolderGit2, Github, Linkedin, Twitter, Instagram, Globe } from 'lucide-react';
 import { analyticsService } from '../services/analyticsService';
 import { portfolioService } from '../services/portfolioService';
 import { useToast } from '../components/Toast';
@@ -151,7 +151,7 @@ const CorporateTemplate = ({ data }) => {
           </div>
 
           <div className={`p-6 rounded-2xl border space-y-3 ${isDark ? 'bg-slate-900 border-slate-800 text-xs' : 'bg-white border-slate-200 text-xs shadow-sm'}`}>
-            <h3 className="font-bold text-sm text-indigo-400 border-b border-slate-800 pb-2">Contact Details</h3>
+            <h3 className="font-bold text-sm text-indigo-400 border-b border-slate-800 pb-2">Contact & Socials</h3>
             {personalInfo.email && (
               <div className="flex items-center gap-2 text-slate-300">
                 <Mail className="w-4 h-4 text-indigo-400" />
@@ -170,6 +170,33 @@ const CorporateTemplate = ({ data }) => {
                 <span>{personalInfo.location}</span>
               </div>
             )}
+            <div className="flex items-center space-x-2 pt-2 border-t border-slate-800">
+              {socialLinks.github && (
+                <a href={socialLinks.github} target="_blank" rel="noreferrer" className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-indigo-600 transition" title="GitHub">
+                  <Github className="w-3.5 h-3.5" />
+                </a>
+              )}
+              {socialLinks.linkedin && (
+                <a href={socialLinks.linkedin} target="_blank" rel="noreferrer" className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-indigo-600 transition" title="LinkedIn">
+                  <Linkedin className="w-3.5 h-3.5 text-sky-400" />
+                </a>
+              )}
+              {socialLinks.twitter && (
+                <a href={socialLinks.twitter} target="_blank" rel="noreferrer" className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-indigo-600 transition" title="Twitter / X">
+                  <Twitter className="w-3.5 h-3.5 text-sky-400" />
+                </a>
+              )}
+              {socialLinks.instagram && (
+                <a href={socialLinks.instagram} target="_blank" rel="noreferrer" className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-indigo-600 transition" title="Instagram">
+                  <Instagram className="w-3.5 h-3.5 text-pink-400" />
+                </a>
+              )}
+              {(socialLinks.portfolio || socialLinks.website) && (
+                <a href={socialLinks.portfolio || socialLinks.website} target="_blank" rel="noreferrer" className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-indigo-600 transition" title="Personal Website">
+                  <Globe className="w-3.5 h-3.5 text-emerald-400" />
+                </a>
+              )}
+            </div>
           </div>
         </aside>
 

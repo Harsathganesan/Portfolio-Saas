@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Github, Linkedin, Twitter, Mail, MapPin, ExternalLink, Download, Sun, Moon, Sparkles, User, FolderGit2, Code2, Briefcase, GraduationCap, Award, Send, Menu, X } from 'lucide-react';
+import { Github, Linkedin, Twitter, Instagram, Globe, Mail, MapPin, ExternalLink, Download, Sun, Moon, Sparkles, User, FolderGit2, Code2, Briefcase, GraduationCap, Award, Send, Menu, X } from 'lucide-react';
 import { analyticsService } from '../services/analyticsService';
 import { portfolioService } from '../services/portfolioService';
 import { useToast } from '../components/Toast';
@@ -155,13 +155,28 @@ const SleekTemplate = ({ data }) => {
 
                 <div className="flex items-center space-x-3">
                   {socialLinks.github && (
-                    <a href={socialLinks.github} target="_blank" rel="noreferrer" className="p-2.5 rounded-xl bg-slate-800/80 text-slate-300 hover:text-white hover:bg-indigo-600 transition">
+                    <a href={socialLinks.github} target="_blank" rel="noreferrer" className="p-2.5 rounded-xl bg-slate-800/80 text-slate-300 hover:text-white hover:bg-indigo-600 transition" title="GitHub">
                       <Github className="w-4 h-4" />
                     </a>
                   )}
                   {socialLinks.linkedin && (
-                    <a href={socialLinks.linkedin} target="_blank" rel="noreferrer" className="p-2.5 rounded-xl bg-slate-800/80 text-slate-300 hover:text-white hover:bg-indigo-600 transition">
+                    <a href={socialLinks.linkedin} target="_blank" rel="noreferrer" className="p-2.5 rounded-xl bg-slate-800/80 text-slate-300 hover:text-white hover:bg-indigo-600 transition" title="LinkedIn">
                       <Linkedin className="w-4 h-4" />
+                    </a>
+                  )}
+                  {socialLinks.twitter && (
+                    <a href={socialLinks.twitter} target="_blank" rel="noreferrer" className="p-2.5 rounded-xl bg-slate-800/80 text-slate-300 hover:text-white hover:bg-indigo-600 transition" title="Twitter / X">
+                      <Twitter className="w-4 h-4" />
+                    </a>
+                  )}
+                  {socialLinks.instagram && (
+                    <a href={socialLinks.instagram} target="_blank" rel="noreferrer" className="p-2.5 rounded-xl bg-slate-800/80 text-slate-300 hover:text-white hover:bg-indigo-600 transition" title="Instagram">
+                      <Instagram className="w-4 h-4" />
+                    </a>
+                  )}
+                  {(socialLinks.portfolio || socialLinks.website) && (
+                    <a href={socialLinks.portfolio || socialLinks.website} target="_blank" rel="noreferrer" className="p-2.5 rounded-xl bg-slate-800/80 text-slate-300 hover:text-white hover:bg-indigo-600 transition" title="Personal Website">
+                      <Globe className="w-4 h-4" />
                     </a>
                   )}
                   {personalInfo.email && (
