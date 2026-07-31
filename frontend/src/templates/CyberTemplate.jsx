@@ -238,28 +238,45 @@ const CyberTemplate = ({ data }) => {
               <h2 className="text-lg font-bold">DEPLOYED_NODES // PROJECTS ({projects.length})</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {projects.map((proj) => (
-                <div key={proj._id || proj.title} className="border border-emerald-500/30 bg-black/80 p-5 rounded-lg space-y-3 hover:border-emerald-400 transition">
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-bold text-base text-emerald-200">{proj.title}</h3>
-                    {proj.liveUrl && (
-                      <a href={proj.liveUrl} target="_blank" rel="noreferrer" className="text-emerald-400 hover:text-white">
-                        <ExternalLink className="w-4 h-4" />
-                      </a>
+              {projects.map((proj) => {
+                const stack = Array.isArray(proj.techStack) ? proj.techStack : typeof proj.techStack === 'string' ? proj.techStack.split(',') : [];
+                return (
+                  <div key={proj._id || proj.title} className="border border-emerald-500/30 bg-black/80 p-5 rounded-lg space-y-3 hover:border-emerald-400 transition flex flex-col justify-between">
+                    <div className="space-y-3">
+                      {(proj.thumbnail || proj.image) && (
+                        <div className="overflow-hidden rounded h-40 border border-emerald-500/30">
+                          <img src={proj.thumbnail || proj.image} alt={proj.title} className="w-full h-full object-cover" />
+                        </div>
+                      )}
+                      <div className="flex justify-between items-center">
+                        <h3 className="font-bold text-base text-emerald-200">{proj.title}</h3>
+                        <div className="flex items-center space-x-2">
+                          {(proj.githubUrl || proj.github) && (
+                            <a href={proj.githubUrl || proj.github} target="_blank" rel="noreferrer" className="text-emerald-400 hover:text-white p-1" title="GitHub Repository">
+                              <Github className="w-4 h-4" />
+                            </a>
+                          )}
+                          {(proj.liveUrl || proj.demoUrl || proj.link) && (
+                            <a href={proj.liveUrl || proj.demoUrl || proj.link} target="_blank" rel="noreferrer" className="text-emerald-400 hover:text-white p-1" title="Live Demo">
+                              <ExternalLink className="w-4 h-4" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-xs text-slate-400 leading-relaxed">{proj.description}</p>
+                    </div>
+                    {stack.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 pt-2 border-t border-emerald-500/20">
+                        {stack.map((tech) => (
+                          <span key={tech} className="text-[10px] px-2 py-0.5 border border-emerald-500/40 text-emerald-400 rounded font-mono">
+                            [{String(tech).trim()}]
+                          </span>
+                        ))}
+                      </div>
                     )}
                   </div>
-                  <p className="text-xs text-slate-400 leading-relaxed">{proj.description}</p>
-                  {proj.techStack && (
-                    <div className="flex flex-wrap gap-1.5 pt-2">
-                      {proj.techStack.map((tech) => (
-                        <span key={tech} className="text-[10px] px-2 py-0.5 border border-emerald-500/40 text-emerald-400 rounded">
-                          [{tech}]
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
         )}

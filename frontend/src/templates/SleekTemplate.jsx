@@ -266,20 +266,44 @@ const SleekTemplate = ({ data }) => {
               <h2 className="text-2xl font-bold">Featured Projects ({projects.length})</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {projects.map((proj) => (
-                <div key={proj._id || proj.title} className={`p-6 rounded-2xl border ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
-                  {proj.thumbnail && <img src={proj.thumbnail} alt={proj.title} className="w-full h-40 object-cover rounded-xl mb-4" />}
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="font-bold text-lg">{proj.title}</h3>
-                    {proj.liveUrl && (
-                      <a href={proj.liveUrl} target="_blank" rel="noreferrer" className="text-indigo-400">
-                        <ExternalLink className="w-4 h-4" />
-                      </a>
+              {projects.map((proj) => {
+                const stack = Array.isArray(proj.techStack) ? proj.techStack : typeof proj.techStack === 'string' ? proj.techStack.split(',') : [];
+                return (
+                  <div key={proj._id || proj.title} className={`p-6 rounded-2xl border flex flex-col justify-between space-y-4 ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
+                    <div className="space-y-3">
+                      {(proj.thumbnail || proj.image) && (
+                        <img src={proj.thumbnail || proj.image} alt={proj.title} className="w-full h-44 object-cover rounded-xl border border-slate-700/40" />
+                      )}
+                      <div className="flex justify-between items-center">
+                        <h3 className="font-bold text-lg">{proj.title}</h3>
+                        <div className="flex items-center space-x-2">
+                          {(proj.githubUrl || proj.github) && (
+                            <a href={proj.githubUrl || proj.github} target="_blank" rel="noreferrer" className="p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white hover:bg-indigo-600 transition" title="GitHub Repository">
+                              <Github className="w-4 h-4" />
+                            </a>
+                          )}
+                          {(proj.liveUrl || proj.demoUrl || proj.link) && (
+                            <a href={proj.liveUrl || proj.demoUrl || proj.link} target="_blank" rel="noreferrer" className="p-2 rounded-xl bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600 hover:text-white transition" title="Live Demo">
+                              <ExternalLink className="w-4 h-4" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-xs text-slate-400 leading-relaxed">{proj.description}</p>
+                    </div>
+
+                    {stack.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 pt-3 border-t border-slate-800/60">
+                        {stack.map((tech) => (
+                          <span key={tech} className="text-[10px] font-mono px-2.5 py-0.5 rounded-md bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 font-semibold">
+                            {String(tech).trim()}
+                          </span>
+                        ))}
+                      </div>
                     )}
                   </div>
-                  <p className="text-xs text-slate-400 mb-4">{proj.description}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
         )}

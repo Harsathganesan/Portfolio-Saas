@@ -731,30 +731,47 @@ const MinimalistTemplate = ({ data }) => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {projects.map((p) => (
-                <div key={p._id || p.id || p.title} className="rounded-3xl border border-slate-100 bg-white shadow-md shadow-slate-200/50 overflow-hidden hover:-translate-y-2 hover:shadow-xl transition duration-300 flex flex-col justify-between">
-                  {(p.image || p.thumbnail) && (
-                    <div className="h-48 overflow-hidden relative">
-                      <img src={p.image || p.thumbnail} alt={p.title} className="w-full h-full object-cover hover:scale-105 transition duration-500" />
-                    </div>
-                  )}
-                  <div className="p-6 space-y-3 flex-1 flex flex-col justify-between">
-                    <div className="space-y-2">
-                      <h3 className="font-extrabold text-lg text-slate-900">{p.title}</h3>
-                      <p className="text-xs text-slate-600 leading-relaxed">{p.description}</p>
-                    </div>
-                    {p.techStack && (
-                      <div className="flex flex-wrap gap-1.5 pt-2">
-                        {p.techStack.map((tech) => (
-                          <span key={tech} className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-indigo-50 text-indigo-700">
-                            {tech}
-                          </span>
-                        ))}
+              {projects.map((p) => {
+                const stack = Array.isArray(p.techStack) ? p.techStack : typeof p.techStack === 'string' ? p.techStack.split(',') : [];
+                return (
+                  <div key={p._id || p.id || p.title} className="rounded-3xl border border-slate-100 bg-white shadow-md shadow-slate-200/50 overflow-hidden hover:-translate-y-2 hover:shadow-xl transition duration-300 flex flex-col justify-between">
+                    {(p.image || p.thumbnail) && (
+                      <div className="h-48 overflow-hidden relative">
+                        <img src={p.image || p.thumbnail} alt={p.title} className="w-full h-full object-cover hover:scale-105 transition duration-500" />
                       </div>
                     )}
+                    <div className="p-6 space-y-3 flex-1 flex flex-col justify-between">
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <h3 className="font-extrabold text-lg text-slate-900">{p.title}</h3>
+                          <div className="flex items-center space-x-1.5">
+                            {(p.githubUrl || p.github) && (
+                              <a href={p.githubUrl || p.github} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-indigo-600 hover:text-white transition" title="GitHub Repository">
+                                <Github className="w-4 h-4" />
+                              </a>
+                            )}
+                            {(p.liveUrl || p.demoUrl || p.link) && (
+                              <a href={p.liveUrl || p.demoUrl || p.link} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white transition" title="Live Demo">
+                                <ExternalLink className="w-4 h-4" />
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                        <p className="text-xs text-slate-600 leading-relaxed">{p.description}</p>
+                      </div>
+                      {stack.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 pt-2 border-t border-slate-100">
+                          {stack.map((tech) => (
+                            <span key={tech} className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-indigo-50 text-indigo-700">
+                              {String(tech).trim()}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </motion.section>
         )}

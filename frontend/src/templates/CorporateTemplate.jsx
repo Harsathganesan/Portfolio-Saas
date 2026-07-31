@@ -263,12 +263,43 @@ const CorporateTemplate = ({ data }) => {
                 <FolderGit2 className="w-5 h-5" /> Highlighted Initiatives & Projects
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {projects.map((proj) => (
-                  <div key={proj._id || proj.title} className={`p-4 rounded-xl border ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200'}`}>
-                    <h3 className="font-bold text-sm mb-1">{proj.title}</h3>
-                    <p className="text-xs text-slate-400 line-clamp-2">{proj.description}</p>
-                  </div>
-                ))}
+                {projects.map((proj) => {
+                  const stack = Array.isArray(proj.techStack) ? proj.techStack : typeof proj.techStack === 'string' ? proj.techStack.split(',') : [];
+                  return (
+                    <div key={proj._id || proj.title} className={`p-5 rounded-2xl border flex flex-col justify-between space-y-3 ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
+                      <div className="space-y-2">
+                        {(proj.thumbnail || proj.image) && (
+                          <img src={proj.thumbnail || proj.image} alt={proj.title} className="w-full h-36 object-cover rounded-xl border border-slate-700/40" />
+                        )}
+                        <div className="flex justify-between items-center">
+                          <h3 className="font-bold text-base text-slate-100">{proj.title}</h3>
+                          <div className="flex items-center space-x-1.5">
+                            {(proj.githubUrl || proj.github) && (
+                              <a href={proj.githubUrl || proj.github} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-indigo-600 transition" title="GitHub Repository">
+                                <Github className="w-3.5 h-3.5" />
+                              </a>
+                            )}
+                            {(proj.liveUrl || proj.demoUrl || proj.link) && (
+                              <a href={proj.liveUrl || proj.demoUrl || proj.link} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-400 hover:bg-indigo-600 hover:text-white transition" title="Live Demo">
+                                <ExternalLink className="w-3.5 h-3.5" />
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                        <p className="text-xs text-slate-400 leading-relaxed">{proj.description}</p>
+                      </div>
+                      {stack.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 pt-2 border-t border-slate-800">
+                          {stack.map((tech) => (
+                            <span key={tech} className="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
+                              {String(tech).trim()}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </section>
           )}
