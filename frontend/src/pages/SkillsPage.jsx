@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
 import { portfolioService } from '../services/portfolioService';
 import { useToast } from '../components/Toast';
-import { Code2, Plus, Trash2, Edit2, Loader2, X } from 'lucide-react';
+import { Code2, Plus, Trash2, Edit2, Loader2, X, Sparkles, Save } from 'lucide-react';
 import SectionPublishBar from '../components/SectionPublishBar';
-
-
 
 const SkillsPage = () => {
 
@@ -16,6 +14,13 @@ const SkillsPage = () => {
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Batch Skill Tag Input State
+  const [tagInput, setTagInput] = useState('');
+  const [tagCategory, setTagCategory] = useState('Frontend');
+  const [tagLevel, setTagLevel] = useState(85);
+  const [draftTags, setDraftTags] = useState([]);
+  const [savingBatch, setSavingBatch] = useState(false);
+
   const [form, setForm] = useState({
     name: '',
     category: 'Frontend',
@@ -23,6 +28,49 @@ const SkillsPage = () => {
   });
 
   const skills = portfolio?.skills || [];
+
+  const handleAddTag = (e) => {
+    if (e) e.preventDefault();
+    if (!tagInput.trim()) return;
+    const name = tagInput.trim();
+    if (draftTags.some((t) => t.name.toLowerCase() === name.toLowerCase())) {
+      toast('Skill already in draft list', 'info');
+      return;
+    }
+    setDraftTags((prev) => [
+      ...prev,
+      { id: Date.now(), name, category: tagCategory, proficiencyLevel: tagLevel },
+    ]);
+    setTagInput('');
+  };
+
+  const handleRemoveDraftTag = (id) => {
+    setDraftTags((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const handleSaveBatchSkills = async () => {
+    if (draftTags.length === 0) return;
+    setSavingBatch(true);
+    try {
+      for (const skill of draftTags) {
+        const res = await portfolioService.createSkill({
+          name: skill.name,
+          category: skill.category,
+          proficiencyLevel: skill.proficiencyLevel,
+        });
+        if (res.success && res.skill) {
+          addSkillToContext(res.skill);
+        }
+      }
+      toast(`${draftTags.length} skill(s) saved & published live!`, 'success');
+      setDraftTags([]);
+      fetchPortfolio();
+    } catch (err) {
+      toast('Failed to save skills batch', 'error');
+    } finally {
+      setSavingBatch(false);
+    }
+  };
 
   const handleOpenAdd = () => {
     setEditingId(null);
@@ -96,6 +144,95 @@ const SkillsPage = () => {
       </div>
 
       <SectionPublishBar sectionId="skills" title="Skills Section" itemCount={skills.length} />
+
+      {/* Interactive Quick Add Skill Tags Section */}
+      <div className="p-6 rounded-3xl border border-slate-200 bg-white space-y-4 shadow-sm">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider text-indigo-600 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-amber-500" /> Quick Add Skill Tags
+          </h2>
+          <span className="text-xs text-slate-400">Type skill name and click Add or press Enter</span>
+        </div>
+
+        <form onSubmit={handleAddTag} className="flex flex-col sm:flex-row items-center gap-3">
+          <input
+            type="text"
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            placeholder="Type skill name (e.g. React.js, Node.js, Python, Figma)..."
+            className="flex-1 w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-indigo-500 focus:bg-white transition"
+          />
+
+          <select
+            value={tagCategory}
+            onChange={(e) => setTagCategory(e.target.value)}
+            className="w-full sm:w-40 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-900 outline-none focus:border-indigo-500 font-medium"
+          >
+            <option value="Frontend">Frontend</option>
+            <option value="Backend">Backend</option>
+            <option value="Database">Database</option>
+            <option value="DevOps">DevOps & Cloud</option>
+            <option value="Tools">Tools & Architecture</option>
+            <option value="Design">UI/UX Design</option>
+            <option value="Other">Other</option>
+          </select>
+
+          <button
+            type="submit"
+            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-sm shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Tag</span>
+          </button>
+        </form>
+
+        {/* Draft Tags Display Chips */}
+        {draftTags.length > 0 && (
+          <div className="pt-3 border-t border-slate-100 space-y-3">
+            <div className="flex justify-between items-center text-xs">
+              <span className="font-bold text-slate-700">Tags ready to save ({draftTags.length}):</span>
+              <button
+                type="button"
+                onClick={() => setDraftTags([])}
+                className="text-slate-400 hover:text-rose-600 transition text-[11px]"
+              >
+                Clear all tags
+              </button>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {draftTags.map((tag) => (
+                <div
+                  key={tag.id}
+                  className="bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-xl px-3 py-1.5 text-xs font-semibold flex items-center gap-2"
+                >
+                  <span>{tag.name}</span>
+                  <span className="text-[10px] text-indigo-400 font-mono">({tag.category})</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveDraftTag(tag.id)}
+                    className="hover:text-rose-600 text-indigo-400 p-0.5 rounded-full hover:bg-rose-50 transition"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={handleSaveBatchSkills}
+                disabled={savingBatch}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 shadow-sm transition"
+              >
+                {savingBatch ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                <span>{savingBatch ? 'Saving Skills...' : `Save ${draftTags.length} Skill Tag(s) to Portfolio`}</span>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 

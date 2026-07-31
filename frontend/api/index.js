@@ -202,11 +202,24 @@ const mapCertificateFields = (cert) => {
   };
 };
 
+const mapExperienceFields = (exp) => {
+  if (!exp) return exp;
+  const obj = exp.toObject ? exp.toObject() : { ...exp };
+  const durationText = obj.duration || obj.period || (obj.startDate ? `${obj.startDate} - ${obj.endDate || 'Present'}` : '') || '';
+  return {
+    ...obj,
+    position: obj.position || obj.role || '',
+    role: obj.role || obj.position || '',
+    duration: durationText,
+    period: durationText,
+  };
+};
+
 // ─── Portfolio Routes ─────────────────────────────────────────────────────────
 app.get(['/api/portfolio/me', '/portfolio/me'], protect, async (req, res) => {
   try {
     const p = await getOrCreate(req.user._id, req.user.username);
-    const [projects, skills, education, experience, rawCertificates] = await Promise.all([
+    const [projects, skills, education, rawExperience, rawCertificates] = await Promise.all([
       Project.find({ portfolioId: p._id }).sort({ createdAt: -1 }),
       Skill.find({ portfolioId: p._id }),
       Education.find({ portfolioId: p._id }).sort({ createdAt: -1 }),
@@ -214,6 +227,7 @@ app.get(['/api/portfolio/me', '/portfolio/me'], protect, async (req, res) => {
       Certificate.find({ portfolioId: p._id }).sort({ createdAt: -1 }),
     ]);
     const certificates = rawCertificates.map(mapCertificateFields);
+    const experience = rawExperience.map(mapExperienceFields);
     res.json({ success: true, portfolio: { ...p.toObject(), projects, skills, education, experience, certificates } });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
@@ -274,7 +288,7 @@ app.get(['/api/user/:username', '/user/:username'], async (req, res) => {
     const username = req.params.username.toLowerCase().trim();
     const p = await Portfolio.findOne({ $or: [{ username }, { slug: username }] });
     if (!p || (!p.isPublished && !p.published)) return res.status(404).json({ success: false, message: 'Portfolio not found or not published' });
-    const [projects, skills, education, experience, rawCertificates] = await Promise.all([
+    const [projects, skills, education, rawExperience, rawCertificates] = await Promise.all([
       Project.find({ portfolioId: p._id }).sort({ isFeatured: -1, createdAt: -1 }),
       Skill.find({ portfolioId: p._id }),
       Education.find({ portfolioId: p._id }).sort({ createdAt: -1 }),
@@ -282,6 +296,7 @@ app.get(['/api/user/:username', '/user/:username'], async (req, res) => {
       Certificate.find({ portfolioId: p._id }).sort({ createdAt: -1 }),
     ]);
     const certificates = rawCertificates.map(mapCertificateFields);
+    const experience = rawExperience.map(mapExperienceFields);
     let a = await Analytics.findOne({ portfolioId: p._id });
     if (!a) a = await Analytics.create({ portfolioId: p._id, username: p.username });
     a.totalViews += 1; await a.save();
