@@ -736,13 +736,30 @@ const MinimalistTemplate = ({ data }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {certificates.map((cert) => (
-                <div key={cert._id || cert.id || cert.title} className="p-6 rounded-3xl border border-slate-100 bg-white shadow-md shadow-slate-200/40 flex items-center space-x-4">
-                  <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
-                    <Award className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-sm text-indigo-600">{cert.title}</h4>
-                    <span className="text-xs text-slate-500">{cert.organization || cert.issuer} • {cert.issueDate || cert.date}</span>
+                <div key={cert._id || cert.id || cert.title || cert.name} className="p-6 rounded-3xl border border-slate-100 bg-white shadow-md shadow-slate-200/40 flex items-start space-x-4">
+                  {(cert.certificateImage || cert.imageUrl) ? (
+                    <img src={cert.certificateImage || cert.imageUrl} alt={cert.title || cert.name} className="w-12 h-12 object-cover rounded-2xl border border-slate-200 shrink-0" />
+                  ) : (
+                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                      <Award className="w-6 h-6" />
+                    </div>
+                  )}
+                  <div className="space-y-1 min-w-0">
+                    <h4 className="font-bold text-sm text-indigo-600 leading-tight">{cert.title || cert.name}</h4>
+                    {(cert.organization || cert.issuer) && (cert.issueDate || cert.date) && (
+                      <span className="text-xs text-slate-500">{cert.organization || cert.issuer} • {cert.issueDate || cert.date}</span>
+                    )}
+                    {(cert.organization || cert.issuer) && !(cert.issueDate || cert.date) && (
+                      <span className="text-xs text-slate-500">{cert.organization || cert.issuer}</span>
+                    )}
+                    {!(cert.organization || cert.issuer) && (cert.issueDate || cert.date) && (
+                      <span className="text-xs text-slate-500">{cert.issueDate || cert.date}</span>
+                    )}
+                    {cert.credentialUrl && (
+                      <a href={cert.credentialUrl} target="_blank" rel="noreferrer" className="text-[11px] text-indigo-500 hover:underline flex items-center gap-1 pt-0.5">
+                        <ExternalLink className="w-3 h-3" /> Verify
+                      </a>
+                    )}
                   </div>
                 </div>
               ))}

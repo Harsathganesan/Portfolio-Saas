@@ -263,9 +263,29 @@ const CyberTemplate = ({ data }) => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {certificates.map((cert) => (
-                <div key={cert._id || cert.title} className="border border-emerald-500/30 bg-black/60 p-4 rounded text-xs space-y-1">
-                  <h3 className="font-bold text-emerald-200">{cert.title}</h3>
-                  <p className="text-emerald-500">{cert.organization} [{cert.issueDate}]</p>
+                <div key={cert._id || cert.title || cert.name} className="border border-emerald-500/30 bg-black/60 p-4 rounded text-xs space-y-1">
+                  <div className="flex items-start gap-3">
+                    {(cert.certificateImage || cert.imageUrl) && (
+                      <img src={cert.certificateImage || cert.imageUrl} alt={cert.title || cert.name} className="w-10 h-10 object-cover rounded border border-emerald-500/30 shrink-0" />
+                    )}
+                    <div className="space-y-1 min-w-0">
+                      <h3 className="font-bold text-emerald-200">{cert.title || cert.name}</h3>
+                      {(cert.organization || cert.issuer) && (cert.issueDate || cert.date) && (
+                        <p className="text-emerald-500">{cert.organization || cert.issuer} [{cert.issueDate || cert.date}]</p>
+                      )}
+                      {(cert.organization || cert.issuer) && !(cert.issueDate || cert.date) && (
+                        <p className="text-emerald-500">{cert.organization || cert.issuer}</p>
+                      )}
+                      {!(cert.organization || cert.issuer) && (cert.issueDate || cert.date) && (
+                        <p className="text-emerald-500">[{cert.issueDate || cert.date}]</p>
+                      )}
+                      {cert.credentialUrl && (
+                        <a href={cert.credentialUrl} target="_blank" rel="noreferrer" className="text-emerald-400 hover:underline flex items-center gap-1">
+                          <ExternalLink className="w-3 h-3" /> VERIFY_LINK
+                        </a>
+                      )}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

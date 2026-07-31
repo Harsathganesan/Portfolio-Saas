@@ -295,10 +295,22 @@ const SleekTemplate = ({ data }) => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {certificates.map((cert) => (
-                <div key={cert._id || cert.title} className={`p-6 rounded-2xl border ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
-                  <h3 className="font-bold text-base">{cert.title}</h3>
-                  <p className="text-xs text-indigo-400">{cert.organization}</p>
-                  <span className="text-[10px] text-slate-500 block mt-1">{cert.issueDate}</span>
+                <div key={cert._id || cert.title || cert.name} className={`p-6 rounded-2xl border ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
+                  <div className="flex items-start gap-3">
+                    {(cert.certificateImage || cert.imageUrl) && (
+                      <img src={cert.certificateImage || cert.imageUrl} alt={cert.title || cert.name} className="w-12 h-12 object-cover rounded-xl border border-slate-700 shrink-0" />
+                    )}
+                    <div className="space-y-1 flex-1 min-w-0">
+                      <h3 className="font-bold text-base leading-tight">{cert.title || cert.name}</h3>
+                      {(cert.organization || cert.issuer) && <p className="text-xs text-indigo-400 font-semibold">{cert.organization || cert.issuer}</p>}
+                      {(cert.issueDate || cert.date) && <span className="text-[10px] text-slate-500 block">{cert.issueDate || cert.date}</span>}
+                      {cert.credentialUrl && (
+                        <a href={cert.credentialUrl} target="_blank" rel="noreferrer" className="text-[10px] text-indigo-400 hover:underline flex items-center gap-1 pt-1">
+                          <ExternalLink className="w-3 h-3" /> Verify Credential
+                        </a>
+                      )}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

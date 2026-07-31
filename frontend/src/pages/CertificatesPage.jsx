@@ -21,23 +21,25 @@ const CertificatesPage = () => {
     organization: '',
     issueDate: '',
     credentialUrl: '',
+    certificateImage: '',
   });
 
   const certificates = portfolio?.certificates || [];
 
   const handleOpenAdd = () => {
     setEditingId(null);
-    setForm({ title: '', organization: '', issueDate: '', credentialUrl: '' });
+    setForm({ title: '', organization: '', issueDate: '', credentialUrl: '', certificateImage: '' });
     setModalOpen(true);
   };
 
   const handleOpenEdit = (cert) => {
     setEditingId(cert._id);
     setForm({
-      title: cert.title || '',
-      organization: cert.organization || '',
+      title: cert.title || cert.name || '',
+      organization: cert.organization || cert.issuer || '',
       issueDate: cert.issueDate || '',
       credentialUrl: cert.credentialUrl || '',
+      certificateImage: cert.certificateImage || cert.imageUrl || '',
     });
     setModalOpen(true);
   };
@@ -94,16 +96,25 @@ const CertificatesPage = () => {
 
         {certificates.map((cert) => (
           <div key={cert._id} className="bg-white border border-slate-100 p-5 rounded-2xl shadow-2xs flex justify-between items-start">
-            <div className="space-y-1">
-              <h3 className="font-bold text-sm text-slate-900">{cert.title || cert.name}</h3>
-              <p className="text-xs font-bold text-blue-600">{cert.organization || cert.issuer}</p>
-              {cert.issueDate && <p className="text-[11px] text-slate-400 font-mono font-medium">Issued: {cert.issueDate}</p>}
-              {cert.credentialUrl && (
-                <a href={cert.credentialUrl} target="_blank" rel="noreferrer" className="text-[11px] text-blue-600 font-bold hover:underline flex items-center gap-1 pt-1">
-                  <span>Verify Credential</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+            <div className="flex items-start gap-3">
+              {(cert.certificateImage || cert.imageUrl) && (
+                <img
+                  src={cert.certificateImage || cert.imageUrl}
+                  alt={cert.title || cert.name}
+                  className="w-12 h-12 object-cover rounded-xl border border-slate-100 shrink-0"
+                />
               )}
+              <div className="space-y-1">
+                <h3 className="font-bold text-sm text-slate-900">{cert.title || cert.name}</h3>
+                {(cert.organization || cert.issuer) && <p className="text-xs font-bold text-blue-600">{cert.organization || cert.issuer}</p>}
+                {cert.issueDate && <p className="text-[11px] text-slate-400 font-mono font-medium">Issued: {cert.issueDate}</p>}
+                {cert.credentialUrl && (
+                  <a href={cert.credentialUrl} target="_blank" rel="noreferrer" className="text-[11px] text-blue-600 font-bold hover:underline flex items-center gap-1 pt-1">
+                    <span>Verify Credential</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
+              </div>
             </div>
             <div className="flex items-center space-x-1">
               <button onClick={() => handleOpenEdit(cert)} className="p-1.5 text-slate-400 hover:text-blue-600 transition">
@@ -154,7 +165,7 @@ const CertificatesPage = () => {
               </div>
 
               <div>
-                <label className="block text-slate-700 mb-1.5 font-semibold">Issue Date</label>
+                <label className="block text-slate-700 mb-1.5 font-semibold">Issue Date (Optional)</label>
                 <input
                   type="text"
                   value={form.issueDate}
@@ -165,12 +176,23 @@ const CertificatesPage = () => {
               </div>
 
               <div>
-                <label className="block text-slate-700 mb-1.5 font-semibold">Credential Verification URL</label>
+                <label className="block text-slate-700 mb-1.5 font-semibold">Credential Verification URL (Optional)</label>
                 <input
                   type="url"
                   value={form.credentialUrl}
                   onChange={(e) => setForm({ ...form, credentialUrl: e.target.value })}
                   placeholder="https://aws.amazon.com/..."
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 mb-1.5 font-semibold">Certificate Image / Badge URL (Optional)</label>
+                <input
+                  type="url"
+                  value={form.certificateImage}
+                  onChange={(e) => setForm({ ...form, certificateImage: e.target.value })}
+                  placeholder="https://example.com/badge.png"
                   className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                 />
               </div>

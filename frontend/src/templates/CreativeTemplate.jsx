@@ -588,10 +588,26 @@ const CreativeTemplate = ({ data }) => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {certificates.map((cert) => (
-                  <div key={cert._id || cert.title} className={`p-6 rounded-3xl border space-y-2 ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-100 shadow-sm'}`}>
-                    <h3 className="font-bold text-base">{cert.title}</h3>
-                    <p className="text-xs font-semibold text-purple-600">{cert.organization}</p>
-                    <span className="text-[10px] text-slate-500 font-mono block">{cert.issueDate}</span>
+                  <div key={cert._id || cert.title || cert.name} className={`p-6 rounded-3xl border space-y-2 ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-100 shadow-sm'}`}>
+                    <div className="flex items-start gap-3">
+                      {(cert.certificateImage || cert.imageUrl) ? (
+                        <img src={cert.certificateImage || cert.imageUrl} alt={cert.title || cert.name} className="w-12 h-12 object-cover rounded-xl border border-slate-700 shrink-0" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center shrink-0">
+                          <Award className="w-5 h-5" />
+                        </div>
+                      )}
+                      <div className="space-y-1 min-w-0">
+                        <h3 className="font-bold text-base leading-tight">{cert.title || cert.name}</h3>
+                        {(cert.organization || cert.issuer) && <p className="text-xs font-semibold text-purple-600">{cert.organization || cert.issuer}</p>}
+                        {(cert.issueDate || cert.date) && <span className="text-[10px] text-slate-500 font-mono block">{cert.issueDate || cert.date}</span>}
+                        {cert.credentialUrl && (
+                          <a href={cert.credentialUrl} target="_blank" rel="noreferrer" className="text-[11px] text-purple-500 hover:underline flex items-center gap-1 pt-0.5">
+                            <ExternalLink className="w-3 h-3" /> Verify Credential
+                          </a>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>

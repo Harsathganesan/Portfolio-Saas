@@ -268,10 +268,26 @@ const CorporateTemplate = ({ data }) => {
               </h2>
               <div className="space-y-3">
                 {certificates.map((cert) => (
-                  <div key={cert._id || cert.title} className={`p-4 rounded-xl border ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200'}`}>
-                    <h3 className="font-bold text-sm">{cert.title}</h3>
-                    <p className="text-xs text-indigo-400">{cert.organization}</p>
-                    <span className="text-[10px] text-slate-500 block">{cert.issueDate}</span>
+                  <div key={cert._id || cert.title || cert.name} className={`p-4 rounded-xl border ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200'}`}>
+                    <div className="flex items-start gap-3">
+                      {(cert.certificateImage || cert.imageUrl) ? (
+                        <img src={cert.certificateImage || cert.imageUrl} alt={cert.title || cert.name} className="w-10 h-10 object-cover rounded-lg border border-slate-700 shrink-0" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center shrink-0 mt-0.5">
+                          <Award className="w-4 h-4" />
+                        </div>
+                      )}
+                      <div className="space-y-0.5 min-w-0">
+                        <h3 className="font-bold text-sm leading-tight">{cert.title || cert.name}</h3>
+                        {(cert.organization || cert.issuer) && <p className="text-xs text-indigo-400">{cert.organization || cert.issuer}</p>}
+                        {(cert.issueDate || cert.date) && <span className="text-[10px] text-slate-500 block">{cert.issueDate || cert.date}</span>}
+                        {cert.credentialUrl && (
+                          <a href={cert.credentialUrl} target="_blank" rel="noreferrer" className="text-[10px] text-indigo-400 hover:underline flex items-center gap-1 pt-0.5">
+                            <ExternalLink className="w-3 h-3" /> Verify
+                          </a>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>

@@ -395,7 +395,7 @@ const generateProjectDescText = async ({ title, techStack = [], goal = '', role 
   return `Engineered ${title || 'a high-performance application'}${goalClause}. As the ${role}, I architected the core application workflow utilizing ${stack}. Implemented robust security authentication, responsive UI components, dynamic data handling, and optimized database queries.`;
 };
 
-app.post(['/api/ai/generate-bio', '/ai/generate-bio'], protect, async (req, res) => {
+app.post(['/api/ai/generate-bio', '/ai/generate-bio', '/api/generate-bio', '/generate-bio'], async (req, res) => {
   try {
     const { name, title, skills, experienceYears, tone } = req.body;
     const bio = await generateBioText({ name, title, skills, experienceYears, tone });
@@ -405,7 +405,7 @@ app.post(['/api/ai/generate-bio', '/ai/generate-bio'], protect, async (req, res)
   }
 });
 
-app.post(['/api/ai/generate-project-desc', '/ai/generate-project-desc'], protect, async (req, res) => {
+app.post(['/api/ai/generate-project-desc', '/ai/generate-project-desc', '/api/generate-project-desc', '/generate-project-desc'], async (req, res) => {
   try {
     const { title, techStack, goal, role } = req.body;
     const description = await generateProjectDescText({ title, techStack, goal, role });
