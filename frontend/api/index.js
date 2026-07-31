@@ -25,7 +25,7 @@ app.use(cors({ origin: true, credentials: true }));
 app.options('*', cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 500 }));
+app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 500, validate: false }));
 
 // ─── MongoDB Connection (cached across warm starts) ──────────────────────────
 let cachedConn = null;
