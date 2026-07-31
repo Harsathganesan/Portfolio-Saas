@@ -7,6 +7,15 @@ import SectionPublishBar from '../components/SectionPublishBar';
 
 
 
+const ensureUrlProtocol = (url) => {
+  if (!url || typeof url !== 'string' || !url.trim()) return '';
+  const clean = url.trim();
+  if (clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('mailto:') || clean.startsWith('tel:')) {
+    return clean;
+  }
+  return `https://${clean}`;
+};
+
 const CertificatesPage = () => {
 
   const { portfolio, fetchPortfolio } = usePortfolio();
@@ -48,12 +57,17 @@ const CertificatesPage = () => {
     e.preventDefault();
     if (!form.title || !form.organization) return;
     setLoading(true);
+    const payload = {
+      ...form,
+      credentialUrl: ensureUrlProtocol(form.credentialUrl),
+      certificateImage: ensureUrlProtocol(form.certificateImage),
+    };
     try {
       if (editingId) {
-        await portfolioService.updateCertificate(editingId, form);
+        await portfolioService.updateCertificate(editingId, payload);
         toast('Certificate updated!', 'success');
       } else {
-        await portfolioService.createCertificate(form);
+        await portfolioService.createCertificate(payload);
         toast('Certificate added!', 'success');
       }
       setModalOpen(false);
@@ -178,7 +192,7 @@ const CertificatesPage = () => {
               <div>
                 <label className="block text-slate-700 mb-1.5 font-semibold">Credential Verification URL (Optional)</label>
                 <input
-                  type="url"
+                  type="text"
                   value={form.credentialUrl}
                   onChange={(e) => setForm({ ...form, credentialUrl: e.target.value })}
                   placeholder="https://aws.amazon.com/..."
@@ -189,7 +203,7 @@ const CertificatesPage = () => {
               <div>
                 <label className="block text-slate-700 mb-1.5 font-semibold">Certificate Image / Badge URL (Optional)</label>
                 <input
-                  type="url"
+                  type="text"
                   value={form.certificateImage}
                   onChange={(e) => setForm({ ...form, certificateImage: e.target.value })}
                   placeholder="https://example.com/badge.png"

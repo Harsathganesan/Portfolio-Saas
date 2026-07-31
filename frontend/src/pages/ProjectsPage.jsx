@@ -9,6 +9,15 @@ import AIGeneratorModal from '../components/AIGeneratorModal';
 
 
 
+const ensureUrlProtocol = (url) => {
+  if (!url || typeof url !== 'string' || !url.trim()) return '';
+  const clean = url.trim();
+  if (clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('mailto:') || clean.startsWith('tel:')) {
+    return clean;
+  }
+  return `https://${clean}`;
+};
+
 const ProjectsPage = () => {
   const { portfolio, fetchPortfolio, addProjectToContext, removeProjectFromContext, updatePortfolio } = usePortfolio();
 
@@ -86,14 +95,20 @@ const ProjectsPage = () => {
       toast('Project title is required', 'error');
       return;
     }
+    const payload = {
+      ...form,
+      githubUrl: ensureUrlProtocol(form.githubUrl),
+      liveUrl: ensureUrlProtocol(form.liveUrl),
+      thumbnail: ensureUrlProtocol(form.thumbnail),
+    };
     setLoading(true);
     try {
       if (editingId) {
-        await portfolioService.updateProject(editingId, form);
+        await portfolioService.updateProject(editingId, payload);
         toast('Project updated!', 'success');
         fetchPortfolio();
       } else {
-        const res = await portfolioService.createProject(form);
+        const res = await portfolioService.createProject(payload);
         if (res.success && res.project) {
           addProjectToContext(res.project);
         } else {
@@ -247,7 +262,7 @@ const ProjectsPage = () => {
                 <div>
                   <label className="block text-slate-700 mb-1.5 font-semibold">GitHub Repository URL</label>
                   <input
-                    type="url"
+                    type="text"
                     value={form.githubUrl}
                     onChange={(e) => setForm({ ...form, githubUrl: e.target.value })}
                     placeholder="https://github.com/..."
@@ -257,7 +272,7 @@ const ProjectsPage = () => {
                 <div>
                   <label className="block text-slate-700 mb-1.5 font-semibold">Live Demo URL</label>
                   <input
-                    type="url"
+                    type="text"
                     value={form.liveUrl}
                     onChange={(e) => setForm({ ...form, liveUrl: e.target.value })}
                     placeholder="https://example.com"

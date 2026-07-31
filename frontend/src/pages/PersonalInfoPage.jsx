@@ -7,6 +7,15 @@ import AIGeneratorModal from '../components/AIGeneratorModal';
 
 import SectionPublishBar from '../components/SectionPublishBar';
 
+const ensureUrlProtocol = (url) => {
+  if (!url || typeof url !== 'string' || !url.trim()) return '';
+  const clean = url.trim();
+  if (clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('mailto:') || clean.startsWith('tel:')) {
+    return clean;
+  }
+  return `https://${clean}`;
+};
+
 const PersonalInfoPage = () => {
 
   const { portfolio, updatePortfolio, saving } = usePortfolio();
@@ -96,12 +105,12 @@ const PersonalInfoPage = () => {
           avatar: form.avatar,
         },
         socialLinks: {
-          github: form.github,
-          linkedin: form.linkedin,
-          twitter: form.twitter,
-          instagram: form.instagram,
-          portfolio: form.portfolioUrl,
-          website: form.portfolioUrl,
+          github: ensureUrlProtocol(form.github),
+          linkedin: ensureUrlProtocol(form.linkedin),
+          twitter: ensureUrlProtocol(form.twitter),
+          instagram: ensureUrlProtocol(form.instagram),
+          portfolio: ensureUrlProtocol(form.portfolioUrl),
+          website: ensureUrlProtocol(form.portfolioUrl),
         },
         sectionsEnabled: {
           ...(portfolio?.sectionsEnabled || {}),
@@ -283,7 +292,7 @@ const PersonalInfoPage = () => {
             <div>
               <label className="block text-slate-600 mb-1 font-medium">GitHub URL</label>
               <input
-                type="url"
+                type="text"
                 name="github"
                 value={form.github}
                 onChange={handleChange}
@@ -294,7 +303,7 @@ const PersonalInfoPage = () => {
             <div>
               <label className="block text-slate-600 mb-1 font-medium">LinkedIn URL</label>
               <input
-                type="url"
+                type="text"
                 name="linkedin"
                 value={form.linkedin}
                 onChange={handleChange}
@@ -306,7 +315,7 @@ const PersonalInfoPage = () => {
             <div>
               <label className="block text-slate-600 mb-1 font-medium">Instagram URL</label>
               <input
-                type="url"
+                type="text"
                 name="instagram"
                 value={form.instagram}
                 onChange={handleChange}
