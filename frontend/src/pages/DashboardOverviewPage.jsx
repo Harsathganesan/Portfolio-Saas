@@ -3,22 +3,10 @@ import { Link } from 'react-router-dom';
 import { usePortfolio } from '../context/PortfolioContext';
 import { useToast } from '../components/Toast';
 import {
-  Eye,
-  FolderGit2,
-  Code2,
-  Mail,
   ExternalLink,
   CheckCircle2,
   Circle,
   Clock,
-  Plus,
-  Briefcase,
-  GraduationCap,
-  FileText,
-  Upload,
-  Send,
-  Award,
-  Sparkles,
 } from 'lucide-react';
 import { SkeletonCard } from '../components/Skeleton';
 
@@ -37,8 +25,6 @@ const DashboardOverviewPage = () => {
 
   const projectsCount = portfolio?.projects?.length || 8;
   const skillsCount = portfolio?.skills?.length || 12;
-  const totalViews = portfolio?.analytics?.totalViews || 542;
-  const unreadMessages = portfolio?.messages?.filter((m) => !m.read)?.length || 3;
 
   const publicUrl = `https://portfolia.dev/${username}`;
 
@@ -150,73 +136,6 @@ const DashboardOverviewPage = () => {
             <Clock className="w-3.5 h-3.5 text-slate-400" />
             <span>Last updated: 2 mins ago</span>
           </div>
-        </div>
-      </div>
-
-      {/* 3. Four Metric Cards Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {/* Metric 1: Views */}
-        <div className="bg-white border border-slate-100 p-5 rounded-2xl shadow-2xs space-y-3">
-          <div className="flex justify-between items-center">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-              <Eye className="w-4.5 h-4.5" />
-            </div>
-          </div>
-          <div>
-            <p className="text-xs font-bold text-slate-700">Total Views</p>
-            <p className="text-2xl font-extrabold text-slate-900 mt-0.5">{totalViews}</p>
-          </div>
-          <p className="text-xs text-emerald-600 font-bold flex items-center gap-1">
-            <span>↑ 18% this week</span>
-          </p>
-        </div>
-
-        {/* Metric 2: Projects */}
-        <div className="bg-white border border-slate-100 p-5 rounded-2xl shadow-2xs space-y-3">
-          <div className="flex justify-between items-center">
-            <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
-              <FolderGit2 className="w-4.5 h-4.5" />
-            </div>
-          </div>
-          <div>
-            <p className="text-xs font-bold text-slate-700">Projects</p>
-            <p className="text-2xl font-extrabold text-slate-900 mt-0.5">{projectsCount}</p>
-          </div>
-          <Link to="/dashboard/projects" className="text-xs text-blue-600 font-bold hover:underline block">
-            Manage Projects →
-          </Link>
-        </div>
-
-        {/* Metric 3: Skills */}
-        <div className="bg-white border border-slate-100 p-5 rounded-2xl shadow-2xs space-y-3">
-          <div className="flex justify-between items-center">
-            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <Code2 className="w-4.5 h-4.5" />
-            </div>
-          </div>
-          <div>
-            <p className="text-xs font-bold text-slate-700">Skills</p>
-            <p className="text-2xl font-extrabold text-slate-900 mt-0.5">{skillsCount}</p>
-          </div>
-          <Link to="/dashboard/skills" className="text-xs text-blue-600 font-bold hover:underline block">
-            Manage Skills →
-          </Link>
-        </div>
-
-        {/* Metric 4: Messages */}
-        <div className="bg-white border border-slate-100 p-5 rounded-2xl shadow-2xs space-y-3">
-          <div className="flex justify-between items-center">
-            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-              <Mail className="w-4.5 h-4.5" />
-            </div>
-          </div>
-          <div>
-            <p className="text-xs font-bold text-slate-700">Messages</p>
-            <p className="text-2xl font-extrabold text-slate-900 mt-0.5">{unreadMessages}</p>
-          </div>
-          <Link to="/dashboard/inbox" className="text-xs text-blue-600 font-bold hover:underline block">
-            View Messages →
-          </Link>
         </div>
       </div>
     </div>

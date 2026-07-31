@@ -1,7 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sparkles, X, Loader2, Check, RefreshCw } from 'lucide-react';
 import { aiService } from '../services/aiService';
 import { useToast } from './Toast';
+
+const formatSkillsString = (s) => {
+  if (!s) return 'React, Node.js, TypeScript';
+  if (typeof s === 'string') return s;
+  if (Array.isArray(s)) {
+    return s.map((item) => (typeof item === 'string' ? item : item.name || '')).filter(Boolean).join(', ');
+  }
+  return 'React, Node.js, TypeScript';
+};
+
+const formatTechStackString = (s) => {
+  if (!s) return 'React, Express, MongoDB';
+  if (typeof s === 'string') return s;
+  if (Array.isArray(s)) return s.map((item) => (typeof item === 'string' ? item : item.name || '')).filter(Boolean).join(', ');
+  return 'React, Express, MongoDB';
+};
 
 const AIGeneratorModal = ({ isOpen, onClose, type = 'bio', initialData = {}, onApply }) => {
   const { toast } = useToast();
@@ -9,15 +25,26 @@ const AIGeneratorModal = ({ isOpen, onClose, type = 'bio', initialData = {}, onA
   const [generatedText, setGeneratedText] = useState('');
 
   // Bio fields
-  const [name, setName] = useState(initialData.fullName || '');
-  const [title, setTitle] = useState(initialData.title || 'Full Stack Engineer');
+  const [name, setName] = useState('');
+  const [title, setTitle] = useState('');
   const [tone, setTone] = useState('professional');
-  const [skills, setSkills] = useState(initialData.skills || 'React, Node.js, TypeScript');
+  const [skills, setSkills] = useState('');
 
   // Project fields
-  const [projectTitle, setProjectTitle] = useState(initialData.projectTitle || '');
-  const [techStack, setTechStack] = useState(initialData.techStack || 'React, Express, MongoDB');
+  const [projectTitle, setProjectTitle] = useState('');
+  const [techStack, setTechStack] = useState('');
   const [goal, setGoal] = useState('automate workflows and optimize user experience');
+
+  useEffect(() => {
+    if (isOpen) {
+      setName(initialData.fullName || initialData.name || '');
+      setTitle(initialData.title || 'Full Stack Engineer');
+      setSkills(formatSkillsString(initialData.skills));
+      setProjectTitle(initialData.projectTitle || initialData.title || '');
+      setTechStack(formatTechStackString(initialData.techStack));
+      setGeneratedText('');
+    }
+  }, [isOpen, initialData]);
 
   if (!isOpen) return null;
 
@@ -25,28 +52,45 @@ const AIGeneratorModal = ({ isOpen, onClose, type = 'bio', initialData = {}, onA
     setLoading(true);
     try {
       if (type === 'bio') {
+        const skillsArray = typeof skills === 'string'
+          ? skills.split(',').map((s) => s.trim()).filter(Boolean)
+          : Array.isArray(skills)
+          ? skills.map((s) => (typeof s === 'string' ? s : s.name || '')).filter(Boolean)
+          : [];
+
         const res = await aiService.generateBio({
           name,
           title,
-          skills: skills.split(',').map((s) => s.trim()),
+          skills: skillsArray,
           tone,
         });
-        if (res.success) {
+        if (res?.success && res?.bio) {
           setGeneratedText(res.bio);
           toast('AI Bio generated successfully!', 'success');
+        } else {
+          toast('Failed to generate AI content.', 'error');
         }
       } else {
+        const stackArray = typeof techStack === 'string'
+          ? techStack.split(',').map((s) => s.trim()).filter(Boolean)
+          : Array.isArray(techStack)
+          ? techStack.map((s) => String(s)).filter(Boolean)
+          : [];
+
         const res = await aiService.generateProjectDescription({
           title: projectTitle,
-          techStack: techStack.split(',').map((s) => s.trim()),
+          techStack: stackArray,
           goal,
         });
-        if (res.success) {
+        if (res?.success && res?.description) {
           setGeneratedText(res.description);
           toast('AI Project Description generated successfully!', 'success');
+        } else {
+          toast('Failed to generate AI content.', 'error');
         }
       }
     } catch (error) {
+      console.error('AI Generator Error:', error);
       toast('Failed to generate AI content. Try again.', 'error');
     } finally {
       setLoading(false);
