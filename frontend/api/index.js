@@ -11,6 +11,8 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
+import multer from 'multer';
+import { v2 as cloudinary } from 'cloudinary';
 
 const app = express();
 
@@ -391,9 +393,83 @@ app.get(['/api/public/explore', '/public/explore'], async (req, res) => {
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 
-// ─── Upload stub (serverless doesn't support multer disk storage) ─────────────
-app.post(['/api/upload', '/upload'], protect, (req, res) => {
-  res.json({ success: false, message: 'Direct upload not supported in serverless. Use Cloudinary widget.' });
+// ─── Cloudinary Upload (memoryStorage — no disk, works on Vercel) ────────────
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const memUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
+  fileFilter: (req, file, cb) => {
+    const ok = /jpeg|jpg|png|webp|gif|svg|pdf/.test(file.mimetype);
+    ok ? cb(null, true) : cb(new Error('Only images and PDF are allowed'));
+  },
+});
+
+const uploadToCloudinary = (buffer, options) =>
+  new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(options, (err, result) => {
+      if (err) reject(err); else resolve(result);
+    });
+    stream.end(buffer);
+  });
+
+// Generic upload — images & PDF
+app.post(['/api/upload', '/upload'], protect, memUpload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ success: false, message: 'No file provided' });
+    const isPdf = req.file.mimetype === 'application/pdf';
+    const result = await uploadToCloudinary(req.file.buffer, {
+      folder: 'portfolio-saas',
+      resource_type: isPdf ? 'raw' : 'image',
+      format: isPdf ? 'pdf' : undefined,
+    });
+    res.json({ success: true, url: result.secure_url, publicId: result.public_id });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+});
+
+// Image-specific (auto WebP optimisation)
+app.post(['/api/upload/image', '/upload/image'], protect, memUpload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ success: false, message: 'No file provided' });
+    const result = await uploadToCloudinary(req.file.buffer, {
+      folder: 'portfolio-saas/images',
+      resource_type: 'image',
+      transformation: [{ quality: 'auto', fetch_format: 'auto' }],
+    });
+    res.json({ success: true, url: result.secure_url, publicId: result.public_id });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+});
+
+// Resume PDF
+app.post(['/api/upload/resume', '/upload/resume'], protect, memUpload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ success: false, message: 'No file provided' });
+    if (req.file.mimetype !== 'application/pdf')
+      return res.status(400).json({ success: false, message: 'Only PDF files are accepted for resume' });
+    const result = await uploadToCloudinary(req.file.buffer, {
+      folder: 'portfolio-saas/resumes',
+      resource_type: 'raw',
+      format: 'pdf',
+    });
+    // Save resumeUrl directly to portfolio
+    const p = await Portfolio.findOne({ userId: req.user._id });
+    if (p) { p.resumeUrl = result.secure_url; await p.save(); }
+    res.json({ success: true, url: result.secure_url, publicId: result.public_id });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+});
+
+// Delete from Cloudinary
+app.delete(['/api/upload/file', '/upload/file'], protect, async (req, res) => {
+  try {
+    const { publicId, resourceType } = req.body;
+    if (!publicId) return res.status(400).json({ success: false, message: 'publicId required' });
+    await cloudinary.uploader.destroy(publicId, { resource_type: resourceType || 'image' });
+    res.json({ success: true, message: 'File deleted from Cloudinary' });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 
 // ─── 404 & Error Handler ──────────────────────────────────────────────────────
