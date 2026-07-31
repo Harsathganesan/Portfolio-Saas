@@ -94,7 +94,6 @@ const AIGeneratorModal = ({ isOpen, onClose, type = 'bio', initialData = {}, onA
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="John Doe"
                     className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -104,7 +103,6 @@ const AIGeneratorModal = ({ isOpen, onClose, type = 'bio', initialData = {}, onA
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Full Stack Engineer"
                     className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -115,7 +113,6 @@ const AIGeneratorModal = ({ isOpen, onClose, type = 'bio', initialData = {}, onA
                   type="text"
                   value={skills}
                   onChange={(e) => setSkills(e.target.value)}
-                  placeholder="React, Node.js, Python, MongoDB"
                   className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-indigo-500"
                 />
               </div>
@@ -140,7 +137,6 @@ const AIGeneratorModal = ({ isOpen, onClose, type = 'bio', initialData = {}, onA
                   type="text"
                   value={projectTitle}
                   onChange={(e) => setProjectTitle(e.target.value)}
-                  placeholder="AI Task Manager"
                   className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-indigo-500"
                 />
               </div>
@@ -150,7 +146,6 @@ const AIGeneratorModal = ({ isOpen, onClose, type = 'bio', initialData = {}, onA
                   type="text"
                   value={techStack}
                   onChange={(e) => setTechStack(e.target.value)}
-                  placeholder="React, Express, MongoDB, Tailwind"
                   className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-indigo-500"
                 />
               </div>
@@ -160,7 +155,6 @@ const AIGeneratorModal = ({ isOpen, onClose, type = 'bio', initialData = {}, onA
                   type="text"
                   value={goal}
                   onChange={(e) => setGoal(e.target.value)}
-                  placeholder="optimize load speed by 40% and automate reporting"
                   className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-indigo-500"
                 />
               </div>

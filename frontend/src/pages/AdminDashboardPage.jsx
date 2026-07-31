@@ -86,7 +86,7 @@ const AdminDashboardPage = () => {
       </div>
 
       {/* Admin Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="glass-card p-6 rounded-2xl border border-slate-800 space-y-2">
           <div className="flex justify-between items-center text-slate-400">
             <span className="text-xs font-medium">Total Registered Users</span>
@@ -101,14 +101,6 @@ const AdminDashboardPage = () => {
             <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           </div>
           <p className="text-3xl font-extrabold text-white">{stats?.publishedPortfolios || 0}</p>
-        </div>
-
-        <div className="glass-card p-6 rounded-2xl border border-slate-800 space-y-2">
-          <div className="flex justify-between items-center text-slate-400">
-            <span className="text-xs font-medium">Platform Total Views</span>
-            <Eye className="w-4 h-4 text-purple-400" />
-          </div>
-          <p className="text-3xl font-extrabold text-white">{stats?.totalViews || 0}</p>
         </div>
 
         <div className="glass-card p-6 rounded-2xl border border-slate-800 space-y-2">
@@ -130,7 +122,6 @@ const AdminDashboardPage = () => {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search user or email..."
               className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white outline-none focus:border-indigo-500"
             />
           </div>
