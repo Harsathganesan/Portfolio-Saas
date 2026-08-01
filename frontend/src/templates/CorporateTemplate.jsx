@@ -144,7 +144,7 @@ const CorporateTemplate = ({ data }) => {
         <aside className="space-y-6 md:col-span-1">
           <div className={`p-6 rounded-2xl border text-center space-y-4 ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
             {personalInfo.avatar && (
-              <img src={personalInfo.avatar} alt={personalInfo.fullName} className="w-32 h-32 rounded-full mx-auto object-cover ring-4 ring-indigo-500/20" />
+              <img src={personalInfo.avatar} alt={personalInfo.fullName} className="w-32 h-32 rounded-full mx-auto object-cover ring-4 ring-indigo-500/20 hidden md:block" />
             )}
             <div>
               <h1 className="text-2xl font-bold">{personalInfo.fullName || username}</h1>

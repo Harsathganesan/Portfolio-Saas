@@ -467,7 +467,7 @@ const MinimalistTemplate = ({ data }) => {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
-              className="flex-1 flex justify-center items-center"
+              className="flex-1 hidden md:flex justify-center items-center"
             >
               <div className="relative w-80 h-80 sm:w-96 sm:h-96 rounded-full flex items-center justify-center">
                 {/* Delicate Outer Orbit Ring */}

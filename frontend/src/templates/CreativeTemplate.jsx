@@ -382,7 +382,7 @@ const CreativeTemplate = ({ data }) => {
               </div>
 
               {/* Right Column: Clean Simple Circular Photo Card */}
-              <div className="flex-1 flex justify-center items-center py-8">
+              <div className="flex-1 hidden md:flex justify-center items-center py-8">
                 <div className="relative w-64 h-64 sm:w-80 sm:h-80 rounded-full flex items-center justify-center">
                   {/* Subtle Glow Ring */}
                   <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-purple-500/30 to-indigo-500/20 blur-2xl pointer-events-none" />

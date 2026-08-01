@@ -198,7 +198,7 @@ const SleekTemplate = ({ data }) => {
               <img
                 src={personalInfo.avatar}
                 alt={personalInfo.fullName}
-                className="w-44 h-44 rounded-3xl object-cover shadow-2xl ring-4 ring-indigo-500/20"
+                className="w-44 h-44 rounded-3xl object-cover shadow-2xl ring-4 ring-indigo-500/20 hidden md:block"
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&q=80';

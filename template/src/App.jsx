@@ -176,7 +176,7 @@ const App = () => {
                 </div>
               </div>
 
-              <div className="flex-1 flex justify-center items-center py-8">
+              <div className="flex-1 hidden md:flex justify-center items-center py-8">
                 <div className="relative w-64 h-64 sm:w-80 sm:h-80 rounded-full flex items-center justify-center">
                   <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-purple-500/30 to-indigo-500/20 blur-2xl pointer-events-none" />
                   <div className="relative z-10 w-60 h-60 sm:w-76 sm:h-76 rounded-full overflow-hidden shadow-2xl ring-8 ring-purple-600/15 bg-slate-900 border-4 border-white">
