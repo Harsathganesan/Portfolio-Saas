@@ -1,7 +1,56 @@
+import mongoose from 'mongoose';
 import User from '../models/User.js';
 import Portfolio from '../models/Portfolio.js';
 import Analytics from '../models/Analytics.js';
 import Project from '../models/Project.js';
+
+// @desc    Check MongoDB Atlas Connection Status & Health Ping
+// @route   GET /api/admin/db-status
+export const getDbStatus = async (req, res) => {
+  try {
+    const startTime = Date.now();
+    const isConnected = mongoose.connection.readyState === 1;
+    let pingTimeMs = 0;
+
+    if (isConnected && mongoose.connection.db) {
+      await mongoose.connection.db.admin().ping();
+      pingTimeMs = Date.now() - startTime;
+    }
+
+    const host = mongoose.connection.host || 'cluster0.tuz60f1.mongodb.net';
+    const dbName = mongoose.connection.name || 'portfolio_saas';
+    const totalUsers = await User.countDocuments();
+    const totalPortfolios = await Portfolio.countDocuments();
+    const totalProjects = await Project.countDocuments();
+
+    res.json({
+      success: true,
+      dbStatus: {
+        isConnected,
+        statusText: isConnected ? 'MongoDB Atlas Connected & Healthy' : 'Database Offline',
+        host,
+        dbName,
+        pingTimeMs,
+        totalUsers,
+        totalPortfolios,
+        totalProjects,
+        mode: 'MongoDB Atlas Cloud Database',
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      dbStatus: {
+        isConnected: false,
+        statusText: `Connection Error: ${error.message}`,
+        host: 'cluster0.tuz60f1.mongodb.net',
+        dbName: 'portfolio_saas',
+        pingTimeMs: 0,
+        mode: 'MongoDB Atlas Cloud Database',
+      },
+    });
+  }
+};
 
 // @desc    Get Admin Dashboard Stats
 // @route   GET /api/admin/stats

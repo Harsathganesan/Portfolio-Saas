@@ -1,6 +1,10 @@
 import API from './api';
 
 export const adminService = {
+  getDbStatus: async () => {
+    const response = await API.get('/admin/db-status');
+    return response.data;
+  },
   getStats: async () => {
     const response = await API.get('/admin/stats');
     return response.data;

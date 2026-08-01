@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import { isInMemoryFallback } from '../config/db.js';
+import { getJwtSecret } from '../utils/jwt.js';
 
 export const protect = async (req, res, next) => {
   let token;
@@ -17,10 +18,7 @@ export const protect = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || 'super_secret_jwt_key_portfolio_saas_2026'
-    );
+    const decoded = jwt.verify(token, getJwtSecret());
 
     if (isInMemoryFallback) {
       req.user = {
