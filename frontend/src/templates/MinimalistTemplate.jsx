@@ -196,7 +196,7 @@ const MinimalistTemplate = ({ data }) => {
 
   return (
     <div className="min-h-screen bg-[#f8f9ff] text-slate-900 font-sans relative overflow-x-hidden">
-      
+
       {/* Background Animated Ambient Purple Glows */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <motion.div
@@ -232,11 +232,10 @@ const MinimalistTemplate = ({ data }) => {
                 <button
                   key={item.id}
                   onClick={() => scrollToSection(item.id)}
-                  className={`relative py-1 transition-all duration-200 ${
-                    isActive
+                  className={`relative py-1 transition-all duration-200 ${isActive
                       ? 'font-bold'
                       : 'text-slate-600 hover:text-slate-900'
-                  }`}
+                    }`}
                   style={isActive ? themeStyles.primaryText : {}}
                 >
                   <span>{item.label}</span>
@@ -287,9 +286,8 @@ const MinimalistTemplate = ({ data }) => {
                   scrollToSection(item.id);
                   setNavOpen(false);
                 }}
-                className={`block w-full text-left py-2.5 px-4 rounded-xl transition ${
-                  activeSection === item.id ? 'text-white font-bold shadow-md' : 'text-slate-600 hover:bg-slate-50'
-                }`}
+                className={`block w-full text-left py-2.5 px-4 rounded-xl transition ${activeSection === item.id ? 'text-white font-bold shadow-md' : 'text-slate-600 hover:bg-slate-50'
+                  }`}
                 style={activeSection === item.id ? themeStyles.primaryBg : {}}
               >
                 {item.label}
@@ -301,7 +299,7 @@ const MinimalistTemplate = ({ data }) => {
 
       {/* 2. MAIN SCROLLABLE CONTAINER */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16 space-y-24 relative z-10">
-        
+
         {/* ============================================================ */}
         {/* SECTION 1: HERO HOME                                         */}
         {/* ============================================================ */}
@@ -599,6 +597,7 @@ const MinimalistTemplate = ({ data }) => {
                   </motion.div>
                 </div>
               </div>
+
             </div>
           </motion.section>
         )}
