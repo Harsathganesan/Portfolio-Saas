@@ -13,8 +13,11 @@ dotenv.config();
 
 const seed = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/portfolio_saas');
-    console.log('Connected to DB for seeding...');
+    if (!process.env.MONGODB_URI) {
+      throw new Error('MONGODB_URI environment variable is missing in .env');
+    }
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('Connected to MongoDB Atlas for seeding...');
 
     await User.deleteMany();
     await Portfolio.deleteMany();

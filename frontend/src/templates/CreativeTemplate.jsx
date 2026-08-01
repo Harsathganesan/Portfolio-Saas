@@ -106,7 +106,7 @@ const CreativeTemplate = ({ data }) => {
     try {
       const res = await portfolioService.sendMessage({ username, ...contactForm });
 
-      const rawPhone = personalInfo.phone || '6382245266';
+      const rawPhone = personalInfo.whatsapp || personalInfo.phone || '6382245266';
       let userPhone = rawPhone.replace(/[^0-9]/g, '');
       if (userPhone.length === 10) {
         userPhone = '91' + userPhone;

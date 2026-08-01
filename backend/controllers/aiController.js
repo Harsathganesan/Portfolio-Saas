@@ -10,6 +10,7 @@ export const handleGenerateBio = async (req, res) => {
     res.json({
       success: true,
       bio: generatedBio,
+      text: generatedBio,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -26,6 +27,7 @@ export const handleGenerateProjectDesc = async (req, res) => {
     res.json({
       success: true,
       description: generatedDesc,
+      text: generatedDesc,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

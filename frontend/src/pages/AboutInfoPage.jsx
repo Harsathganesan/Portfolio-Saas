@@ -55,6 +55,7 @@ const AboutInfoPage = () => {
         personalInfo: {
           ...portfolio?.personalInfo,
           aboutBio: bio,
+          bio: bio,
           avatar: avatar,
         },
 

@@ -121,8 +121,10 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please provide email and password' });
     }
 
+    const loginIdentifier = String(email).toLowerCase().trim();
+
     if (isInMemoryFallback) {
-      const user = await mockStore.findUserByEmail(email);
+      const user = await mockStore.findUserByEmail(loginIdentifier);
       if (!user) {
         return res.status(401).json({ success: false, message: 'Invalid email or password' });
       }
@@ -146,7 +148,10 @@ export const loginUser = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({
+      $or: [{ email: loginIdentifier }, { username: loginIdentifier }],
+    }).select('+password');
+
     if (!user || !(await user.matchPassword(password))) {
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }

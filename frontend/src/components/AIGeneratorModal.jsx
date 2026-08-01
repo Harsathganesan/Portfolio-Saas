@@ -72,9 +72,11 @@ const AIGeneratorModal = ({ isOpen, onClose, type = 'bio', initialData = {}, onA
           skills: skillsArray,
           tone,
         });
-        if (res?.success && res?.bio) {
-          setGeneratedText(res.bio);
-          toast('AI Bio generated successfully!', 'success');
+        const bioText = res?.bio || res?.text;
+        if (res?.success && bioText) {
+          setGeneratedText(bioText);
+          if (onApply) onApply(bioText);
+          toast('AI Bio generated & applied to About field!', 'success');
         } else {
           toast('Failed to generate AI content.', 'error');
         }
@@ -90,9 +92,11 @@ const AIGeneratorModal = ({ isOpen, onClose, type = 'bio', initialData = {}, onA
           techStack: stackArray,
           goal,
         });
-        if (res?.success && res?.description) {
-          setGeneratedText(res.description);
-          toast('AI Project Description generated successfully!', 'success');
+        const descText = res?.description || res?.text;
+        if (res?.success && descText) {
+          setGeneratedText(descText);
+          if (onApply) onApply(descText);
+          toast('AI Description generated & applied to field!', 'success');
         } else {
           toast('Failed to generate AI content.', 'error');
         }

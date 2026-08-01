@@ -61,6 +61,7 @@ const MessagesPage = () => {
           avatar: portfolio?.personalInfo?.avatar || '',
           email: contactForm.email,
           phone: contactForm.phone,
+          whatsapp: contactForm.phone,
           location: contactForm.location,
         },
         sectionsEnabled: {
@@ -142,16 +143,16 @@ const MessagesPage = () => {
             <div>
               <label className="block text-slate-700 mb-1.5 font-semibold flex items-center gap-1.5">
                 <Phone className="w-4 h-4 text-blue-600" />
-                <span>Phone / WhatsApp Number</span>
+                <span>Send Message To (WhatsApp Number)</span>
               </label>
               <input
                 type="text"
                 value={contactForm.phone}
-                onChange={(e) => setContactForm({ ...contactForm, phone: e.target.value })}
+                onChange={(e) => setContactForm({ ...contactForm, phone: e.target.value, whatsapp: e.target.value })}
                 placeholder="+91 6382245266"
                 className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 outline-none focus:border-blue-600 font-medium transition"
               />
-              <p className="text-[11px] text-slate-400 mt-1 font-medium">Used for direct WhatsApp messaging</p>
+              <p className="text-[11px] text-blue-600 mt-1 font-semibold">Visitors clicking "Send Message" will redirect to this WhatsApp number</p>
             </div>
 
             {/* Location Field */}
@@ -191,72 +192,6 @@ const MessagesPage = () => {
             </button>
           </div>
         </form>
-      </div>
-
-      {/* 2. VISITOR MESSAGES INBOX */}
-      <div className="space-y-4 pt-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-blue-600" />
-            <span>Received Visitor Messages ({messages.length})</span>
-          </h2>
-        </div>
-
-        {messages.length === 0 ? (
-          <div className="bg-white border border-slate-100 p-12 rounded-3xl text-center space-y-3 shadow-2xs">
-            <Mail className="w-12 h-12 text-slate-300 mx-auto" />
-            <h3 className="text-sm font-bold text-slate-800">Your Inbox is Empty</h3>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto font-medium">
-              When recruiters or visitors fill out the Contact Me form on your public portfolio, their messages will appear here.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {messages.map((msg) => (
-              <div
-                key={msg._id}
-                className={`p-6 rounded-2xl border transition shadow-2xs ${
-                  msg.isRead
-                    ? 'border-slate-100 bg-slate-50/50 text-slate-700'
-                    : 'border-blue-200 bg-white ring-1 ring-blue-500/10'
-                }`}
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs uppercase border border-blue-100">
-                      {msg.senderName?.charAt(0) || 'V'}
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-sm text-slate-900">{msg.senderName}</h3>
-                      <p className="text-xs font-semibold text-blue-600">{msg.senderEmail}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <span className="text-[11px] text-slate-400 flex items-center gap-1 font-mono font-medium">
-                      <Clock className="w-3.5 h-3.5" />
-                      {new Date(msg.createdAt).toLocaleDateString()}
-                    </span>
-                    {!msg.isRead && (
-                      <button
-                        onClick={() => handleMarkRead(msg._id)}
-                        className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] flex items-center gap-1 transition"
-                      >
-                        <MailCheck className="w-3.5 h-3.5" />
-                        <span>Mark Read</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                <div className="pt-3 border-t border-slate-100 space-y-1">
-                  <p className="text-xs font-bold text-slate-800">{msg.subject || 'No Subject'}</p>
-                  <p className="text-xs text-slate-600 leading-relaxed font-medium">{msg.message}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );
