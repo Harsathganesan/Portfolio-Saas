@@ -49,8 +49,24 @@ const CyberTemplate = ({ data }) => {
     setSending(true);
     try {
       const res = await portfolioService.sendMessage({ username, ...contactForm });
+
+      const rawPhone = personalInfo.phone || '6382245266';
+      let userPhone = rawPhone.replace(/[^0-9]/g, '');
+      if (userPhone.length === 10) {
+        userPhone = '91' + userPhone;
+      }
+      if (userPhone) {
+        const waMessage = encodeURIComponent(
+          `*New Contact Message from Portfolio*\n\n` +
+          `👤 *Name:* ${contactForm.senderName}\n` +
+          `📧 *Email:* ${contactForm.senderEmail}\n` +
+          `💬 *Message:* ${contactForm.message}`
+        );
+        window.open(`https://wa.me/${userPhone}?text=${waMessage}`, '_blank');
+      }
+
       if (res.success) {
-        toast('Message transmitted to terminal inbox!', 'success');
+        toast('Message transmitted & opening WhatsApp!', 'success');
         setContactForm({ senderName: '', senderEmail: '', message: '' });
       }
     } catch (err) {

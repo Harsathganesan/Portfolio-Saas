@@ -122,12 +122,17 @@ const MinimalistTemplate = ({ data }) => {
     try {
       const res = await portfolioService.sendMessage({ username, ...contactForm });
 
-      const userPhone = (personalInfo.phone || '').replace(/[^0-9]/g, '');
+      const rawPhone = personalInfo.phone || '6382245266';
+      let userPhone = rawPhone.replace(/[^0-9]/g, '');
+      if (userPhone.length === 10) {
+        userPhone = '91' + userPhone;
+      }
       if (userPhone) {
         const waMessage = encodeURIComponent(
           `*New Contact Message from Portfolio*\n\n` +
           `👤 *Name:* ${contactForm.senderName}\n` +
           `📧 *Email:* ${contactForm.senderEmail}\n` +
+          (contactForm.subject ? `📌 *Subject:* ${contactForm.subject}\n` : '') +
           `💬 *Message:* ${contactForm.message}`
         );
         window.open(`https://wa.me/${userPhone}?text=${waMessage}`, '_blank');
