@@ -82,8 +82,11 @@ const SleekTemplate = ({ data }) => {
     <div className={`min-h-screen font-sans transition-colors duration-300 ${isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
       {/* Header Bar */}
       <header className={`sticky top-0 z-40 border-b backdrop-blur-md px-6 py-4 flex justify-between items-center ${isDark ? 'bg-slate-950/80 border-slate-800' : 'bg-white/80 border-slate-200'}`}>
-        <button onClick={() => setActiveTab('home')} className="font-bold text-lg text-indigo-500">
-          {personalInfo.fullName || username}
+        <button onClick={() => setActiveTab('home')} className="flex items-center gap-2 font-bold text-lg text-indigo-500">
+          <div className="md:hidden w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold">
+            {username?.charAt(0).toUpperCase()}
+          </div>
+          <span className="hidden md:inline">{personalInfo.fullName || username}</span>
         </button>
 
         <nav className="hidden md:flex items-center space-x-2 text-xs font-semibold">
@@ -137,11 +140,26 @@ const SleekTemplate = ({ data }) => {
         {/* HOME TAB ONLY */}
         {(activeTab === 'home' || activeTab === 'all') && (
           <section className="flex flex-col md:flex-row items-center justify-between gap-8 pt-4 border-b border-slate-800 pb-12 mb-10">
-            <div className="space-y-4 max-w-xl">
+            <div className="space-y-4 max-w-xl w-full">
               <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
                 Hello, I'm <span className="text-indigo-500">{personalInfo.fullName || username}</span>.
               </h1>
               <p className="text-lg font-medium text-slate-400">{personalInfo.title || 'Full Stack Engineer'}</p>
+
+              {/* Mobile Profile Photo (Placed below heading and title, above bio) */}
+              {personalInfo.avatar && (
+                <div className="md:hidden flex justify-center py-2">
+                  <img
+                    src={personalInfo.avatar}
+                    alt={personalInfo.fullName}
+                    className="w-44 h-44 rounded-3xl object-cover shadow-2xl ring-4 ring-indigo-500/20"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&q=80';
+                    }}
+                  />
+                </div>
+              )}
               <p className="text-sm text-slate-400 leading-relaxed">{personalInfo.bio}</p>
 
               <div className="flex flex-wrap items-center gap-4 pt-2">

@@ -214,12 +214,14 @@ const MinimalistTemplate = ({ data }) => {
       {/* 1. TOP HEADER NAVBAR */}
       <header className="fixed top-0 left-0 right-0 z-[100] w-full h-16 backdrop-blur-2xl bg-white/95 border-b border-slate-100 shadow-sm transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
-          {/* Brand Logo: Abi. */}
-          <button onClick={() => scrollToSection('home')} className="font-extrabold text-2xl tracking-tight flex items-baseline group">
-            <span className="text-slate-900">
-              {firstName}
+          {/* Brand Logo: Desktop full name, Mobile circular letter badge */}
+          <button onClick={() => scrollToSection('home')} className="flex items-center gap-2 group">
+            <div className="sm:hidden w-9 h-9 rounded-full flex items-center justify-center text-white font-extrabold text-sm shadow-md" style={themeStyles.primaryBg}>
+              {firstName?.charAt(0).toUpperCase()}
+            </div>
+            <span className="hidden sm:inline font-extrabold text-2xl tracking-tight text-slate-900">
+              {firstName}<span style={themeStyles.primaryText}>.</span>
             </span>
-            <span className="font-black text-2xl" style={themeStyles.primaryText}>.</span>
           </button>
 
           {/* Desktop Navigation Links */}
@@ -251,17 +253,17 @@ const MinimalistTemplate = ({ data }) => {
           </nav>
 
           {/* Right Controls */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             {/* Top Download Resume Button */}
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               onClick={handleResumeClick}
-              className="text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md transition"
+              className="text-white px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 shadow-md transition"
               style={themeStyles.primaryBg}
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Download Resume</span>
+              <span>Resume</span>
             </motion.button>
 
             <button onClick={() => setNavOpen(!navOpen)} className="lg:hidden p-2 text-slate-600 hover:text-slate-900">
@@ -334,6 +336,19 @@ const MinimalistTemplate = ({ data }) => {
                   <>Full Stack <span style={themeStyles.primaryText}>Developer</span></>
                 )}
               </h2>
+
+              {/* Mobile Only Profile Photo (Displayed below heading, above bio content) */}
+              <div className="lg:hidden flex justify-center py-2">
+                <div className="relative w-52 h-52 sm:w-64 sm:h-64 rounded-full overflow-hidden shadow-2xl bg-slate-100 ring-4 ring-indigo-500/20">
+                  {personalInfo.avatar ? (
+                    <img src={personalInfo.avatar} alt={personalInfo.fullName} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-white font-black text-5xl" style={themeStyles.primaryBg}>
+                      {firstName?.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+              </div>
 
               {/* Bio */}
               <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal max-w-xl">

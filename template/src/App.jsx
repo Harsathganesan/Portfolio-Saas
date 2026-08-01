@@ -58,8 +58,11 @@ const App = () => {
       {/* HEADER NAVBAR */}
       <header className="sticky top-0 z-40 w-full backdrop-blur-md border-b bg-white/90 border-slate-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <button onClick={() => setActiveTab('home')} className="font-extrabold text-2xl tracking-tight text-slate-900">
-            {name}
+          <button onClick={() => setActiveTab('home')} className="flex items-center gap-2 font-extrabold text-2xl tracking-tight text-slate-900">
+            <div className="md:hidden w-9 h-9 rounded-full bg-purple-600 text-white flex items-center justify-center text-sm font-extrabold shadow-md">
+              {name?.charAt(0).toUpperCase()}
+            </div>
+            <span className="hidden md:inline">{name}</span>
           </button>
 
           {/* Centered Navigation Tabs */}
@@ -125,7 +128,7 @@ const App = () => {
           {/* TAB 1: HOME */}
           {activeTab === 'home' && (
             <motion.section key="home" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="min-h-[75vh] flex flex-col md:flex-row items-center justify-between gap-12 py-6">
-              <div className="flex-1 space-y-6 text-left max-w-2xl">
+              <div className="flex-1 space-y-6 text-left max-w-2xl w-full">
                 <span className="text-xs font-extrabold uppercase tracking-widest text-purple-600 font-sans">{tagline}</span>
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900">
                   Hi, I'm <span className="text-purple-600">{name}</span>
@@ -133,6 +136,19 @@ const App = () => {
                 <div className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
                   <span className="text-slate-800">A</span>
                   <span className="text-purple-600 font-bold">{title}</span>
+                </div>
+
+                {/* Mobile Profile Photo (Placed below heading and title, above bio) */}
+                <div className="md:hidden flex justify-center py-2">
+                  <div className="relative w-52 h-52 sm:w-64 sm:h-64 rounded-full overflow-hidden shadow-2xl ring-4 ring-purple-600/20 bg-slate-900">
+                    {avatar ? (
+                      <img src={avatar} alt={name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white font-black text-5xl">
+                        {name?.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <p className="text-sm sm:text-base text-slate-500 leading-relaxed max-w-xl font-normal">{bio}</p>
 
