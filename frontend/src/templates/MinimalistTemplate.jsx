@@ -547,9 +547,9 @@ const MinimalistTemplate = ({ data }) => {
 
                   {/* Main Portrait Image */}
                   <div className="relative w-full h-[320px] sm:h-[400px] rounded-2xl overflow-hidden shadow-2xl">
-                    {personalInfo.avatar ? (
+                    {(personalInfo.aboutAvatar || personalInfo.avatar) ? (
                       <img
-                        src={personalInfo.avatar}
+                        src={personalInfo.aboutAvatar || personalInfo.avatar}
                         alt="About Me"
                         className="w-full h-full object-cover object-top"
                         onError={(e) => {

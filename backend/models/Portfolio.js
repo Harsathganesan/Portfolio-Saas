@@ -22,6 +22,7 @@ const portfolioSchema = new mongoose.Schema(
       phone: { type: String, default: '' },
       whatsapp: { type: String, default: '' },
       avatar: { type: String, default: '' },
+      aboutAvatar: { type: String, default: '' },
       aboutBio: { type: String, default: '' },
       aboutMeHtml: { type: String, default: '' },
     },

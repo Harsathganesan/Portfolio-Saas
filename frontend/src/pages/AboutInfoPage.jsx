@@ -13,14 +13,14 @@ const AboutInfoPage = () => {
   const { toast } = useToast();
 
   const [bio, setBio] = useState('');
-  const [avatar, setAvatar] = useState('');
+  const [aboutAvatar, setAboutAvatar] = useState('');
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [aiModalOpen, setAiModalOpen] = useState(false);
 
   useEffect(() => {
     if (portfolio?.personalInfo) {
       setBio(portfolio.personalInfo.aboutBio || portfolio.personalInfo.bio || '');
-      setAvatar(portfolio.personalInfo.avatar || '');
+      setAboutAvatar(portfolio.personalInfo.aboutAvatar || portfolio.personalInfo.avatar || '');
     }
   }, [portfolio]);
 
@@ -31,12 +31,12 @@ const AboutInfoPage = () => {
     try {
       const res = await uploadService.uploadFile(file);
       if (res.success) {
-        setAvatar(res.url);
-        // Auto-save uploaded avatar immediately for live portfolio display
+        setAboutAvatar(res.url);
+        // Auto-save uploaded aboutAvatar immediately for live portfolio display
         await updatePortfolio({
           personalInfo: {
             ...portfolio?.personalInfo,
-            avatar: res.url,
+            aboutAvatar: res.url,
           },
         });
         toast('About Me photo uploaded and saved live!', 'success');
@@ -56,7 +56,7 @@ const AboutInfoPage = () => {
           ...portfolio?.personalInfo,
           aboutBio: bio,
           bio: bio,
-          avatar: avatar,
+          aboutAvatar: aboutAvatar,
         },
 
         sectionsEnabled: {
@@ -83,7 +83,7 @@ const AboutInfoPage = () => {
             <FileText className="w-6 h-6 text-indigo-600" /> About Me Description & Photo
           </h1>
           <p className="text-xs text-slate-500">
-            Upload your profile photo and write your personal bio description for your live portfolio.
+            Upload your dedicated About Me photo and write your personal bio description for your live portfolio.
           </p>
         </div>
 
@@ -104,14 +104,14 @@ const AboutInfoPage = () => {
         {/* Profile Photo Upload Section */}
         <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
           <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-            About Me Profile Photo
+            About Me Section Photo
           </label>
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <div className="relative group">
-              {avatar ? (
+              {aboutAvatar ? (
                 <img
-                  src={avatar}
-                  alt="Avatar"
+                  src={aboutAvatar}
+                  alt="About Avatar"
                   className="w-24 h-24 rounded-2xl object-cover ring-2 ring-indigo-500/20 shadow-sm"
                   onError={(e) => {
                     e.target.onerror = null;
@@ -136,7 +136,7 @@ const AboutInfoPage = () => {
               <div className="flex items-center gap-3">
                 <label className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl cursor-pointer flex items-center gap-2 font-bold text-xs transition shadow-sm">
                   {uploadingAvatar ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                  <span>{uploadingAvatar ? 'Uploading Image...' : 'Choose Profile Photo'}</span>
+                  <span>{uploadingAvatar ? 'Uploading Image...' : 'Choose About Section Photo'}</span>
                   <input type="file" accept="image/*" onChange={handleAvatarUpload} disabled={uploadingAvatar} className="hidden" />
                 </label>
               </div>
@@ -145,8 +145,8 @@ const AboutInfoPage = () => {
                 <label className="block text-slate-600 mb-1 text-[11px] font-medium">Or enter Image URL</label>
                 <input
                   type="text"
-                  value={avatar}
-                  onChange={(e) => setAvatar(e.target.value)}
+                  value={aboutAvatar}
+                  onChange={(e) => setAboutAvatar(e.target.value)}
                   placeholder="https://images.unsplash.com/photo-..."
                   className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-indigo-500"
                 />
