@@ -310,10 +310,10 @@ const MinimalistTemplate = ({ data }) => {
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7 }}
-              className="flex-1 space-y-6 max-w-2xl"
+              className="flex-1 space-y-6 max-w-2xl w-full text-center lg:text-left flex flex-col items-center lg:items-start"
             >
               {/* Greeting */}
-              <div className="text-sm font-semibold text-slate-500 flex items-center gap-1.5">
+              <div className="text-sm font-semibold text-slate-500 flex items-center justify-center lg:justify-start gap-1.5">
                 <span>Hello, I'm</span>
                 <span className="text-base">👋</span>
               </div>
@@ -349,13 +349,13 @@ const MinimalistTemplate = ({ data }) => {
               </div>
 
               {/* Bio */}
-              <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal max-w-xl">
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal max-w-xl text-center lg:text-left">
                 {personalInfo.bio ||
                   'I build modern, responsive and user-friendly web applications that solve real-world problems with clean code and great design.'}
               </p>
 
               {/* Hero Action Buttons */}
-              <div className="flex flex-wrap items-center gap-4 pt-2">
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
                 <motion.button
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
@@ -380,9 +380,9 @@ const MinimalistTemplate = ({ data }) => {
               </div>
 
               {/* Connect with me - Social Circle Links */}
-              <div className="space-y-2 pt-4">
+              <div className="space-y-2 pt-4 flex flex-col items-center lg:items-start">
                 <span className="text-xs text-slate-400 font-medium block">Connect with me</span>
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center justify-center lg:justify-start space-x-3">
                   {socialLinks.github && (
                     <motion.a
                       whileHover={{ scale: 1.1, y: -2 }}

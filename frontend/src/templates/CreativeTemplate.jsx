@@ -254,7 +254,7 @@ const CreativeTemplate = ({ data }) => {
               className="min-h-[75vh] flex flex-col md:flex-row items-center justify-between gap-12 py-6"
             >
               {/* Left Column: Welcome Tag, Headline, Role, Bio, Buttons, Social Icons */}
-              <div className="flex-1 space-y-6 text-left max-w-2xl w-full">
+              <div className="flex-1 space-y-6 max-w-2xl w-full text-center md:text-left flex flex-col items-center md:items-start">
                 {/* Purple Welcome Badge */}
                 <div className="inline-block">
                   <span className="text-xs font-extrabold uppercase tracking-widest text-purple-600 font-sans">
@@ -268,7 +268,7 @@ const CreativeTemplate = ({ data }) => {
                 </h1>
 
                 {/* Static Role Title */}
-                <div className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+                <div className="text-2xl sm:text-3xl font-bold flex items-center justify-center md:justify-start gap-2">
                   <span className={isDark ? 'text-slate-200' : 'text-slate-800'}>A</span>
                   <span className="text-purple-600 font-bold">
                     {personalInfo.title || 'Software Developer'}
@@ -289,13 +289,13 @@ const CreativeTemplate = ({ data }) => {
                 </div>
 
                 {/* Bio Description */}
-                <p className="text-sm sm:text-base text-slate-500 leading-relaxed max-w-xl font-normal">
+                <p className="text-sm sm:text-base text-slate-500 leading-relaxed max-w-xl font-normal text-center md:text-left">
                   {personalInfo.bio ||
                     'I build modern, responsive, and high-performance web applications with clean code and intuitive user experiences. Passionate about creating innovative software solutions that solve real-world problems.'}
                 </p>
 
                 {/* Action Buttons */}
-                <div className="flex flex-wrap items-center gap-4 pt-2">
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-2">
                   <button
                     onClick={handleResumeClick}
                     className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3.5 rounded-2xl text-xs font-bold flex items-center gap-2 shadow-xl shadow-purple-600/30 transition transform active:scale-95"

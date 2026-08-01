@@ -128,12 +128,12 @@ const App = () => {
           {/* TAB 1: HOME */}
           {activeTab === 'home' && (
             <motion.section key="home" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="min-h-[75vh] flex flex-col md:flex-row items-center justify-between gap-12 py-6">
-              <div className="flex-1 space-y-6 text-left max-w-2xl w-full">
+              <div className="flex-1 space-y-6 max-w-2xl w-full text-center md:text-left flex flex-col items-center md:items-start">
                 <span className="text-xs font-extrabold uppercase tracking-widest text-purple-600 font-sans">{tagline}</span>
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900">
                   Hi, I'm <span className="text-purple-600">{name}</span>
                 </h1>
-                <div className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+                <div className="text-2xl sm:text-3xl font-bold flex items-center justify-center md:justify-start gap-2">
                   <span className="text-slate-800">A</span>
                   <span className="text-purple-600 font-bold">{title}</span>
                 </div>
@@ -150,9 +150,9 @@ const App = () => {
                     )}
                   </div>
                 </div>
-                <p className="text-sm sm:text-base text-slate-500 leading-relaxed max-w-xl font-normal">{bio}</p>
+                <p className="text-sm sm:text-base text-slate-500 leading-relaxed max-w-xl font-normal text-center md:text-left">{bio}</p>
 
-                <div className="flex flex-wrap items-center gap-4 pt-2">
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-2">
                   {resumeUrl && (
                     <a
                       href={resumeUrl}

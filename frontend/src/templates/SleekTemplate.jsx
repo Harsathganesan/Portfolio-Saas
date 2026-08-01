@@ -140,7 +140,7 @@ const SleekTemplate = ({ data }) => {
         {/* HOME TAB ONLY */}
         {(activeTab === 'home' || activeTab === 'all') && (
           <section className="flex flex-col md:flex-row items-center justify-between gap-8 pt-4 border-b border-slate-800 pb-12 mb-10">
-            <div className="space-y-4 max-w-xl w-full">
+            <div className="space-y-4 max-w-xl w-full text-center md:text-left flex flex-col items-center md:items-start">
               <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
                 Hello, I'm <span className="text-indigo-500">{personalInfo.fullName || username}</span>.
               </h1>
@@ -160,9 +160,9 @@ const SleekTemplate = ({ data }) => {
                   />
                 </div>
               )}
-              <p className="text-sm text-slate-400 leading-relaxed">{personalInfo.bio}</p>
+              <p className="text-sm text-slate-400 leading-relaxed text-center md:text-left">{personalInfo.bio}</p>
 
-              <div className="flex flex-wrap items-center gap-4 pt-2">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-2">
                 {resumeUrl && (
                   <button
                     onClick={() => {
@@ -176,7 +176,7 @@ const SleekTemplate = ({ data }) => {
                   </button>
                 )}
 
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center justify-center md:justify-start space-x-3">
                   {socialLinks.github && (
                     <a href={socialLinks.github} target="_blank" rel="noreferrer" className="p-2.5 rounded-xl bg-slate-800/80 text-slate-300 hover:text-white hover:bg-indigo-600 transition" title="GitHub">
                       <Github className="w-4 h-4" />
