@@ -54,14 +54,7 @@ const App = () => {
       <Route path="/explore" element={<ExplorePortfoliosPage />} />
 
       {/* Admin Panel */}
-      <Route
-        path="/admin"
-        element={
-          <AdminRoute>
-            <AdminDashboardPage />
-          </AdminRoute>
-        }
-      />
+      <Route path="/admin" element={<AdminDashboardPage />} />
 
       {/* SaaS Dashboard Protected Routes */}
       <Route
