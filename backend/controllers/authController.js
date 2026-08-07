@@ -16,11 +16,20 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please fill in all required fields' });
     }
 
-    const cleanedUsername = username.toLowerCase().trim().replace(/[^a-z0-9_-]/g, '');
+    const cleanedEmail = String(email).toLowerCase().trim();
+    const cleanedUsername = String(username).toLowerCase().trim().replace(/[^a-z0-9_-]/g, '');
+
+    if (!cleanedUsername || cleanedUsername.length < 3) {
+      return res.status(400).json({ success: false, message: 'Username must be at least 3 characters long (letters, numbers, hyphens, underscores).' });
+    }
+
+    if (String(password).length < 6) {
+      return res.status(400).json({ success: false, message: 'Password must be at least 6 characters long.' });
+    }
 
     // Fallback store handling if MongoDB is offline
     if (isInMemoryFallback) {
-      const existingEmail = await mockStore.findUserByEmail(email);
+      const existingEmail = await mockStore.findUserByEmail(cleanedEmail);
       if (existingEmail) {
         return res.status(400).json({ success: false, message: 'Email is already registered' });
       }
@@ -30,10 +39,14 @@ export const registerUser = async (req, res) => {
         return res.status(400).json({ success: false, message: 'Username is already taken' });
       }
 
-      const user = await mockStore.createUser({ username: cleanedUsername, email, password, fullName });
+      const user = await mockStore.createUser({ username: cleanedUsername, email: cleanedEmail, password, fullName });
       const portfolio = await mockStore.createPortfolio({
         userId: user._id,
         username: user.username,
+        isPublished: true,
+        published: true,
+        publishedAt: new Date(),
+        slug: user.username,
         personalInfo: {
           fullName: user.fullName || user.username,
           title: 'Full Stack Developer',
@@ -45,7 +58,7 @@ export const registerUser = async (req, res) => {
       const token = generateToken(user._id);
       return res.status(201).json({
         success: true,
-        message: 'User registered successfully (In-Memory Mode)',
+        message: 'User registered successfully',
         token,
         user: {
           id: user._id,
@@ -58,19 +71,20 @@ export const registerUser = async (req, res) => {
     }
 
     // Normal MongoDB path
-    const existingEmail = await User.findOne({ email });
-    if (existingEmail) {
-      return res.status(400).json({ success: false, message: 'Email is already registered' });
-    }
+    const existingUser = await User.findOne({
+      $or: [{ email: cleanedEmail }, { username: cleanedUsername }],
+    });
 
-    const existingUsername = await User.findOne({ username: cleanedUsername });
-    if (existingUsername) {
-      return res.status(400).json({ success: false, message: 'Username is already taken' });
+    if (existingUser) {
+      if (existingUser.email === cleanedEmail) {
+        return res.status(400).json({ success: false, message: 'Email is already registered. Please log in instead.' });
+      }
+      return res.status(400).json({ success: false, message: 'Username is already taken. Please choose another username.' });
     }
 
     const user = await User.create({
       username: cleanedUsername,
-      email,
+      email: cleanedEmail,
       password,
       fullName: fullName || cleanedUsername,
     });
@@ -78,6 +92,10 @@ export const registerUser = async (req, res) => {
     const portfolio = await Portfolio.create({
       userId: user._id,
       username: user.username,
+      isPublished: true,
+      published: true,
+      publishedAt: new Date(),
+      slug: user.username,
       personalInfo: {
         fullName: user.fullName || user.username,
         title: 'Full Stack Developer',
@@ -107,7 +125,14 @@ export const registerUser = async (req, res) => {
     });
   } catch (error) {
     console.error('Registration Error:', error);
-    res.status(500).json({ success: false, message: error.message });
+    if (error.code === 11000) {
+      return res.status(400).json({ success: false, message: 'Email or username is already registered.' });
+    }
+    if (error.name === 'ValidationError') {
+      const message = Object.values(error.errors).map((val) => val.message).join(', ');
+      return res.status(400).json({ success: false, message });
+    }
+    res.status(500).json({ success: false, message: error.message || 'Server error during registration' });
   }
 };
 
@@ -118,20 +143,20 @@ export const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ success: false, message: 'Please provide email and password' });
+      return res.status(400).json({ success: false, message: 'Please provide email/username and password' });
     }
 
     const loginIdentifier = String(email).toLowerCase().trim();
 
     if (isInMemoryFallback) {
-      const user = await mockStore.findUserByEmail(loginIdentifier);
+      const user = (await mockStore.findUserByEmail(loginIdentifier)) || (await mockStore.findUserByUsername(loginIdentifier));
       if (!user) {
-        return res.status(401).json({ success: false, message: 'Invalid email or password' });
+        return res.status(401).json({ success: false, message: 'Invalid email/username or password' });
       }
 
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
-        return res.status(401).json({ success: false, message: 'Invalid email or password' });
+        return res.status(401).json({ success: false, message: 'Invalid email/username or password' });
       }
 
       const token = generateToken(user._id);
@@ -153,7 +178,7 @@ export const loginUser = async (req, res) => {
     }).select('+password');
 
     if (!user || !(await user.matchPassword(password))) {
-      return res.status(401).json({ success: false, message: 'Invalid email or password' });
+      return res.status(401).json({ success: false, message: 'Invalid email/username or password' });
     }
 
     if (user.isDisabled) {

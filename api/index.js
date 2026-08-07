@@ -142,26 +142,39 @@ R('/register', async (req, res) => {
     const { username, email, password, fullName } = req.body;
     if (!username || !email || !password)
       return res.status(400).json({ success: false, message: 'username, email and password are required' });
-    const clean = username.toLowerCase().trim().replace(/[^a-z0-9_-]/g, '');
-    if (!clean) return res.status(400).json({ success: false, message: 'Invalid username' });
-    if (await User.findOne({ $or: [{ email: email.toLowerCase() }, { username: clean }] }))
-      return res.status(400).json({ success: false, message: 'Email or username already taken' });
-    const user = await User.create({ username: clean, email: email.toLowerCase(), password, fullName: fullName || clean });
+    const clean = String(username).toLowerCase().trim().replace(/[^a-z0-9_-]/g, '');
+    const cleanEmail = String(email).toLowerCase().trim();
+    if (!clean || clean.length < 3) return res.status(400).json({ success: false, message: 'Username must be at least 3 characters long' });
+    if (String(password).length < 6) return res.status(400).json({ success: false, message: 'Password must be at least 6 characters long' });
+
+    const existing = await User.findOne({ $or: [{ email: cleanEmail }, { username: clean }] });
+    if (existing) {
+      return res.status(400).json({
+        success: false,
+        message: existing.email === cleanEmail ? 'Email is already registered. Please log in.' : 'Username is already taken. Choose another.'
+      });
+    }
+
+    const user = await User.create({ username: clean, email: cleanEmail, password, fullName: fullName || clean });
     const portfolio = await Portfolio.create({
-      userId: user._id, username: user.username,
+      userId: user._id, username: user.username, isPublished: true, published: true, publishedAt: new Date(), slug: user.username,
       personalInfo: { fullName: user.fullName, email: user.email, title: 'Full Stack Developer', bio: `Hi, I'm ${user.fullName}!` },
     });
     await Analytics.create({ portfolioId: portfolio._id, username: user.username });
     res.status(201).json({ success: true, token: signToken(user._id), user: { id: user._id, username: user.username, email: user.email, fullName: user.fullName, role: user.role } });
-  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+  } catch (err) {
+    if (err.code === 11000) return res.status(400).json({ success: false, message: 'Email or username already registered' });
+    res.status(400).json({ success: false, message: err.message });
+  }
 });
 
 R('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ success: false, message: 'Email and password required' });
-    const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
-    if (!user || !(await user.matchPassword(password))) return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    if (!email || !password) return res.status(400).json({ success: false, message: 'Email/username and password required' });
+    const loginId = String(email).toLowerCase().trim();
+    const user = await User.findOne({ $or: [{ email: loginId }, { username: loginId }] }).select('+password');
+    if (!user || !(await user.matchPassword(password))) return res.status(401).json({ success: false, message: 'Invalid email/username or password' });
     if (user.isDisabled) return res.status(403).json({ success: false, message: 'Account disabled' });
     res.json({ success: true, token: signToken(user._id), user: { id: user._id, username: user.username, email: user.email, fullName: user.fullName, role: user.role } });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
@@ -181,7 +194,7 @@ app.post(['/api/auth/forgot-password', '/auth/forgot-password'], (req, res) =>
 // ─── Portfolio Helpers ────────────────────────────────────────────────────────
 const getOrCreate = async (userId, username) => {
   let p = await Portfolio.findOne({ userId });
-  if (!p) p = await Portfolio.create({ userId, username, personalInfo: { email: '' } });
+  if (!p) p = await Portfolio.create({ userId, username, isPublished: true, published: true, publishedAt: new Date(), slug: username, personalInfo: { email: '' } });
   return p;
 };
 
@@ -267,8 +280,12 @@ app.get(['/api/portfolio/check-username/:username', '/portfolio/check-username/:
 app.get(['/api/user/:username', '/user/:username'], async (req, res) => {
   try {
     const username = req.params.username.toLowerCase().trim();
-    const p = await Portfolio.findOne({ $or: [{ username }, { slug: username }] });
-    if (!p || (!p.isPublished && !p.published)) return res.status(404).json({ success: false, message: 'Portfolio not found or not published' });
+    let p = await Portfolio.findOne({ $or: [{ username }, { slug: username }] });
+    if (!p) return res.status(404).json({ success: false, message: 'Portfolio not found' });
+    if (!p.isPublished && !p.published) {
+      p.isPublished = true; p.published = true; p.publishedAt = new Date();
+      await p.save();
+    }
     const [projects, skills, education, experience, rawCertificates] = await Promise.all([
       Project.find({ portfolioId: p._id }).sort({ isFeatured: -1, createdAt: -1 }),
       Skill.find({ portfolioId: p._id }),

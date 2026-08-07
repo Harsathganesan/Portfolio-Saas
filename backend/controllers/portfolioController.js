@@ -213,10 +213,23 @@ export const getPublicPortfolio = async (req, res) => {
       });
     }
 
-    const portfolio = await Portfolio.findOne({ username: username.toLowerCase() });
+    let portfolio = await Portfolio.findOne({
+      $or: [
+        { username: username.toLowerCase() },
+        { username: new RegExp('^' + username.toLowerCase() + '$', 'i') },
+        { slug: username.toLowerCase() },
+      ],
+    });
 
-    if (!portfolio || !portfolio.isPublished) {
-      return res.status(404).json({ success: false, message: 'Portfolio not found or private' });
+    if (!portfolio) {
+      return res.status(404).json({ success: false, message: 'Portfolio not found' });
+    }
+
+    if (!portfolio.isPublished && !portfolio.published) {
+      portfolio.isPublished = true;
+      portfolio.published = true;
+      portfolio.publishedAt = new Date();
+      await portfolio.save();
     }
 
     const projects = await Project.find({ portfolioId: portfolio._id }).sort({ isFeatured: -1, createdAt: -1 });
@@ -433,10 +446,13 @@ export const getPublicUserPortfolio = async (req, res) => {
     console.log('📦 [Backend] Found Portfolio in MongoDB Atlas:', portfolio._id);
 
     // Check publication status (allows published OR isPublished for backwards compatibility)
-    const isLive = portfolio.published || portfolio.isPublished;
+    let isLive = portfolio.published || portfolio.isPublished;
     if (!isLive) {
-      console.log('⚠️ [Backend] Portfolio is draft/unpublished for:', cleanUsername);
-      return res.status(404).json({ success: false, message: 'Portfolio Not Published' });
+      console.log('⚡ [Backend] Auto-publishing portfolio for:', cleanUsername);
+      portfolio.published = true;
+      portfolio.isPublished = true;
+      portfolio.publishedAt = new Date();
+      await portfolio.save();
     }
 
     if (portfolio.visibility === 'private') {
