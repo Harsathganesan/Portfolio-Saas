@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminService } from '../services/adminService';
+import { authService } from '../services/authService';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/Toast';
 import {
@@ -38,6 +39,7 @@ import {
   Filter,
   Check,
   Zap,
+  KeyRound,
 } from 'lucide-react';
 import { SkeletonCard } from '../components/Skeleton';
 
@@ -53,6 +55,13 @@ const AdminDashboardPage = () => {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+
+  // Change Password Form State
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [changingPassword, setChangingPassword] = useState(false);
+
 
   // Active Tab state: 'overview' | 'users' | 'database' | 'portfolios' | 'settings'
   const [activeTab, setActiveTab] = useState('overview');
@@ -159,6 +168,44 @@ const AdminDashboardPage = () => {
       toast('Action failed', 'error');
     }
   };
+
+  const handleChangePasswordSubmit = async (e) => {
+    e.preventDefault();
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast('Please fill in all password fields', 'error');
+      return;
+    }
+    if (newPassword.length < 6) {
+      toast('New password must be at least 6 characters', 'error');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast('New passwords do not match', 'error');
+      return;
+    }
+
+    setChangingPassword(true);
+    try {
+      const res = await authService.changePassword({
+        currentPassword,
+        newPassword,
+        confirmPassword,
+      });
+      if (res.success) {
+        toast('Admin password updated successfully!', 'success');
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      } else {
+        toast(res.message || 'Failed to change password', 'error');
+      }
+    } catch (err) {
+      toast(err.response?.data?.message || 'Error updating password', 'error');
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
 
   // LIGHT THEME LOGIN SCREEN FOR NON-ADMIN USERS
   if (!user || user.role !== 'admin') {
@@ -1047,10 +1094,81 @@ const AdminDashboardPage = () => {
 
                 </div>
 
+                {/* Change Password Card */}
+                <div className="bg-slate-50 p-6 sm:p-7 rounded-2xl border border-slate-200/80 space-y-5">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-2xl bg-indigo-100 border border-indigo-200 text-indigo-700 flex items-center justify-center shadow-sm">
+                      <KeyRound className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-black text-slate-900">Change Account Password</h4>
+                      <p className="text-xs text-slate-500">Update your superadmin account credentials securely</p>
+                    </div>
+                  </div>
+
+                  <form onSubmit={handleChangePasswordSubmit} className="space-y-4 text-xs max-w-xl">
+                    <div>
+                      <label className="block text-slate-600 font-bold uppercase text-[10px] tracking-wider mb-1.5">
+                        Current Password
+                      </label>
+                      <input
+                        type="password"
+                        required
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 outline-none focus:border-indigo-600 font-semibold transition"
+                        placeholder="••••••••"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-slate-600 font-bold uppercase text-[10px] tracking-wider mb-1.5">
+                          New Password
+                        </label>
+                        <input
+                          type="password"
+                          required
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 outline-none focus:border-indigo-600 font-semibold transition"
+                          placeholder="Min 6 characters"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-600 font-bold uppercase text-[10px] tracking-wider mb-1.5">
+                          Confirm New Password
+                        </label>
+                        <input
+                          type="password"
+                          required
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 outline-none focus:border-indigo-600 font-semibold transition"
+                          placeholder="Re-enter password"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="pt-2">
+                      <button
+                        type="submit"
+                        disabled={changingPassword}
+                        className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs flex items-center gap-2 shadow-md shadow-indigo-600/20 transition active:scale-95"
+                      >
+                        <KeyRound className="w-4 h-4" />
+                        <span>{changingPassword ? 'Updating Password...' : 'Update Admin Password'}</span>
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
               </div>
 
             </div>
           )}
+
 
         </div>
 
