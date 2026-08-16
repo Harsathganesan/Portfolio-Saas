@@ -1,16 +1,28 @@
-import React, { useState } from 'react';
-import { Outlet, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Outlet, Link, useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { usePortfolio } from '../context/PortfolioContext';
 import { useToast } from '../components/Toast';
-import { QrCode, Eye, Edit3, Loader2, Radio, WifiOff } from 'lucide-react';
+import { QrCode, Eye, Loader2, Radio, WifiOff, Sparkles } from 'lucide-react';
 import QRCodeModal from '../components/QRCodeModal';
 
 const DashboardLayout = () => {
   const { portfolio, updatePortfolio, saving } = usePortfolio();
   const { toast } = useToast();
+  const location = useLocation();
+
   const [qrOpen, setQrOpen] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  // Trigger centered circular loading animation on route navigation
+  useEffect(() => {
+    setIsNavigating(true);
+    const timer = setTimeout(() => {
+      setIsNavigating(false);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
 
   const isPublished = portfolio?.isPublished ?? false;
   const userName = portfolio?.personalInfo?.fullName?.split(' ')[0] || portfolio?.username || 'User';
@@ -107,23 +119,26 @@ const DashboardLayout = () => {
                 {publishing ? 'Publishing...' : 'Publish Portfolio'}
               </button>
             )}
-
-            {/* Edit Portfolio */}
-            <Link
-              to="/dashboard/personal"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm shadow-blue-600/20 transition"
-            >
-              <Edit3 className="w-4 h-4" />
-              <span>Edit Portfolio</span>
-            </Link>
           </div>
         </header>
 
         {/* Content Body */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
-          <div className="max-w-6xl mx-auto">
-            <Outlet />
-          </div>
+        <main className="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar relative">
+          {isNavigating ? (
+            <div className="flex flex-col items-center justify-center min-h-[450px] space-y-4">
+              <div className="relative flex items-center justify-center">
+                {/* Centered Circular Loading Ring */}
+                <div className="w-14 h-14 rounded-full border-4 border-indigo-100 border-t-indigo-600 border-r-indigo-600 animate-spin shadow-md shadow-indigo-500/10" />
+                {/* Center Sparkle Icon */}
+                <Sparkles className="w-5 h-5 text-indigo-600 absolute animate-pulse" />
+              </div>
+              <p className="text-xs font-bold text-slate-500 tracking-wide animate-pulse">Loading page...</p>
+            </div>
+          ) : (
+            <div className="max-w-6xl mx-auto">
+              <Outlet />
+            </div>
+          )}
         </main>
       </div>
 
