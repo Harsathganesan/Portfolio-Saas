@@ -36,70 +36,71 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 selection:bg-indigo-600 selection:text-white">
-      <div className="w-full max-w-md space-y-6">
-        {/* Back to Home Button */}
-        <div className="flex justify-start">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-indigo-600 transition bg-white hover:bg-slate-100 border border-slate-200 px-4 py-2 rounded-xl shadow-xs"
-          >
-            <ArrowLeft className="w-4 h-4 text-indigo-600" />
-            <span>Back to Home</span>
-          </Link>
-        </div>
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 flex items-center justify-center p-4 sm:p-6 selection:bg-indigo-600 selection:text-white relative">
+      {/* Top Left Back to Home Pill */}
+      <Link
+        to="/"
+        className="fixed top-5 left-5 sm:top-8 sm:left-8 inline-flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-indigo-600 transition bg-white/90 backdrop-blur-md hover:bg-white border border-slate-200/90 px-4 py-2.5 rounded-2xl shadow-xs z-10"
+      >
+        <ArrowLeft className="w-4 h-4 text-indigo-600" />
+        <span>Back to Home</span>
+      </Link>
 
-        <div className="text-center space-y-2">
+      {/* Main Centered Content */}
+      <div className="w-full max-w-md mx-auto space-y-6 py-12">
+        {/* Brand Header */}
+        <div className="text-center space-y-2.5">
           <Link to="/" className="inline-flex items-center space-x-3 group justify-center">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600 p-0.5 shadow-md shadow-indigo-500/20">
-              <div className="w-full h-full bg-white rounded-[10px] flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-indigo-600" />
+            <div className="w-11 h-11 rounded-2xl bg-indigo-600 p-0.5 shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform duration-300">
+              <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
+                <Sparkles className="w-6 h-6 text-indigo-600" />
               </div>
             </div>
             <span className="text-2xl font-black text-slate-900 tracking-tight">Portfolia</span>
           </Link>
-          <h2 className="text-2xl font-extrabold text-slate-900 pt-1">Welcome Back</h2>
-          <p className="text-xs text-slate-500 font-medium">Log in to manage and edit your SaaS portfolio</p>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Welcome Back</h2>
+          <p className="text-xs sm:text-sm text-slate-500 font-medium">Log in to manage and edit your SaaS portfolio</p>
         </div>
 
-        <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/50 space-y-5">
-          <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+        {/* Login Form Card */}
+        <div className="bg-white p-7 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xl shadow-slate-200/40 space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block font-bold text-slate-700 mb-1.5">Email Address or Username</label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+              <label className="block font-bold text-slate-700 text-xs mb-1.5">Email Address or Username</label>
+              <div className="relative flex items-center">
+                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
                 <input
                   type="text"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="harsath or name@example.com"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-slate-900 outline-none focus:bg-white focus:border-indigo-600 transition font-medium"
+                  className="w-full bg-slate-50 border border-slate-200/90 rounded-2xl pl-10 pr-4 py-3 text-sm text-slate-900 outline-none focus:bg-white focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 transition-all font-medium"
                 />
               </div>
             </div>
 
             <div>
               <div className="flex justify-between items-center mb-1.5">
-                <label className="font-bold text-slate-700">Password</label>
-                <Link to="/forgot-password" className="text-indigo-600 font-semibold hover:underline">
+                <label className="font-bold text-slate-700 text-xs">Password</label>
+                <Link to="/forgot-password" className="text-xs text-indigo-600 font-bold hover:underline">
                   Forgot Password?
                 </Link>
               </div>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+              <div className="relative flex items-center">
+                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-10 py-3 text-slate-900 outline-none focus:bg-white focus:border-indigo-600 transition font-medium"
+                  className="w-full bg-slate-50 border border-slate-200/90 rounded-2xl pl-10 pr-11 py-3 text-sm text-slate-900 outline-none focus:bg-white focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 transition-all font-medium"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600 transition focus:outline-none"
+                  className="absolute right-3.5 p-1 text-slate-400 hover:text-slate-600 transition focus:outline-none flex items-center justify-center"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -110,7 +111,7 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 mt-2 shadow-md shadow-indigo-500/20 transition"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/25 active:scale-[0.99] transition-all cursor-pointer disabled:opacity-60"
             >
               {loading ? (
                 <>
@@ -127,6 +128,7 @@ const LoginPage = () => {
           </form>
         </div>
 
+        {/* Footer Link */}
         <p className="text-center text-xs text-slate-600 font-medium">
           Don't have an account?{' '}
           <Link to="/register" className="text-indigo-600 font-bold hover:underline">
