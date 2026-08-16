@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Sparkles, LayoutDashboard, LogOut, Menu, X, ShieldAlert } from 'lucide-react';
+import { Sparkles, LayoutDashboard, LogOut, Menu, X } from 'lucide-react';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -27,15 +27,6 @@ const Navbar = () => {
         <div className="hidden md:flex items-center space-x-4">
           {user ? (
             <div className="flex items-center space-x-3">
-              {user.role === 'admin' && (
-                <Link
-                  to="/admin"
-                  className="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 transition flex items-center gap-1"
-                >
-                  <ShieldAlert className="w-3.5 h-3.5" />
-                  Admin
-                </Link>
-              )}
               <Link
                 to="/dashboard"
                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-4.5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 shadow-md shadow-indigo-500/20 transition"
