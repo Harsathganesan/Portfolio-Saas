@@ -183,6 +183,38 @@ app.get(['/api/auth/profile', '/auth/profile'], protect, async (req, res) => {
 app.post(['/api/auth/forgot-password', '/auth/forgot-password'], (req, res) =>
   res.json({ success: true, message: 'Password reset instructions sent' }));
 
+app.put(['/api/auth/change-password', '/auth/change-password'], protect, async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ success: false, message: 'Please enter current password and new password' });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ success: false, message: 'New password must be at least 6 characters long' });
+    }
+    if (confirmPassword && newPassword !== confirmPassword) {
+      return res.status(400).json({ success: false, message: 'New passwords do not match' });
+    }
+
+    const user = await User.findById(req.user._id).select('+password');
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const isMatch = await user.matchPassword(currentPassword);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: 'Incorrect current password' });
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res.json({ success: true, message: 'Password changed successfully' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message || 'Error updating password' });
+  }
+});
+
 // ─── Portfolio Helpers ────────────────────────────────────────────────────────
 const getOrCreate = async (userId, username) => {
   let p = await Portfolio.findOne({ userId });
