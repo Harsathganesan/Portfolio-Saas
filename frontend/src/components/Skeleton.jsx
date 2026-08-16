@@ -1,24 +1,21 @@
 import React from 'react';
+import { Sparkles } from 'lucide-react';
 
 export const SkeletonCard = () => (
-  <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-4 animate-pulse">
-    <div className="h-6 bg-slate-800 rounded w-1/3"></div>
-    <div className="h-4 bg-slate-800 rounded w-2/3"></div>
-    <div className="h-20 bg-slate-800 rounded"></div>
-    <div className="flex space-x-2 pt-2">
-      <div className="h-8 w-16 bg-slate-800 rounded-lg"></div>
-      <div className="h-8 w-16 bg-slate-800 rounded-lg"></div>
+  <div className="flex flex-col items-center justify-center min-h-[350px] w-full space-y-4 py-12">
+    <div className="relative flex items-center justify-center">
+      {/* Centered Circular Loading Ring */}
+      <div className="w-14 h-14 rounded-full border-4 border-indigo-100 border-t-indigo-600 border-r-indigo-600 animate-spin shadow-md shadow-indigo-500/10" />
+      {/* Center Sparkle Icon */}
+      <Sparkles className="w-5 h-5 text-indigo-600 absolute animate-pulse" />
     </div>
+    <p className="text-xs font-bold text-slate-500 tracking-wide animate-pulse">Loading...</p>
   </div>
 );
 
-export const SkeletonText = ({ lines = 3 }) => (
-  <div className="space-y-2 animate-pulse">
-    {Array.from({ length: lines }).map((_, i) => (
-      <div
-        key={i}
-        className={`h-4 bg-slate-800 rounded ${i === lines - 1 ? 'w-1/2' : 'w-full'}`}
-      ></div>
-    ))}
+export const SkeletonText = () => (
+  <div className="flex flex-col items-center justify-center py-6 space-y-3">
+    <div className="w-10 h-10 rounded-full border-3 border-indigo-100 border-t-indigo-600 animate-spin" />
+    <p className="text-xs font-bold text-slate-400 animate-pulse">Loading content...</p>
   </div>
 );
