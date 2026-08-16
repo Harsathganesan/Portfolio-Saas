@@ -8,6 +8,7 @@ import {
   ShieldAlert,
   Users,
   Eye,
+  EyeOff,
   Download,
   Star,
   UserX,
@@ -61,6 +62,12 @@ const AdminDashboardPage = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
+
+  // Password Visibility States
+  const [showAdminPassword, setShowAdminPassword] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
 
   // Active Tab state: 'overview' | 'users' | 'database' | 'portfolios' | 'settings'
@@ -238,14 +245,24 @@ const AdminDashboardPage = () => {
 
               <div>
                 <label className="block font-bold text-slate-700 mb-1.5 uppercase text-[10px] tracking-wider">Password</label>
-                <input
-                  type="password"
-                  required
-                  value={adminPassword}
-                  onChange={(e) => setAdminPassword(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 outline-none focus:border-indigo-600 focus:bg-white transition font-semibold"
-                  placeholder="••••••••"
-                />
+                <div className="relative">
+                  <input
+                    type={showAdminPassword ? 'text' : 'password'}
+                    required
+                    value={adminPassword}
+                    onChange={(e) => setAdminPassword(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-4 pr-10 py-3 text-slate-900 outline-none focus:border-indigo-600 focus:bg-white transition font-semibold"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowAdminPassword(!showAdminPassword)}
+                    className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600 transition focus:outline-none"
+                    aria-label={showAdminPassword ? "Hide password" : "Show password"}
+                  >
+                    {showAdminPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
 
               <button
@@ -1111,14 +1128,24 @@ const AdminDashboardPage = () => {
                       <label className="block text-slate-600 font-bold uppercase text-[10px] tracking-wider mb-1.5">
                         Current Password
                       </label>
-                      <input
-                        type="password"
-                        required
-                        value={currentPassword}
-                        onChange={(e) => setCurrentPassword(e.target.value)}
-                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 outline-none focus:border-indigo-600 font-semibold transition"
-                        placeholder="••••••••"
-                      />
+                      <div className="relative">
+                        <input
+                          type={showCurrentPassword ? 'text' : 'password'}
+                          required
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
+                          className="w-full bg-white border border-slate-200 rounded-xl pl-4 pr-10 py-2.5 text-slate-900 outline-none focus:border-indigo-600 font-semibold transition"
+                          placeholder="••••••••"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                          className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-600 transition focus:outline-none"
+                          aria-label={showCurrentPassword ? "Hide password" : "Show password"}
+                        >
+                          {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1126,28 +1153,48 @@ const AdminDashboardPage = () => {
                         <label className="block text-slate-600 font-bold uppercase text-[10px] tracking-wider mb-1.5">
                           New Password
                         </label>
-                        <input
-                          type="password"
-                          required
-                          value={newPassword}
-                          onChange={(e) => setNewPassword(e.target.value)}
-                          className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 outline-none focus:border-indigo-600 font-semibold transition"
-                          placeholder="Min 6 characters"
-                        />
+                        <div className="relative">
+                          <input
+                            type={showNewPassword ? 'text' : 'password'}
+                            required
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-xl pl-4 pr-10 py-2.5 text-slate-900 outline-none focus:border-indigo-600 font-semibold transition"
+                            placeholder="Min 6 characters"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowNewPassword(!showNewPassword)}
+                            className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-600 transition focus:outline-none"
+                            aria-label={showNewPassword ? "Hide password" : "Show password"}
+                          >
+                            {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
                       </div>
 
                       <div>
                         <label className="block text-slate-600 font-bold uppercase text-[10px] tracking-wider mb-1.5">
                           Confirm New Password
                         </label>
-                        <input
-                          type="password"
-                          required
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                          className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 outline-none focus:border-indigo-600 font-semibold transition"
-                          placeholder="Re-enter password"
-                        />
+                        <div className="relative">
+                          <input
+                            type={showConfirmPassword ? 'text' : 'password'}
+                            required
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-xl pl-4 pr-10 py-2.5 text-slate-900 outline-none focus:border-indigo-600 font-semibold transition"
+                            placeholder="Re-enter password"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-600 transition focus:outline-none"
+                            aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                          >
+                            {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
                       </div>
                     </div>
 

@@ -497,6 +497,56 @@ app.get(['/api/analytics/me', '/analytics/me'], protect, async (req, res) => {
 });
 
 // ─── Admin ────────────────────────────────────────────────────────────────────
+app.get(['/api/admin/db-status', '/admin/db-status'], protect, adminOnly, async (req, res) => {
+  try {
+    const startTime = Date.now();
+    const isConnected = mongoose.connection.readyState === 1;
+    let pingTimeMs = 0;
+
+    if (isConnected && mongoose.connection.db) {
+      try {
+        await mongoose.connection.db.admin().ping();
+        pingTimeMs = Date.now() - startTime;
+      } catch (e) {
+        pingTimeMs = Date.now() - startTime;
+      }
+    }
+
+    const host = mongoose.connection.host || 'cluster0.tuz60f1.mongodb.net';
+    const dbName = mongoose.connection.name || 'portfolio_saas';
+    const totalUsers = await User.countDocuments();
+    const totalPortfolios = await Portfolio.countDocuments();
+    const totalProjects = await Project.countDocuments();
+
+    res.json({
+      success: true,
+      dbStatus: {
+        isConnected,
+        statusText: isConnected ? 'MongoDB Atlas Connected & Healthy' : 'Database Offline',
+        host,
+        dbName,
+        pingTimeMs,
+        totalUsers,
+        totalPortfolios,
+        totalProjects,
+        mode: 'MongoDB Atlas Cloud Database',
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      dbStatus: {
+        isConnected: false,
+        statusText: `Connection Error: ${error.message}`,
+        host: 'cluster0.tuz60f1.mongodb.net',
+        dbName: 'portfolio_saas',
+        pingTimeMs: 0,
+        mode: 'MongoDB Atlas Cloud Database',
+      },
+    });
+  }
+});
+
 app.get(['/api/admin/stats', '/admin/stats'], protect, adminOnly, async (req, res) => {
   try {
     const [totalUsers, publishedPortfolios] = await Promise.all([
@@ -515,7 +565,7 @@ app.get(['/api/admin/users', '/admin/users'], protect, adminOnly, async (req, re
     res.json({ success: true, users: users.map(u => ({ ...u, portfolio: pMap[String(u._id)] || null })) });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
-app.put(['/api/admin/users/:id/toggle', '/admin/users/:id/toggle'], protect, adminOnly, async (req, res) => {
+app.put(['/api/admin/users/:id/toggle-status', '/api/admin/users/:id/toggle', '/admin/users/:id/toggle-status', '/admin/users/:id/toggle'], protect, adminOnly, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
