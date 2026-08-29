@@ -340,7 +340,7 @@ const MinimalistTemplate = ({ data }) => {
 
               {/* Mobile Only Profile Photo (Displayed below heading, above bio content) */}
               <div className="lg:hidden flex justify-center py-2">
-                <div className="relative w-52 h-52 sm:w-64 sm:h-64 rounded-full overflow-hidden shadow-2xl bg-slate-100 ring-4 ring-indigo-500/20">
+                <div className="relative w-60 h-60 sm:w-72 sm:h-72 rounded-full overflow-hidden shadow-2xl bg-slate-100 ring-4" style={{ ringColor: primaryColor }}>
                   {personalInfo.avatar ? (
                     <img src={personalInfo.avatar} alt={personalInfo.fullName} className="w-full h-full object-cover" />
                   ) : (
@@ -478,7 +478,7 @@ const MinimalistTemplate = ({ data }) => {
               </div>
             </motion.div>
 
-            {/* Right Sleek Professional Photo Frame */}
+            {/* Right Sleek Professional Large Photo Frame */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -488,43 +488,29 @@ const MinimalistTemplate = ({ data }) => {
               <div className="relative group">
                 {/* Soft Ambient Radial Glow */}
                 <div
-                  className="absolute -inset-4 rounded-full blur-2xl opacity-40 group-hover:opacity-70 transition duration-700 pointer-events-none"
+                  className="absolute -inset-4 rounded-full blur-3xl opacity-40 group-hover:opacity-75 transition duration-700 pointer-events-none"
                   style={{ background: `radial-gradient(circle, ${primaryColor}80, ${primaryColor}20)` }}
                 />
 
                 {/* Gradient Outer Ring Container */}
                 <div
-                  className="relative z-10 p-1.5 rounded-full shadow-2xl transition duration-500 group-hover:scale-[1.02]"
+                  className="relative z-10 p-2 rounded-full shadow-2xl transition duration-500 group-hover:scale-[1.02]"
                   style={{
                     background: `linear-gradient(135deg, ${primaryColor}, #818cf8, #c084fc)`,
-                    boxShadow: `0 20px 40px -15px ${primaryColor}40`,
+                    boxShadow: `0 20px 50px -15px ${primaryColor}50`,
                   }}
                 >
                   {/* Inner White Separation Border */}
-                  <div className="w-72 h-72 sm:w-80 sm:h-80 rounded-full overflow-hidden border-4 border-white bg-slate-100 shadow-inner">
+                  <div className="w-80 h-80 sm:w-96 sm:h-96 lg:w-[26rem] lg:h-[26rem] rounded-full overflow-hidden border-4 border-white bg-slate-100 shadow-inner">
                     {personalInfo.avatar ? (
                       <img src={personalInfo.avatar} alt={personalInfo.fullName} className="w-full h-full object-cover transition duration-700 group-hover:scale-105" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-white font-black text-6xl" style={themeStyles.primaryBg}>
+                      <div className="w-full h-full flex items-center justify-center text-white font-black text-7xl" style={themeStyles.primaryBg}>
                         {firstName?.charAt(0).toUpperCase()}
                       </div>
                     )}
                   </div>
                 </div>
-
-                {/* Floating "Available for Work" Live Badge */}
-                <motion.div
-                  initial={{ y: 10, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                  className="absolute -bottom-2 right-4 z-20 px-4 py-2 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200/80 shadow-xl flex items-center gap-2"
-                >
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                  </span>
-                  <span className="text-xs font-bold text-slate-800">Available for Work</span>
-                </motion.div>
               </div>
             </motion.div>
           </div>
@@ -546,16 +532,16 @@ const MinimalistTemplate = ({ data }) => {
               {/* LEFT COLUMN: About Text + Stat Cards */}
               <div className="lg:col-span-6 space-y-6">
                 {/* Badge */}
-                <div className="inline-block px-3.5 py-1 rounded-full bg-indigo-50 border border-indigo-200/60 text-indigo-600 text-xs font-bold">
+                <div className="inline-block px-3.5 py-1 rounded-full text-xs font-bold border" style={{ ...themeStyles.lightBadge, borderColor: `${primaryColor}40` }}>
                   About Me
                 </div>
 
                 {/* Headline */}
                 <div className="space-y-2">
                   <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
-                    Get to know <span className="text-indigo-600">me</span>
+                    Get to know <span style={themeStyles.primaryText}>me</span>
                   </h2>
-                  <div className="w-10 h-1 bg-indigo-600 rounded-full" />
+                  <div className="w-10 h-1 rounded-full" style={themeStyles.primaryBg} />
                 </div>
 
                 {/* Bio Description */}
@@ -564,17 +550,15 @@ const MinimalistTemplate = ({ data }) => {
                     "I'm a passionate Full Stack Developer who loves building beautiful, functional and user-friendly web applications. I enjoy turning complex problems into simple, elegant solutions that create real value."}
                 </p>
 
-
-
               </div>
 
               {/* RIGHT COLUMN: Photo + Floating Overlay Card */}
               <div className="lg:col-span-6 relative flex justify-center">
-                <div className="relative w-full max-w-lg rounded-3xl overflow-hidden p-6 sm:p-8 bg-gradient-to-tr from-[#f4f5ff] to-[#eef0ff] border border-indigo-100/80">
+                <div className="relative w-full max-w-lg rounded-3xl overflow-hidden p-6 sm:p-8 bg-gradient-to-tr from-slate-50 to-slate-100 border border-slate-200/80">
                   {/* Dot Grid Pattern in Top Right */}
                   <div className="absolute top-6 right-6 grid grid-cols-5 gap-2 opacity-30 pointer-events-none">
                     {[...Array(20)].map((_, i) => (
-                      <div key={i} className="w-1.5 h-1.5 rounded-full bg-indigo-600" />
+                      <div key={i} className="w-1.5 h-1.5 rounded-full" style={themeStyles.primaryBg} />
                     ))}
                   </div>
 
@@ -591,8 +575,7 @@ const MinimalistTemplate = ({ data }) => {
                         }}
                       />
                     ) : (
-
-                      <div className="w-full h-full bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white font-black text-6xl">
+                      <div className="w-full h-full flex items-center justify-center text-white font-black text-6xl" style={themeStyles.primaryBg}>
                         {firstName?.charAt(0).toUpperCase()}
                       </div>
                     )}
@@ -603,13 +586,13 @@ const MinimalistTemplate = ({ data }) => {
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.4 }}
-                    className="absolute bottom-8 left-8 sm:bottom-12 sm:left-12 p-4 rounded-2xl shadow-2xl border border-slate-100 bg-white/95 backdrop-blur-md text-slate-900 shadow-indigo-500/10 max-w-xs space-y-1.5 z-20"
+                    className="absolute bottom-8 left-8 sm:bottom-12 sm:left-12 p-4 rounded-2xl shadow-2xl border border-slate-100 bg-white/95 backdrop-blur-md text-slate-900 max-w-xs space-y-1.5 z-20"
                   >
-                    <div className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center mb-2" style={themeStyles.lightBadge}>
                       <Users className="w-4 h-4" />
                     </div>
                     <h4 className="font-extrabold text-sm tracking-tight">{personalInfo.fullName || (firstName + ' ' + lastName)}</h4>
-                    <p className="text-xs font-bold text-indigo-600">{personalInfo.title || 'Full Stack Developer'}</p>
+                    <p className="text-xs font-bold" style={themeStyles.primaryText}>{personalInfo.title || 'Full Stack Developer'}</p>
                     <div className="flex items-center gap-1 text-[11px] text-slate-500 pt-1 font-medium">
                       <MapPin className="w-3 h-3 text-slate-400" />
                       <span>{personalInfo.location || 'Chennai, Tamil Nadu, India'}</span>
@@ -638,19 +621,19 @@ const MinimalistTemplate = ({ data }) => {
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
                 Education
               </h2>
-              <div className="w-12 h-1 bg-indigo-600 rounded-full mx-auto" />
+              <div className="w-12 h-1 rounded-full mx-auto" style={themeStyles.primaryBg} />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {education.map((edu) => (
-                <div key={edu._id || edu.id || edu.degree} className="p-6 rounded-3xl border border-slate-100 bg-white shadow-md shadow-slate-200/40 hover:border-indigo-300 transition flex flex-col justify-between space-y-4">
+                <div key={edu._id || edu.id || edu.degree} className="p-6 rounded-3xl border border-slate-100 bg-white shadow-md shadow-slate-200/40 transition flex flex-col justify-between space-y-4">
                   <div className="flex items-center space-x-3.5">
-                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={themeStyles.lightBadge}>
                       <GraduationCap className="w-6 h-6" />
                     </div>
                     <div>
                       <h4 className="font-bold text-base text-slate-900">{edu.degree}</h4>
-                      <span className="text-xs text-indigo-600 font-semibold">{edu.institution}</span>
+                      <span className="text-xs font-semibold" style={themeStyles.primaryText}>{edu.institution}</span>
                     </div>
                   </div>
                   {edu.description && (
@@ -659,7 +642,7 @@ const MinimalistTemplate = ({ data }) => {
                   <div className="flex justify-between items-center text-xs text-slate-500 pt-3 border-t border-slate-100 font-medium">
                     <span>{edu.year || edu.duration}</span>
                     {(edu.cgpa || edu.grade) && (
-                      <span className="font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-xl">
+                      <span className="font-bold border px-3 py-1 rounded-xl" style={{ ...themeStyles.lightBadge, borderColor: `${primaryColor}30` }}>
                         CGPA / Grade: {edu.cgpa || edu.grade}
                       </span>
                     )}
@@ -683,19 +666,19 @@ const MinimalistTemplate = ({ data }) => {
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
                 Work Experience
               </h2>
-              <div className="w-12 h-1 bg-indigo-600 rounded-full mx-auto" />
+              <div className="w-12 h-1 rounded-full mx-auto" style={themeStyles.primaryBg} />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {experience.map((exp) => (
-                <div key={exp._id || exp.id || exp.role || exp.position} className="p-6 rounded-3xl border border-slate-100 bg-white shadow-md shadow-slate-200/40 hover:border-indigo-300 transition flex flex-col justify-between space-y-4">
+                <div key={exp._id || exp.id || exp.role || exp.position} className="p-6 rounded-3xl border border-slate-100 bg-white shadow-md shadow-slate-200/40 transition flex flex-col justify-between space-y-4">
                   <div className="flex items-center space-x-3.5">
-                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={themeStyles.lightBadge}>
                       <Briefcase className="w-6 h-6" />
                     </div>
                     <div>
                       <h4 className="font-bold text-base text-slate-900">{exp.role || exp.position}</h4>
-                      <span className="text-xs text-indigo-600 font-semibold">{exp.company}</span>
+                      <span className="text-xs font-semibold" style={themeStyles.primaryText}>{exp.company}</span>
                       {exp.location && <span className="text-xs text-slate-400 block">{exp.location}</span>}
                     </div>
                   </div>
@@ -729,7 +712,7 @@ const MinimalistTemplate = ({ data }) => {
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
                 Skills
               </h2>
-              <div className="w-12 h-1 bg-indigo-600 rounded-full mx-auto" />
+              <div className="w-12 h-1 rounded-full mx-auto" style={themeStyles.primaryBg} />
             </div>
 
             <div className="flex flex-wrap justify-center gap-3.5 max-w-4xl mx-auto">
@@ -739,7 +722,8 @@ const MinimalistTemplate = ({ data }) => {
                 return (
                   <span
                     key={skillName}
-                    className="px-6 py-3.5 rounded-2xl text-sm font-extrabold border border-slate-200 bg-white text-indigo-700 shadow-sm hover:border-indigo-400 hover:shadow-md hover:scale-105 transition duration-200 flex items-center gap-2"
+                    className="px-6 py-3.5 rounded-2xl text-sm font-extrabold border border-slate-200 bg-white shadow-sm hover:shadow-md hover:scale-105 transition duration-200 flex items-center gap-2"
+                    style={{ ...themeStyles.lightBadge, borderColor: `${primaryColor}40` }}
                   >
                     <span>{skillName}</span>
                     {skillLevel && <span className="text-xs text-slate-400 font-medium">({skillLevel})</span>}
@@ -766,7 +750,7 @@ const MinimalistTemplate = ({ data }) => {
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
                 Featured Projects
               </h2>
-              <div className="w-12 h-1 bg-indigo-600 rounded-full mx-auto" />
+              <div className="w-12 h-1 rounded-full mx-auto" style={themeStyles.primaryBg} />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -785,12 +769,12 @@ const MinimalistTemplate = ({ data }) => {
                           <h3 className="font-extrabold text-lg text-slate-900">{p.title}</h3>
                           <div className="flex items-center space-x-1.5">
                             {(p.githubUrl || p.github) && (
-                              <a href={p.githubUrl || p.github} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-indigo-600 hover:text-white transition" title="GitHub Repository">
+                              <a href={p.githubUrl || p.github} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:text-white transition" style={{ hover: themeStyles.primaryBg }} title="GitHub Repository">
                                 <Github className="w-4 h-4" />
                               </a>
                             )}
                             {(p.liveUrl || p.demoUrl || p.link) && (
-                              <a href={p.liveUrl || p.demoUrl || p.link} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white transition" title="Live Demo">
+                              <a href={p.liveUrl || p.demoUrl || p.link} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg transition" style={themeStyles.lightBadge} title="Live Demo">
                                 <ExternalLink className="w-4 h-4" />
                               </a>
                             )}
@@ -799,7 +783,8 @@ const MinimalistTemplate = ({ data }) => {
                         <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">{p.description}</p>
                         <button
                           onClick={() => setSelectedProject(p)}
-                          className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 pt-1.5 group"
+                          className="text-xs font-bold flex items-center gap-1.5 pt-1.5 group"
+                          style={themeStyles.primaryText}
                         >
                           <Eye className="w-3.5 h-3.5 transition group-hover:scale-110" />
                           <span>View Details</span>
@@ -808,7 +793,7 @@ const MinimalistTemplate = ({ data }) => {
                       {stack.length > 0 && (
                         <div className="flex flex-wrap gap-1.5 pt-2 border-t border-slate-100">
                           {stack.map((tech) => (
-                            <span key={tech} className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-indigo-50 text-indigo-700">
+                            <span key={tech} className="px-2.5 py-1 rounded-lg text-[10px] font-bold" style={themeStyles.lightBadge}>
                               {String(tech).trim()}
                             </span>
                           ))}
@@ -838,9 +823,8 @@ const MinimalistTemplate = ({ data }) => {
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
                 Certifications & Awards
               </h2>
-              <div className="w-12 h-1 bg-indigo-600 rounded-full mx-auto" />
+              <div className="w-12 h-1 rounded-full mx-auto" style={themeStyles.primaryBg} />
             </div>
-
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {certificates.map((cert) => (
@@ -848,12 +832,12 @@ const MinimalistTemplate = ({ data }) => {
                   {(cert.certificateImage || cert.imageUrl) ? (
                     <img src={cert.certificateImage || cert.imageUrl} alt={cert.title || cert.name} className="w-12 h-12 object-cover rounded-2xl border border-slate-200 shrink-0" />
                   ) : (
-                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={themeStyles.lightBadge}>
                       <Award className="w-6 h-6" />
                     </div>
                   )}
                   <div className="space-y-1 min-w-0">
-                    <h4 className="font-bold text-sm text-indigo-600 leading-tight">{cert.title || cert.name}</h4>
+                    <h4 className="font-bold text-sm leading-tight" style={themeStyles.primaryText}>{cert.title || cert.name}</h4>
                     {(cert.organization || cert.issuer) && (cert.issueDate || cert.date) && (
                       <span className="text-xs text-slate-500">{cert.organization || cert.issuer} • {cert.issueDate || cert.date}</span>
                     )}
@@ -864,7 +848,7 @@ const MinimalistTemplate = ({ data }) => {
                       <span className="text-xs text-slate-500">{cert.issueDate || cert.date}</span>
                     )}
                     {cert.credentialUrl && (
-                      <a href={cert.credentialUrl} target="_blank" rel="noreferrer" className="text-[11px] text-indigo-500 hover:underline flex items-center gap-1 pt-0.5">
+                      <a href={cert.credentialUrl} target="_blank" rel="noreferrer" className="text-[11px] hover:underline flex items-center gap-1 pt-0.5" style={themeStyles.primaryText}>
                         <ExternalLink className="w-3 h-3" /> Verify
                       </a>
                     )}
@@ -888,19 +872,19 @@ const MinimalistTemplate = ({ data }) => {
             id="contact"
             className="space-y-10 pt-6 scroll-mt-28"
           >
-            {/* Centered Heading matching Screenshot */}
+            {/* Centered Heading */}
             <div className="text-center space-y-2">
               <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
                 Contact Me
               </h2>
-              <div className="w-12 h-1 bg-blue-600 rounded-full mx-auto" />
+              <div className="w-12 h-1 rounded-full mx-auto" style={themeStyles.primaryBg} />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Left Side Info Card */}
               <div className="lg:col-span-5 p-8 rounded-3xl border border-slate-100 bg-white shadow-xl shadow-slate-200/40 space-y-6">
                 <div className="space-y-2">
-                  <h3 className="text-xl font-bold text-blue-600">
+                  <h3 className="text-xl font-bold" style={themeStyles.primaryText}>
                     Let's Build Something
                   </h3>
                   <p className="text-xs text-slate-600 leading-relaxed font-medium">
@@ -911,7 +895,7 @@ const MinimalistTemplate = ({ data }) => {
                 <div className="space-y-3.5 pt-2">
                   {/* Email */}
                   <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100/80 flex items-center gap-3.5">
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={themeStyles.lightBadge}>
                       <Mail className="w-4.5 h-4.5" />
                     </div>
                     <div className="min-w-0">
@@ -924,7 +908,7 @@ const MinimalistTemplate = ({ data }) => {
 
                   {/* Phone / WhatsApp */}
                   <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100/80 flex items-center gap-3.5">
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={themeStyles.lightBadge}>
                       <Phone className="w-4.5 h-4.5" />
                     </div>
                     <div className="min-w-0">
@@ -937,7 +921,7 @@ const MinimalistTemplate = ({ data }) => {
 
                   {/* Location */}
                   <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100/80 flex items-center gap-3.5">
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={themeStyles.lightBadge}>
                       <MapPin className="w-4.5 h-4.5" />
                     </div>
                     <div className="min-w-0">
@@ -950,7 +934,7 @@ const MinimalistTemplate = ({ data }) => {
                 </div>
               </div>
 
-              {/* Right Side Form Card matching Screenshot */}
+              {/* Right Side Form Card */}
               <form
                 onSubmit={handleContactSubmit}
                 className="lg:col-span-7 p-8 rounded-3xl border border-slate-100 bg-white shadow-xl shadow-slate-200/40 space-y-4"
@@ -964,7 +948,8 @@ const MinimalistTemplate = ({ data }) => {
                       value={contactForm.senderName}
                       onChange={(e) => setContactForm({ ...contactForm, senderName: e.target.value })}
                       placeholder="Enter your name"
-                      className="w-full border border-slate-200 bg-white rounded-xl px-4 py-3 text-xs text-slate-900 outline-none focus:border-blue-600 transition font-medium"
+                      className="w-full border border-slate-200 bg-white rounded-xl px-4 py-3 text-xs text-slate-900 outline-none transition font-medium focus:ring-2"
+                      style={{ focusRingColor: primaryColor }}
                     />
                   </div>
                   <div>
@@ -975,7 +960,7 @@ const MinimalistTemplate = ({ data }) => {
                       value={contactForm.senderEmail}
                       onChange={(e) => setContactForm({ ...contactForm, senderEmail: e.target.value })}
                       placeholder="Enter your email"
-                      className="w-full border border-slate-200 bg-white rounded-xl px-4 py-3 text-xs text-slate-900 outline-none focus:border-blue-600 transition font-medium"
+                      className="w-full border border-slate-200 bg-white rounded-xl px-4 py-3 text-xs text-slate-900 outline-none transition font-medium focus:ring-2"
                     />
                   </div>
                 </div>
@@ -987,7 +972,7 @@ const MinimalistTemplate = ({ data }) => {
                     value={contactForm.subject}
                     onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
                     placeholder="What is this regarding?"
-                    className="w-full border border-slate-200 bg-white rounded-xl px-4 py-3 text-xs text-slate-900 outline-none focus:border-blue-600 transition font-medium"
+                    className="w-full border border-slate-200 bg-white rounded-xl px-4 py-3 text-xs text-slate-900 outline-none transition font-medium focus:ring-2"
                   />
                 </div>
 
@@ -999,7 +984,7 @@ const MinimalistTemplate = ({ data }) => {
                     value={contactForm.message}
                     onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
                     placeholder="Write your message here..."
-                    className="w-full border border-slate-200 bg-white rounded-xl px-4 py-3 text-xs text-slate-900 outline-none focus:border-blue-600 transition font-medium leading-relaxed"
+                    className="w-full border border-slate-200 bg-white rounded-xl px-4 py-3 text-xs text-slate-900 outline-none transition font-medium leading-relaxed focus:ring-2"
                   />
                 </div>
 
@@ -1009,7 +994,8 @@ const MinimalistTemplate = ({ data }) => {
                     whileTap={{ scale: 0.98 }}
                     type="submit"
                     disabled={sending}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-7 py-3 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-blue-600/25 transition"
+                    className="text-white px-7 py-3 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg transition"
+                    style={{ ...themeStyles.primaryBg, boxShadow: `0 10px 25px -5px ${primaryColor}40` }}
                   >
                     <span>{sending ? 'Sending Message...' : 'Send Message'}</span>
                     <Send className="w-4 h-4" />
