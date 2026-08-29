@@ -519,7 +519,7 @@ const MinimalistTemplate = ({ data }) => {
         {/* ============================================================ */}
         {/* SECTION 2: ABOUT ME                                          */}
         {/* ============================================================ */}
-        {(isEnabled('personal') || isEnabled('about')) && (
+        {isEnabled('about') && (
           <motion.section
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -532,14 +532,14 @@ const MinimalistTemplate = ({ data }) => {
               {/* LEFT COLUMN: About Text + Stat Cards */}
               <div className="lg:col-span-6 space-y-6">
                 {/* Badge */}
-                <div className="inline-block px-3.5 py-1 rounded-full text-xs font-bold border" style={{ ...themeStyles.lightBadge, borderColor: `${primaryColor}40` }}>
+                <div className="inline-block px-3.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold">
                   About Me
                 </div>
 
                 {/* Headline */}
                 <div className="space-y-2">
                   <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
-                    Get to know <span style={themeStyles.primaryText}>me</span>
+                    Get to know me
                   </h2>
                   <div className="w-10 h-1 rounded-full" style={themeStyles.primaryBg} />
                 </div>
@@ -588,11 +588,11 @@ const MinimalistTemplate = ({ data }) => {
                     transition={{ delay: 0.4 }}
                     className="absolute bottom-8 left-8 sm:bottom-12 sm:left-12 p-4 rounded-2xl shadow-2xl border border-slate-100 bg-white/95 backdrop-blur-md text-slate-900 max-w-xs space-y-1.5 z-20"
                   >
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center mb-2" style={themeStyles.lightBadge}>
+                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center mb-2" style={themeStyles.primaryText}>
                       <Users className="w-4 h-4" />
                     </div>
-                    <h4 className="font-extrabold text-sm tracking-tight">{personalInfo.fullName || (firstName + ' ' + lastName)}</h4>
-                    <p className="text-xs font-bold" style={themeStyles.primaryText}>{personalInfo.title || 'Full Stack Developer'}</p>
+                    <h4 className="font-extrabold text-sm tracking-tight text-slate-900">{personalInfo.fullName || (firstName + ' ' + lastName)}</h4>
+                    <p className="text-xs font-bold text-slate-600">{personalInfo.title || 'Full Stack Developer'}</p>
                     <div className="flex items-center gap-1 text-[11px] text-slate-500 pt-1 font-medium">
                       <MapPin className="w-3 h-3 text-slate-400" />
                       <span>{personalInfo.location || 'Chennai, Tamil Nadu, India'}</span>
@@ -628,12 +628,12 @@ const MinimalistTemplate = ({ data }) => {
               {education.map((edu) => (
                 <div key={edu._id || edu.id || edu.degree} className="p-6 rounded-3xl border border-slate-100 bg-white shadow-md shadow-slate-200/40 transition flex flex-col justify-between space-y-4">
                   <div className="flex items-center space-x-3.5">
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={themeStyles.lightBadge}>
+                    <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center shrink-0" style={themeStyles.primaryText}>
                       <GraduationCap className="w-6 h-6" />
                     </div>
                     <div>
                       <h4 className="font-bold text-base text-slate-900">{edu.degree}</h4>
-                      <span className="text-xs font-semibold" style={themeStyles.primaryText}>{edu.institution}</span>
+                      <span className="text-xs font-semibold text-slate-600">{edu.institution}</span>
                     </div>
                   </div>
                   {edu.description && (
@@ -642,7 +642,7 @@ const MinimalistTemplate = ({ data }) => {
                   <div className="flex justify-between items-center text-xs text-slate-500 pt-3 border-t border-slate-100 font-medium">
                     <span>{edu.year || edu.duration}</span>
                     {(edu.cgpa || edu.grade) && (
-                      <span className="font-bold border px-3 py-1 rounded-xl" style={{ ...themeStyles.lightBadge, borderColor: `${primaryColor}30` }}>
+                      <span className="font-bold bg-slate-100 text-slate-700 border border-slate-200 px-3 py-1 rounded-xl">
                         CGPA / Grade: {edu.cgpa || edu.grade}
                       </span>
                     )}
@@ -673,12 +673,12 @@ const MinimalistTemplate = ({ data }) => {
               {experience.map((exp) => (
                 <div key={exp._id || exp.id || exp.role || exp.position} className="p-6 rounded-3xl border border-slate-100 bg-white shadow-md shadow-slate-200/40 transition flex flex-col justify-between space-y-4">
                   <div className="flex items-center space-x-3.5">
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={themeStyles.lightBadge}>
+                    <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center shrink-0" style={themeStyles.primaryText}>
                       <Briefcase className="w-6 h-6" />
                     </div>
                     <div>
                       <h4 className="font-bold text-base text-slate-900">{exp.role || exp.position}</h4>
-                      <span className="text-xs font-semibold" style={themeStyles.primaryText}>{exp.company}</span>
+                      <span className="text-xs font-semibold text-slate-600">{exp.company}</span>
                       {exp.location && <span className="text-xs text-slate-400 block">{exp.location}</span>}
                     </div>
                   </div>
@@ -722,8 +722,7 @@ const MinimalistTemplate = ({ data }) => {
                 return (
                   <span
                     key={skillName}
-                    className="px-6 py-3.5 rounded-2xl text-sm font-extrabold border border-slate-200 bg-white shadow-sm hover:shadow-md hover:scale-105 transition duration-200 flex items-center gap-2"
-                    style={{ ...themeStyles.lightBadge, borderColor: `${primaryColor}40` }}
+                    className="px-6 py-3.5 rounded-2xl text-sm font-extrabold border border-slate-200 bg-white text-slate-800 shadow-sm hover:shadow-md hover:scale-105 transition duration-200 flex items-center gap-2"
                   >
                     <span>{skillName}</span>
                     {skillLevel && <span className="text-xs text-slate-400 font-medium">({skillLevel})</span>}
@@ -774,7 +773,7 @@ const MinimalistTemplate = ({ data }) => {
                               </a>
                             )}
                             {(p.liveUrl || p.demoUrl || p.link) && (
-                              <a href={p.liveUrl || p.demoUrl || p.link} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg transition" style={themeStyles.lightBadge} title="Live Demo">
+                              <a href={p.liveUrl || p.demoUrl || p.link} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg bg-slate-100 text-slate-600 transition" title="Live Demo">
                                 <ExternalLink className="w-4 h-4" />
                               </a>
                             )}
@@ -793,7 +792,7 @@ const MinimalistTemplate = ({ data }) => {
                       {stack.length > 0 && (
                         <div className="flex flex-wrap gap-1.5 pt-2 border-t border-slate-100">
                           {stack.map((tech) => (
-                            <span key={tech} className="px-2.5 py-1 rounded-lg text-[10px] font-bold" style={themeStyles.lightBadge}>
+                            <span key={tech} className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-700">
                               {String(tech).trim()}
                             </span>
                           ))}
@@ -832,12 +831,12 @@ const MinimalistTemplate = ({ data }) => {
                   {(cert.certificateImage || cert.imageUrl) ? (
                     <img src={cert.certificateImage || cert.imageUrl} alt={cert.title || cert.name} className="w-12 h-12 object-cover rounded-2xl border border-slate-200 shrink-0" />
                   ) : (
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={themeStyles.lightBadge}>
+                    <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center shrink-0" style={themeStyles.primaryText}>
                       <Award className="w-6 h-6" />
                     </div>
                   )}
                   <div className="space-y-1 min-w-0">
-                    <h4 className="font-bold text-sm leading-tight" style={themeStyles.primaryText}>{cert.title || cert.name}</h4>
+                    <h4 className="font-bold text-sm text-slate-900 leading-tight">{cert.title || cert.name}</h4>
                     {(cert.organization || cert.issuer) && (cert.issueDate || cert.date) && (
                       <span className="text-xs text-slate-500">{cert.organization || cert.issuer} • {cert.issueDate || cert.date}</span>
                     )}
@@ -884,7 +883,7 @@ const MinimalistTemplate = ({ data }) => {
               {/* Left Side Info Card */}
               <div className="lg:col-span-5 p-8 rounded-3xl border border-slate-100 bg-white shadow-xl shadow-slate-200/40 space-y-6">
                 <div className="space-y-2">
-                  <h3 className="text-xl font-bold" style={themeStyles.primaryText}>
+                  <h3 className="text-xl font-bold text-slate-900">
                     Let's Build Something
                   </h3>
                   <p className="text-xs text-slate-600 leading-relaxed font-medium">
@@ -895,7 +894,7 @@ const MinimalistTemplate = ({ data }) => {
                 <div className="space-y-3.5 pt-2">
                   {/* Email */}
                   <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100/80 flex items-center gap-3.5">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={themeStyles.lightBadge}>
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0" style={themeStyles.primaryText}>
                       <Mail className="w-4.5 h-4.5" />
                     </div>
                     <div className="min-w-0">
@@ -908,7 +907,7 @@ const MinimalistTemplate = ({ data }) => {
 
                   {/* Phone / WhatsApp */}
                   <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100/80 flex items-center gap-3.5">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={themeStyles.lightBadge}>
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0" style={themeStyles.primaryText}>
                       <Phone className="w-4.5 h-4.5" />
                     </div>
                     <div className="min-w-0">
@@ -921,7 +920,7 @@ const MinimalistTemplate = ({ data }) => {
 
                   {/* Location */}
                   <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100/80 flex items-center gap-3.5">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={themeStyles.lightBadge}>
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0" style={themeStyles.primaryText}>
                       <MapPin className="w-4.5 h-4.5" />
                     </div>
                     <div className="min-w-0">
