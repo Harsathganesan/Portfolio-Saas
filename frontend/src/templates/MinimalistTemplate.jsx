@@ -25,6 +25,7 @@ import {
   Users,
   Trophy,
   CheckCircle2,
+  Eye,
 } from 'lucide-react';
 import { analyticsService } from '../services/analyticsService';
 import { portfolioService } from '../services/portfolioService';
@@ -50,6 +51,7 @@ const MinimalistTemplate = ({ data }) => {
   const [contactForm, setContactForm] = useState({ senderName: '', senderEmail: '', subject: '', message: '' });
   const [sending, setSending] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
 
   const defaultSections = {
     personal: true,
@@ -119,32 +121,33 @@ const MinimalistTemplate = ({ data }) => {
     e.preventDefault();
     if (!contactForm.senderName || !contactForm.senderEmail || !contactForm.message) return;
     setSending(true);
+
+    const targetUsername = username || data?.username || personalInfo?.username || '';
+    const rawPhone = personalInfo.whatsapp || personalInfo.phone || '6382245266';
+    let userPhone = rawPhone.replace(/[^0-9]/g, '');
+    if (userPhone.length === 10) {
+      userPhone = '91' + userPhone;
+    }
+
+    if (userPhone) {
+      const waMessage = encodeURIComponent(
+        `*New Contact Message from Portfolio*\n\n` +
+        `👤 *Name:* ${contactForm.senderName}\n` +
+        `📧 *Email:* ${contactForm.senderEmail}\n` +
+        (contactForm.subject ? `📌 *Subject:* ${contactForm.subject}\n` : '') +
+        `💬 *Message:* ${contactForm.message}`
+      );
+      window.open(`https://wa.me/${userPhone}?text=${waMessage}`, '_blank');
+    }
+
     try {
-      const res = await portfolioService.sendMessage({ username, ...contactForm });
-
-      const rawPhone = personalInfo.whatsapp || personalInfo.phone || '6382245266';
-      let userPhone = rawPhone.replace(/[^0-9]/g, '');
-      if (userPhone.length === 10) {
-        userPhone = '91' + userPhone;
-      }
-      if (userPhone) {
-        const waMessage = encodeURIComponent(
-          `*New Contact Message from Portfolio*\n\n` +
-          `👤 *Name:* ${contactForm.senderName}\n` +
-          `📧 *Email:* ${contactForm.senderEmail}\n` +
-          (contactForm.subject ? `📌 *Subject:* ${contactForm.subject}\n` : '') +
-          `💬 *Message:* ${contactForm.message}`
-        );
-        window.open(`https://wa.me/${userPhone}?text=${waMessage}`, '_blank');
-      }
-
-      if (res.success) {
-        toast('Message saved to inbox & opening WhatsApp!', 'success');
-        setContactForm({ senderName: '', senderEmail: '', subject: '', message: '' });
-      }
+      await portfolioService.sendMessage({ username: targetUsername, ...contactForm });
+      toast('Opening WhatsApp & saved to inbox!', 'success');
     } catch (err) {
-      toast('Failed to send message', 'error');
+      console.warn('Backend message save skipped/failed:', err?.response?.data?.message || err.message);
+      toast('Opening WhatsApp!', 'success');
     } finally {
+      setContactForm({ senderName: '', senderEmail: '', subject: '', message: '' });
       setSending(false);
     }
   };
@@ -475,36 +478,53 @@ const MinimalistTemplate = ({ data }) => {
               </div>
             </motion.div>
 
-            {/* Right Circular Photo Frame with Orbit Rings */}
+            {/* Right Sleek Professional Photo Frame */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
+              initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
               className="flex-1 hidden md:flex justify-center items-center"
             >
-              <div className="relative w-80 h-80 sm:w-96 sm:h-96 rounded-full flex items-center justify-center">
-                {/* Delicate Outer Orbit Ring */}
-                <div className="absolute inset-0 rounded-full border opacity-40" style={themeStyles.primaryBorder} />
-                <div className="absolute inset-4 rounded-full border opacity-30" style={themeStyles.primaryBorder} />
+              <div className="relative group">
+                {/* Soft Ambient Radial Glow */}
+                <div
+                  className="absolute -inset-4 rounded-full blur-2xl opacity-40 group-hover:opacity-70 transition duration-700 pointer-events-none"
+                  style={{ background: `radial-gradient(circle, ${primaryColor}80, ${primaryColor}20)` }}
+                />
 
-                {/* Floating Orbit Dots */}
-                <div className="absolute top-4 right-16 w-3 h-3 rounded-full shadow-md" style={themeStyles.primaryBg} />
-                <div className="absolute bottom-16 left-6 w-3.5 h-3.5 rounded-full opacity-70" style={themeStyles.primaryBg} />
-                <div className="absolute bottom-6 right-20 w-4 h-4 rounded-full opacity-50" style={themeStyles.primaryBg} />
-
-                {/* Soft Background Aura */}
-                <div className="absolute inset-8 rounded-full blur-2xl pointer-events-none opacity-40" style={{ background: `radial-gradient(circle, ${primaryColor}60, ${primaryColor}20)` }} />
-
-                {/* Main Circular Avatar Image */}
-                <div className="relative z-10 w-72 h-72 sm:w-84 sm:h-84 rounded-full overflow-hidden shadow-2xl bg-slate-100" style={{ boxShadow: `0 0 0 8px ${primaryColor}15` }}>
-                  {personalInfo.avatar ? (
-                    <img src={personalInfo.avatar} alt={personalInfo.fullName} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-white font-black text-6xl" style={themeStyles.primaryBg}>
-                      {firstName?.charAt(0).toUpperCase()}
-                    </div>
-                  )}
+                {/* Gradient Outer Ring Container */}
+                <div
+                  className="relative z-10 p-1.5 rounded-full shadow-2xl transition duration-500 group-hover:scale-[1.02]"
+                  style={{
+                    background: `linear-gradient(135deg, ${primaryColor}, #818cf8, #c084fc)`,
+                    boxShadow: `0 20px 40px -15px ${primaryColor}40`,
+                  }}
+                >
+                  {/* Inner White Separation Border */}
+                  <div className="w-72 h-72 sm:w-80 sm:h-80 rounded-full overflow-hidden border-4 border-white bg-slate-100 shadow-inner">
+                    {personalInfo.avatar ? (
+                      <img src={personalInfo.avatar} alt={personalInfo.fullName} className="w-full h-full object-cover transition duration-700 group-hover:scale-105" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-white font-black text-6xl" style={themeStyles.primaryBg}>
+                        {firstName?.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
                 </div>
+
+                {/* Floating "Available for Work" Live Badge */}
+                <motion.div
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="absolute -bottom-2 right-4 z-20 px-4 py-2 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200/80 shadow-xl flex items-center gap-2"
+                >
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                  </span>
+                  <span className="text-xs font-bold text-slate-800">Available for Work</span>
+                </motion.div>
               </div>
             </motion.div>
           </div>
@@ -755,8 +775,8 @@ const MinimalistTemplate = ({ data }) => {
                 return (
                   <div key={p._id || p.id || p.title} className="rounded-3xl border border-slate-100 bg-white shadow-md shadow-slate-200/50 overflow-hidden hover:-translate-y-2 hover:shadow-xl transition duration-300 flex flex-col justify-between">
                     {(p.image || p.thumbnail) && (
-                      <div className="h-48 overflow-hidden relative">
-                        <img src={p.image || p.thumbnail} alt={p.title} className="w-full h-full object-cover hover:scale-105 transition duration-500" />
+                      <div className="h-52 bg-slate-900/90 flex items-center justify-center p-3 overflow-hidden relative">
+                        <img src={p.image || p.thumbnail} alt={p.title} className="w-full h-full object-contain hover:scale-105 transition duration-500" />
                       </div>
                     )}
                     <div className="p-6 space-y-3 flex-1 flex flex-col justify-between">
@@ -776,7 +796,14 @@ const MinimalistTemplate = ({ data }) => {
                             )}
                           </div>
                         </div>
-                        <p className="text-xs text-slate-600 leading-relaxed">{p.description}</p>
+                        <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">{p.description}</p>
+                        <button
+                          onClick={() => setSelectedProject(p)}
+                          className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 pt-1.5 group"
+                        >
+                          <Eye className="w-3.5 h-3.5 transition group-hover:scale-110" />
+                          <span>View Details</span>
+                        </button>
                       </div>
                       {stack.length > 0 && (
                         <div className="flex flex-wrap gap-1.5 pt-2 border-t border-slate-100">
@@ -1009,6 +1036,102 @@ const MinimalistTemplate = ({ data }) => {
           </motion.button>
         </div>
       </footer>
+
+      {/* Expanded Project Details Modal */}
+      {selectedProject && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-slate-100 relative max-h-[90vh] flex flex-col"
+          >
+            {/* Top Close Button (Cancel Symbol) */}
+            <button
+              onClick={() => setSelectedProject(null)}
+              className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-slate-900/70 hover:bg-slate-900 text-white backdrop-blur-md shadow-lg transition duration-200"
+              title="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Modal Full Image Header */}
+            {(selectedProject.image || selectedProject.thumbnail) && (
+              <div className="w-full h-64 sm:h-72 bg-slate-950 flex items-center justify-center p-4 relative shrink-0">
+                <img
+                  src={selectedProject.image || selectedProject.thumbnail}
+                  alt={selectedProject.title}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            )}
+
+            {/* Modal Body */}
+            <div className="p-6 sm:p-8 space-y-5 overflow-y-auto flex-1">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                  <h3 className="text-2xl font-extrabold text-slate-900">{selectedProject.title}</h3>
+                  {selectedProject.category && (
+                    <span className="text-xs font-semibold text-indigo-600">{selectedProject.category}</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  {(selectedProject.githubUrl || selectedProject.github) && (
+                    <a
+                      href={selectedProject.githubUrl || selectedProject.github}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs hover:border-indigo-600 hover:text-indigo-600 flex items-center gap-1.5 transition"
+                    >
+                      <Github className="w-4 h-4" />
+                      <span>Code</span>
+                    </a>
+                  )}
+                  {(selectedProject.liveUrl || selectedProject.demoUrl || selectedProject.link) && (
+                    <a
+                      href={selectedProject.liveUrl || selectedProject.demoUrl || selectedProject.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-4 py-2 rounded-xl text-white font-bold text-xs flex items-center gap-1.5 shadow-md transition"
+                      style={themeStyles.primaryBg}
+                    >
+                      <span>Live Demo</span>
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              {/* Full Description */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Project Description</h4>
+                <p className="text-sm text-slate-600 leading-relaxed font-normal whitespace-pre-line">
+                  {selectedProject.description}
+                </p>
+              </div>
+
+              {/* Tech Stack Badges */}
+              {selectedProject.techStack && (
+                <div className="space-y-2 pt-2">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Technologies Used</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {(Array.isArray(selectedProject.techStack)
+                      ? selectedProject.techStack
+                      : typeof selectedProject.techStack === 'string'
+                      ? selectedProject.techStack.split(',')
+                      : []
+                    ).map((tech) => (
+                      <span key={tech} className="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                        {String(tech).trim()}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };

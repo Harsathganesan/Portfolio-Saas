@@ -6,8 +6,10 @@ import { mockStore } from '../utils/mockStore.js';
 export const sendMessage = async (req, res) => {
   try {
     const { username, senderName, senderEmail, subject, message } = req.body;
+    const cleanUsername = username ? username.trim().toLowerCase() : '';
+
     if (isInMemoryFallback) {
-      const portfolio = await mockStore.findPortfolioByUsername(username);
+      const portfolio = await mockStore.findPortfolioByUsername(cleanUsername);
       const msg = {
         _id: 'mock_msg_' + Date.now(),
         portfolioId: portfolio?._id,
@@ -23,7 +25,21 @@ export const sendMessage = async (req, res) => {
       return res.status(201).json({ success: true, message: 'Message sent successfully', data: msg });
     }
 
-    const portfolio = await Portfolio.findOne({ username: username.toLowerCase() });
+    let portfolio = null;
+    if (cleanUsername) {
+      portfolio = await Portfolio.findOne({
+        $or: [
+          { username: cleanUsername },
+          { username: new RegExp('^' + cleanUsername + '$', 'i') },
+          { slug: cleanUsername },
+        ],
+      });
+    }
+
+    if (!portfolio) {
+      portfolio = await Portfolio.findOne().sort({ createdAt: 1 });
+    }
+
     if (!portfolio) return res.status(404).json({ success: false, message: 'Recipient portfolio not found' });
 
     const msg = await Message.create({

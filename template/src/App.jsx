@@ -18,6 +18,7 @@ import {
   Menu,
   X,
   ArrowRight,
+  Eye,
 } from 'lucide-react';
 
 import portfolioData from './data/portfolio.json';
@@ -27,6 +28,7 @@ const App = () => {
   const [contactForm, setContactForm] = useState({ senderName: '', senderEmail: '', subject: '', message: '' });
   const [sentMsg, setSentMsg] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
 
   const {
     name = 'My Portfolio',
@@ -48,6 +50,25 @@ const App = () => {
 
   const handleContactSubmit = (e) => {
     e.preventDefault();
+    if (!contactForm.senderName || !contactForm.senderEmail || !contactForm.message) return;
+
+    const rawPhone = phone || '6382245266';
+    let userPhone = rawPhone.replace(/[^0-9]/g, '');
+    if (userPhone.length === 10) {
+      userPhone = '91' + userPhone;
+    }
+
+    if (userPhone) {
+      const waMessage = encodeURIComponent(
+        `*New Contact Message from Portfolio*\n\n` +
+        `👤 *Name:* ${contactForm.senderName}\n` +
+        `📧 *Email:* ${contactForm.senderEmail}\n` +
+        (contactForm.subject ? `📌 *Subject:* ${contactForm.subject}\n` : '') +
+        `💬 *Message:* ${contactForm.message}`
+      );
+      window.open(`https://wa.me/${userPhone}?text=${waMessage}`, '_blank');
+    }
+
     setSentMsg(true);
     setTimeout(() => setSentMsg(false), 4000);
     setContactForm({ senderName: '', senderEmail: '', subject: '', message: '' });
@@ -305,8 +326,8 @@ const App = () => {
                   <div key={i} className="p-6 rounded-3xl border bg-white border-slate-100 shadow-sm space-y-4 flex flex-col justify-between group">
                     <div className="space-y-4">
                       {proj.thumbnail && (
-                        <div className="overflow-hidden rounded-2xl h-52 bg-slate-950">
-                          <img src={proj.thumbnail} alt={proj.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                        <div className="overflow-hidden rounded-2xl h-52 bg-slate-950 flex items-center justify-center p-3">
+                          <img src={proj.thumbnail} alt={proj.title} className="w-full h-full object-contain group-hover:scale-105 transition duration-500" />
                         </div>
                       )}
                       <div className="flex items-center justify-between">
@@ -324,7 +345,14 @@ const App = () => {
                           )}
                         </div>
                       </div>
-                      <p className="text-xs text-slate-500 leading-relaxed">{proj.description}</p>
+                      <p className="text-xs text-slate-500 leading-relaxed line-clamp-3">{proj.description}</p>
+                      <button
+                        onClick={() => setSelectedProject(proj)}
+                        className="text-xs font-bold text-purple-600 hover:text-purple-700 flex items-center gap-1.5 pt-1 group"
+                      >
+                        <Eye className="w-3.5 h-3.5 transition group-hover:scale-110" />
+                        <span>View Details</span>
+                      </button>
                     </div>
 
                     {proj.techStack && proj.techStack.length > 0 && (
@@ -430,6 +458,98 @@ const App = () => {
       <footer className="border-t border-slate-200 py-8 text-center text-xs text-slate-500">
         <p>© {new Date().getFullYear()} {name}. Built with Portfolia SaaS.</p>
       </footer>
+
+      {/* Expanded Project Details Modal */}
+      {selectedProject && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-slate-100 relative max-h-[90vh] flex flex-col"
+          >
+            {/* Top Close Button (Cancel Symbol) */}
+            <button
+              onClick={() => setSelectedProject(null)}
+              className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-slate-900/70 hover:bg-slate-900 text-white backdrop-blur-md shadow-lg transition duration-200"
+              title="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Modal Full Image Header */}
+            {(selectedProject.thumbnail || selectedProject.image) && (
+              <div className="w-full h-64 sm:h-72 bg-slate-950 flex items-center justify-center p-4 relative shrink-0">
+                <img
+                  src={selectedProject.thumbnail || selectedProject.image}
+                  alt={selectedProject.title}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            )}
+
+            {/* Modal Body */}
+            <div className="p-6 sm:p-8 space-y-5 overflow-y-auto flex-1">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                  <h3 className="text-2xl font-extrabold text-slate-900">{selectedProject.title}</h3>
+                </div>
+                <div className="flex items-center gap-3">
+                  {selectedProject.githubUrl && (
+                    <a
+                      href={selectedProject.githubUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs hover:border-purple-600 hover:text-purple-600 flex items-center gap-1.5 transition"
+                    >
+                      <Github className="w-4 h-4" />
+                      <span>Code</span>
+                    </a>
+                  )}
+                  {selectedProject.liveUrl && (
+                    <a
+                      href={selectedProject.liveUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-4 py-2 rounded-xl bg-purple-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-md hover:bg-purple-700 transition"
+                    >
+                      <span>Live Demo</span>
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              {/* Full Description */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-purple-600">Project Description</h4>
+                <p className="text-sm text-slate-600 leading-relaxed font-normal whitespace-pre-line">
+                  {selectedProject.description}
+                </p>
+              </div>
+
+              {/* Tech Stack Badges */}
+              {selectedProject.techStack && (
+                <div className="space-y-2 pt-2">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-purple-600">Technologies Used</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {(Array.isArray(selectedProject.techStack)
+                      ? selectedProject.techStack
+                      : typeof selectedProject.techStack === 'string'
+                      ? selectedProject.techStack.split(',')
+                      : []
+                    ).map((tech) => (
+                      <span key={tech} className="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-purple-50 text-purple-700 border border-purple-100">
+                        {String(tech).trim()}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };

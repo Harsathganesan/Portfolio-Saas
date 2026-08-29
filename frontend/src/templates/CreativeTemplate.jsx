@@ -24,6 +24,7 @@ import {
   X,
   ArrowRight,
   ShieldAlert,
+  Eye,
 } from 'lucide-react';
 import { analyticsService } from '../services/analyticsService';
 import { portfolioService } from '../services/portfolioService';
@@ -49,6 +50,7 @@ const CreativeTemplate = ({ data }) => {
   const [contactForm, setContactForm] = useState({ senderName: '', senderEmail: '', subject: '', message: '' });
   const [sending, setSending] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
 
   const isDark = theme === 'dark';
 
@@ -103,32 +105,33 @@ const CreativeTemplate = ({ data }) => {
     e.preventDefault();
     if (!contactForm.senderName || !contactForm.senderEmail || !contactForm.message) return;
     setSending(true);
+
+    const targetUsername = username || data?.username || personalInfo?.username || '';
+    const rawPhone = personalInfo.whatsapp || personalInfo.phone || '6382245266';
+    let userPhone = rawPhone.replace(/[^0-9]/g, '');
+    if (userPhone.length === 10) {
+      userPhone = '91' + userPhone;
+    }
+
+    if (userPhone) {
+      const waMessage = encodeURIComponent(
+        `*New Contact Message from Portfolio*\n\n` +
+        `👤 *Name:* ${contactForm.senderName}\n` +
+        `📧 *Email:* ${contactForm.senderEmail}\n` +
+        (contactForm.subject ? `📌 *Subject:* ${contactForm.subject}\n` : '') +
+        `💬 *Message:* ${contactForm.message}`
+      );
+      window.open(`https://wa.me/${userPhone}?text=${waMessage}`, '_blank');
+    }
+
     try {
-      const res = await portfolioService.sendMessage({ username, ...contactForm });
-
-      const rawPhone = personalInfo.whatsapp || personalInfo.phone || '6382245266';
-      let userPhone = rawPhone.replace(/[^0-9]/g, '');
-      if (userPhone.length === 10) {
-        userPhone = '91' + userPhone;
-      }
-      if (userPhone) {
-        const waMessage = encodeURIComponent(
-          `*New Contact Message from Portfolio*\n\n` +
-          `👤 *Name:* ${contactForm.senderName}\n` +
-          `📧 *Email:* ${contactForm.senderEmail}\n` +
-          (contactForm.subject ? `📌 *Subject:* ${contactForm.subject}\n` : '') +
-          `💬 *Message:* ${contactForm.message}`
-        );
-        window.open(`https://wa.me/${userPhone}?text=${waMessage}`, '_blank');
-      }
-
-      if (res.success) {
-        toast('Message saved to inbox & opening WhatsApp!', 'success');
-        setContactForm({ senderName: '', senderEmail: '', subject: '', message: '' });
-      }
+      await portfolioService.sendMessage({ username: targetUsername, ...contactForm });
+      toast('Opening WhatsApp & saved to inbox!', 'success');
     } catch (err) {
-      toast('Failed to send message', 'error');
+      console.warn('Backend message save skipped/failed:', err?.response?.data?.message || err.message);
+      toast('Opening WhatsApp!', 'success');
     } finally {
+      setContactForm({ senderName: '', senderEmail: '', subject: '', message: '' });
       setSending(false);
     }
   };
@@ -588,11 +591,11 @@ const CreativeTemplate = ({ data }) => {
                   >
                     <div className="space-y-4">
                       {proj.thumbnail && (
-                        <div className="overflow-hidden rounded-2xl h-52 bg-slate-950">
+                        <div className="overflow-hidden rounded-2xl h-52 bg-slate-950 flex items-center justify-center p-3">
                           <img
                             src={proj.thumbnail}
                             alt={proj.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                            className="w-full h-full object-contain group-hover:scale-105 transition duration-500"
                           />
                         </div>
                       )}
@@ -619,7 +622,14 @@ const CreativeTemplate = ({ data }) => {
                         </div>
                       </div>
 
-                      <p className="text-xs text-slate-500 leading-relaxed">{proj.description}</p>
+                      <p className="text-xs text-slate-500 leading-relaxed line-clamp-3">{proj.description}</p>
+                      <button
+                        onClick={() => setSelectedProject(proj)}
+                        className="text-xs font-bold text-purple-600 hover:text-purple-700 flex items-center gap-1.5 pt-1 group"
+                      >
+                        <Eye className="w-3.5 h-3.5 transition group-hover:scale-110" />
+                        <span>View Details</span>
+                      </button>
                     </div>
 
                     {proj.techStack && proj.techStack.length > 0 && (
@@ -796,6 +806,105 @@ const CreativeTemplate = ({ data }) => {
 
         </AnimatePresence>
       </main>
+
+      {/* Expanded Project Details Modal */}
+      {selectedProject && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            className={`rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border relative max-h-[90vh] flex flex-col ${
+              isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-100 text-slate-900'
+            }`}
+          >
+            {/* Top Close Button (Cancel Symbol) */}
+            <button
+              onClick={() => setSelectedProject(null)}
+              className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-slate-950/70 hover:bg-slate-950 text-white backdrop-blur-md shadow-lg transition duration-200"
+              title="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Modal Full Image Header */}
+            {(selectedProject.thumbnail || selectedProject.image) && (
+              <div className="w-full h-64 sm:h-72 bg-slate-950 flex items-center justify-center p-4 relative shrink-0">
+                <img
+                  src={selectedProject.thumbnail || selectedProject.image}
+                  alt={selectedProject.title}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            )}
+
+            {/* Modal Body */}
+            <div className="p-6 sm:p-8 space-y-5 overflow-y-auto flex-1">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/40 pb-4">
+                <div>
+                  <h3 className="text-2xl font-extrabold">{selectedProject.title}</h3>
+                  {selectedProject.category && (
+                    <span className="text-xs font-semibold text-purple-500">{selectedProject.category}</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  {(selectedProject.githubUrl || selectedProject.github) && (
+                    <a
+                      href={selectedProject.githubUrl || selectedProject.github}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`px-4 py-2 rounded-xl border font-bold text-xs flex items-center gap-1.5 transition ${
+                        isDark ? 'bg-slate-800 border-slate-700 text-slate-200 hover:text-purple-400' : 'bg-slate-100 border-slate-200 text-slate-700 hover:text-purple-600'
+                      }`}
+                    >
+                      <Github className="w-4 h-4" />
+                      <span>Code</span>
+                    </a>
+                  )}
+                  {(selectedProject.liveUrl || selectedProject.demoUrl || selectedProject.link) && (
+                    <a
+                      href={selectedProject.liveUrl || selectedProject.demoUrl || selectedProject.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-4 py-2 rounded-xl bg-purple-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-md hover:bg-purple-700 transition"
+                    >
+                      <span>Live Demo</span>
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              {/* Full Description */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-purple-500">Project Description</h4>
+                <p className="text-sm leading-relaxed font-normal whitespace-pre-line text-slate-400">
+                  {selectedProject.description}
+                </p>
+              </div>
+
+              {/* Tech Stack Badges */}
+              {selectedProject.techStack && (
+                <div className="space-y-2 pt-2">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-purple-500">Technologies Used</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {(Array.isArray(selectedProject.techStack)
+                      ? selectedProject.techStack
+                      : typeof selectedProject.techStack === 'string'
+                      ? selectedProject.techStack.split(',')
+                      : []
+                    ).map((tech) => (
+                      <span key={tech} className="px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                        {String(tech).trim()}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };

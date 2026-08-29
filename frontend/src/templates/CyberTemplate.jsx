@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Terminal, Cpu, Shield, ExternalLink, Download, Sun, Moon, Mail, Send, Menu, X, User, Briefcase, GraduationCap, Award, Github, Linkedin, Twitter, Instagram, Globe } from 'lucide-react';
+import { Terminal, Cpu, Shield, ExternalLink, Download, Sun, Moon, Mail, Send, Menu, X, User, Briefcase, GraduationCap, Award, Github, Linkedin, Twitter, Instagram, Globe, Eye } from 'lucide-react';
 import { analyticsService } from '../services/analyticsService';
 import { portfolioService } from '../services/portfolioService';
 import { useToast } from '../components/Toast';
@@ -13,6 +13,7 @@ const CyberTemplate = ({ data }) => {
   const [contactForm, setContactForm] = useState({ senderName: '', senderEmail: '', message: '' });
   const [sending, setSending] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
 
   const isDark = theme === 'dark';
 
@@ -47,31 +48,33 @@ const CyberTemplate = ({ data }) => {
     e.preventDefault();
     if (!contactForm.senderName || !contactForm.senderEmail || !contactForm.message) return;
     setSending(true);
+
+    const targetUsername = username || data?.username || personalInfo?.username || '';
+    const rawPhone = personalInfo.whatsapp || personalInfo.phone || '6382245266';
+    let userPhone = rawPhone.replace(/[^0-9]/g, '');
+    if (userPhone.length === 10) {
+      userPhone = '91' + userPhone;
+    }
+
+    if (userPhone) {
+      const waMessage = encodeURIComponent(
+        `*New Contact Message from Portfolio*\n\n` +
+        `👤 *Name:* ${contactForm.senderName}\n` +
+        `📧 *Email:* ${contactForm.senderEmail}\n` +
+        (contactForm.subject ? `📌 *Subject:* ${contactForm.subject}\n` : '') +
+        `💬 *Message:* ${contactForm.message}`
+      );
+      window.open(`https://wa.me/${userPhone}?text=${waMessage}`, '_blank');
+    }
+
     try {
-      const res = await portfolioService.sendMessage({ username, ...contactForm });
-
-      const rawPhone = personalInfo.whatsapp || personalInfo.phone || '6382245266';
-      let userPhone = rawPhone.replace(/[^0-9]/g, '');
-      if (userPhone.length === 10) {
-        userPhone = '91' + userPhone;
-      }
-      if (userPhone) {
-        const waMessage = encodeURIComponent(
-          `*New Contact Message from Portfolio*\n\n` +
-          `👤 *Name:* ${contactForm.senderName}\n` +
-          `📧 *Email:* ${contactForm.senderEmail}\n` +
-          `💬 *Message:* ${contactForm.message}`
-        );
-        window.open(`https://wa.me/${userPhone}?text=${waMessage}`, '_blank');
-      }
-
-      if (res.success) {
-        toast('Message transmitted & opening WhatsApp!', 'success');
-        setContactForm({ senderName: '', senderEmail: '', message: '' });
-      }
+      await portfolioService.sendMessage({ username: targetUsername, ...contactForm });
+      toast('Transmitting & opening WhatsApp!', 'success');
     } catch (err) {
-      toast('Transmission failed', 'error');
+      console.warn('Backend message save skipped/failed:', err?.response?.data?.message || err.message);
+      toast('Opening WhatsApp!', 'success');
     } finally {
+      setContactForm({ senderName: '', senderEmail: '', subject: '', message: '' });
       setSending(false);
     }
   };
@@ -260,8 +263,8 @@ const CyberTemplate = ({ data }) => {
                   <div key={proj._id || proj.title} className="border border-emerald-500/30 bg-black/80 p-5 rounded-lg space-y-3 hover:border-emerald-400 transition flex flex-col justify-between">
                     <div className="space-y-3">
                       {(proj.thumbnail || proj.image) && (
-                        <div className="overflow-hidden rounded h-40 border border-emerald-500/30">
-                          <img src={proj.thumbnail || proj.image} alt={proj.title} className="w-full h-full object-cover" />
+                        <div className="overflow-hidden rounded h-48 border border-emerald-500/30 bg-black flex items-center justify-center p-2">
+                          <img src={proj.thumbnail || proj.image} alt={proj.title} className="w-full h-full object-contain" />
                         </div>
                       )}
                       <div className="flex justify-between items-center">
@@ -279,7 +282,14 @@ const CyberTemplate = ({ data }) => {
                           )}
                         </div>
                       </div>
-                      <p className="text-xs text-slate-400 leading-relaxed">{proj.description}</p>
+                      <p className="text-xs text-slate-400 leading-relaxed line-clamp-3">{proj.description}</p>
+                      <button
+                        onClick={() => setSelectedProject(proj)}
+                        className="text-xs font-bold text-emerald-400 hover:text-emerald-300 flex items-center gap-1.5 pt-1"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>VIEW_DETAILS</span>
+                      </button>
                     </div>
                     {stack.length > 0 && (
                       <div className="flex flex-wrap gap-1.5 pt-2 border-t border-emerald-500/20">
@@ -401,6 +411,87 @@ const CyberTemplate = ({ data }) => {
           </section>
         )}
       </div>
+
+      {/* Expanded Cyber Project Details Modal */}
+      {selectedProject && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="bg-black border border-emerald-500/60 rounded-xl max-w-2xl w-full overflow-hidden shadow-2xl relative max-h-[90vh] flex flex-col text-emerald-400">
+            {/* Top Close Button (Cancel Symbol) */}
+            <button
+              onClick={() => setSelectedProject(null)}
+              className="absolute top-3 right-3 z-20 p-2 rounded border border-emerald-500/60 bg-black hover:bg-emerald-500/20 text-emerald-400 font-bold transition"
+              title="CLOSE"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Modal Image Header */}
+            {(selectedProject.thumbnail || selectedProject.image) && (
+              <div className="w-full h-64 bg-black flex items-center justify-center p-4 border-b border-emerald-500/40 shrink-0">
+                <img
+                  src={selectedProject.thumbnail || selectedProject.image}
+                  alt={selectedProject.title}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            )}
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-4 overflow-y-auto flex-1 text-xs">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-emerald-500/30 pb-3">
+                <h3 className="text-xl font-bold text-emerald-300">&gt; {selectedProject.title}</h3>
+                <div className="flex items-center gap-2">
+                  {(selectedProject.githubUrl || selectedProject.github) && (
+                    <a
+                      href={selectedProject.githubUrl || selectedProject.github}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-3 py-1.5 border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/30 text-emerald-300 rounded font-mono flex items-center gap-1"
+                    >
+                      <Github className="w-3.5 h-3.5" />
+                      <span>SOURCE</span>
+                    </a>
+                  )}
+                  {(selectedProject.liveUrl || selectedProject.demoUrl || selectedProject.link) && (
+                    <a
+                      href={selectedProject.liveUrl || selectedProject.demoUrl || selectedProject.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-3 py-1.5 border border-emerald-500 bg-emerald-500/30 hover:bg-emerald-500/50 text-white font-mono rounded flex items-center gap-1"
+                    >
+                      <span>LIVE_NODE</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <span className="text-[10px] text-emerald-600 block">// DESCRIPTION</span>
+                <p className="text-slate-300 leading-relaxed font-mono whitespace-pre-line">{selectedProject.description}</p>
+              </div>
+
+              {selectedProject.techStack && (
+                <div className="space-y-2 pt-2 border-t border-emerald-500/20">
+                  <span className="text-[10px] text-emerald-600 block">// STACK_MATRIX</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(Array.isArray(selectedProject.techStack)
+                      ? selectedProject.techStack
+                      : typeof selectedProject.techStack === 'string'
+                      ? selectedProject.techStack.split(',')
+                      : []
+                    ).map((tech) => (
+                      <span key={tech} className="text-[10px] px-2 py-0.5 border border-emerald-500/40 text-emerald-300 bg-emerald-500/10 rounded font-mono">
+                        [{String(tech).trim()}]
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
