@@ -4,6 +4,43 @@ import { analyticsService } from '../services/analyticsService';
 import { portfolioService } from '../services/portfolioService';
 import { useToast } from '../components/Toast';
 
+// Typewriter Animation Component
+const TypewriterText = ({ words, colorClass = "text-emerald-400" }) => {
+  const [index, setIndex] = useState(0);
+  const [subIndex, setSubIndex] = useState(0);
+  const [reverse, setReverse] = useState(false);
+
+  useEffect(() => {
+    if (!words || words.length === 0) return;
+    const current = words[index] || '';
+
+    if (subIndex === current.length + 1 && !reverse) {
+      const timeout = setTimeout(() => setReverse(true), 1500);
+      return () => clearTimeout(timeout);
+    }
+
+    if (subIndex === 0 && reverse) {
+      setReverse(false);
+      setIndex((prev) => (prev + 1) % words.length);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setSubIndex((prev) => prev + (reverse ? -1 : 1));
+    }, reverse ? 40 : 80);
+
+    return () => clearTimeout(timeout);
+  }, [subIndex, index, reverse, words]);
+
+  const current = words[index] || '';
+  return (
+    <span className={`inline-flex items-center ${colorClass}`}>
+      <span>{current.substring(0, subIndex)}</span>
+      <span className="inline-block w-0.5 h-4 sm:h-5 ml-1 bg-current animate-pulse" />
+    </span>
+  );
+};
+
 const CyberTemplate = ({ data }) => {
   const { toast } = useToast?.() || { toast: (msg) => alert(msg) };
   const { personalInfo = {}, socialLinks = {}, projects = [], skills = [], education = [], experience = [], certificates = [], sectionsEnabled = {}, username, resumeUrl } = data;
@@ -148,7 +185,18 @@ const CyberTemplate = ({ data }) => {
               <h1 className="text-3xl sm:text-5xl font-extrabold tracking-wider text-emerald-300">
                 &gt; {personalInfo.fullName || username}_
               </h1>
-              <p className="text-sm text-emerald-500/80">&gt; ROLE: {personalInfo.title || 'CYBER ARCHITECT'}</p>
+              <div className="text-sm text-emerald-500/80 flex items-center gap-1.5 h-6 font-mono">
+                <span>&gt; ROLE:</span>
+                <TypewriterText
+                  words={[
+                    personalInfo.title || 'CYBER ARCHITECT',
+                    'FULL STACK DEVELOPER',
+                    'SYSTEM DESIGNER',
+                    'PROTOCOL ENGINEER',
+                  ]}
+                  colorClass="text-emerald-400 font-bold"
+                />
+              </div>
               <p className="text-xs text-slate-400 max-w-2xl leading-relaxed pt-2">
                 {personalInfo.bio || 'Executing high-speed protocol builds & secure applications.'}
               </p>

@@ -30,6 +30,43 @@ import { analyticsService } from '../services/analyticsService';
 import { portfolioService } from '../services/portfolioService';
 import { useToast } from '../components/Toast';
 
+// Typewriter Animation Component
+const TypewriterText = ({ words, colorClass = "text-purple-600" }) => {
+  const [index, setIndex] = useState(0);
+  const [subIndex, setSubIndex] = useState(0);
+  const [reverse, setReverse] = useState(false);
+
+  useEffect(() => {
+    if (!words || words.length === 0) return;
+    const current = words[index] || '';
+
+    if (subIndex === current.length + 1 && !reverse) {
+      const timeout = setTimeout(() => setReverse(true), 1500);
+      return () => clearTimeout(timeout);
+    }
+
+    if (subIndex === 0 && reverse) {
+      setReverse(false);
+      setIndex((prev) => (prev + 1) % words.length);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setSubIndex((prev) => prev + (reverse ? -1 : 1));
+    }, reverse ? 40 : 80);
+
+    return () => clearTimeout(timeout);
+  }, [subIndex, index, reverse, words]);
+
+  const current = words[index] || '';
+  return (
+    <span className={`inline-flex items-center ${colorClass}`}>
+      <span>{current.substring(0, subIndex)}</span>
+      <span className="inline-block w-0.5 h-6 sm:h-7 ml-1 bg-current animate-pulse" />
+    </span>
+  );
+};
+
 const CreativeTemplate = ({ data }) => {
   const { toast } = useToast?.() || { toast: (msg) => alert(msg) };
   const {
@@ -270,12 +307,18 @@ const CreativeTemplate = ({ data }) => {
                   Hi, I'm <span className="text-purple-600">{personalInfo.fullName || username}</span>
                 </h1>
 
-                {/* Static Role Title */}
-                <div className="text-2xl sm:text-3xl font-bold flex items-center justify-center md:justify-start gap-2">
+                {/* Typewriter Role Title */}
+                <div className="text-2xl sm:text-3xl font-bold flex items-center justify-center md:justify-start gap-2 h-10">
                   <span className={isDark ? 'text-slate-200' : 'text-slate-800'}>A</span>
-                  <span className="text-purple-600 font-bold">
-                    {personalInfo.title || 'Software Developer'}
-                  </span>
+                  <TypewriterText
+                    words={[
+                      personalInfo.title || 'Software Developer',
+                      'Full Stack Engineer',
+                      'UI/UX Craftsman',
+                      'Tech Enthusiast',
+                    ]}
+                    colorClass="text-purple-600 font-bold"
+                  />
                 </div>
 
                 {/* Mobile Only Profile Photo (Displayed below heading and title, above bio) */}
@@ -402,7 +445,11 @@ const CreativeTemplate = ({ data }) => {
 
               {/* Right Column: Clean Simple Circular Photo Card */}
               <div className="flex-1 hidden md:flex justify-center items-center py-8">
-                <div className="relative w-64 h-64 sm:w-80 sm:h-80 rounded-full flex items-center justify-center">
+                <motion.div
+                  animate={{ y: [0, -12, 0] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+                  className="relative w-64 h-64 sm:w-80 sm:h-80 rounded-full flex items-center justify-center"
+                >
                   {/* Subtle Glow Ring */}
                   <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-purple-500/30 to-indigo-500/20 blur-2xl pointer-events-none" />
 
@@ -420,7 +467,7 @@ const CreativeTemplate = ({ data }) => {
                       </div>
                     )}
                   </div>
-                </div>
+                </motion.div>
               </div>
             </motion.section>
           )}

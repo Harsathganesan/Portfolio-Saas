@@ -31,6 +31,43 @@ import { analyticsService } from '../services/analyticsService';
 import { portfolioService } from '../services/portfolioService';
 import { useToast } from '../components/Toast';
 
+// Typewriter Animation Component
+const TypewriterText = ({ words, primaryColor }) => {
+  const [index, setIndex] = useState(0);
+  const [subIndex, setSubIndex] = useState(0);
+  const [reverse, setReverse] = useState(false);
+
+  useEffect(() => {
+    if (!words || words.length === 0) return;
+    const current = words[index] || '';
+
+    if (subIndex === current.length + 1 && !reverse) {
+      const timeout = setTimeout(() => setReverse(true), 1500);
+      return () => clearTimeout(timeout);
+    }
+
+    if (subIndex === 0 && reverse) {
+      setReverse(false);
+      setIndex((prev) => (prev + 1) % words.length);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setSubIndex((prev) => prev + (reverse ? -1 : 1));
+    }, reverse ? 40 : 80);
+
+    return () => clearTimeout(timeout);
+  }, [subIndex, index, reverse, words]);
+
+  const current = words[index] || '';
+  return (
+    <span className="inline-flex items-center">
+      <span>{current.substring(0, subIndex)}</span>
+      <span className="inline-block w-0.5 h-6 sm:h-7 ml-1 animate-pulse" style={{ backgroundColor: primaryColor }} />
+    </span>
+  );
+};
+
 const MinimalistTemplate = ({ data }) => {
   const { toast } = useToast?.() || { toast: (msg) => alert(msg) };
   const {
@@ -329,13 +366,17 @@ const MinimalistTemplate = ({ data }) => {
                 </span>
               </h1>
 
-              {/* Subtitle / Role */}
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-700">
-                {personalInfo.title ? (
-                  <span>{personalInfo.title}</span>
-                ) : (
-                  <>Full Stack <span style={themeStyles.primaryText}>Developer</span></>
-                )}
+              {/* Subtitle / Role with Typewriter Animation */}
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-700 h-8 flex items-center justify-center lg:justify-start">
+                <TypewriterText
+                  words={[
+                    personalInfo.title || 'Full Stack Developer',
+                    'UI/UX Enthusiast',
+                    'Problem Solver',
+                    'Creative Engineer',
+                  ]}
+                  primaryColor={primaryColor}
+                />
               </h2>
 
               {/* Mobile Only Profile Photo (Displayed below heading, above bio content) */}
@@ -478,14 +519,18 @@ const MinimalistTemplate = ({ data }) => {
               </div>
             </motion.div>
 
-            {/* Right Sleek Professional Large Photo Frame */}
+            {/* Right Sleek Professional Large Photo Frame with Ambient Floating */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
               className="flex-1 hidden md:flex justify-center items-center"
             >
-              <div className="relative group">
+              <motion.div
+                animate={{ y: [0, -12, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+                className="relative group"
+              >
                 {/* Soft Ambient Radial Glow */}
                 <div
                   className="absolute -inset-4 rounded-full blur-3xl opacity-40 group-hover:opacity-75 transition duration-700 pointer-events-none"
@@ -511,7 +556,7 @@ const MinimalistTemplate = ({ data }) => {
                     )}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
           </div>
         </section>
@@ -716,17 +761,22 @@ const MinimalistTemplate = ({ data }) => {
             </div>
 
             <div className="flex flex-wrap justify-center gap-3.5 max-w-4xl mx-auto">
-              {skills.map((sk) => {
+              {skills.map((sk, idx) => {
                 const skillName = typeof sk === 'string' ? sk : sk.name;
                 const skillLevel = typeof sk === 'object' ? sk.level : null;
                 return (
-                  <span
+                  <motion.span
                     key={skillName}
-                    className="px-6 py-3.5 rounded-2xl text-sm font-extrabold border border-slate-200 bg-white text-slate-800 shadow-sm hover:shadow-md hover:scale-105 transition duration-200 flex items-center gap-2"
+                    initial={{ opacity: 0, scale: 0.8, y: 15 }}
+                    whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.35, delay: idx * 0.04 }}
+                    whileHover={{ scale: 1.08, y: -4 }}
+                    className="px-6 py-3.5 rounded-2xl text-sm font-extrabold border border-slate-200 bg-white text-slate-800 shadow-sm hover:shadow-md transition duration-200 flex items-center gap-2 cursor-pointer"
                   >
                     <span>{skillName}</span>
                     {skillLevel && <span className="text-xs text-slate-400 font-medium">({skillLevel})</span>}
-                  </span>
+                  </motion.span>
                 );
               })}
             </div>

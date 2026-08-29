@@ -4,6 +4,43 @@ import { analyticsService } from '../services/analyticsService';
 import { portfolioService } from '../services/portfolioService';
 import { useToast } from '../components/Toast';
 
+// Typewriter Animation Component
+const TypewriterText = ({ words, colorClass = "text-indigo-400" }) => {
+  const [index, setIndex] = useState(0);
+  const [subIndex, setSubIndex] = useState(0);
+  const [reverse, setReverse] = useState(false);
+
+  useEffect(() => {
+    if (!words || words.length === 0) return;
+    const current = words[index] || '';
+
+    if (subIndex === current.length + 1 && !reverse) {
+      const timeout = setTimeout(() => setReverse(true), 1500);
+      return () => clearTimeout(timeout);
+    }
+
+    if (subIndex === 0 && reverse) {
+      setReverse(false);
+      setIndex((prev) => (prev + 1) % words.length);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setSubIndex((prev) => prev + (reverse ? -1 : 1));
+    }, reverse ? 40 : 80);
+
+    return () => clearTimeout(timeout);
+  }, [subIndex, index, reverse, words]);
+
+  const current = words[index] || '';
+  return (
+    <span className={`inline-flex items-center ${colorClass}`}>
+      <span>{current.substring(0, subIndex)}</span>
+      <span className="inline-block w-0.5 h-6 sm:h-7 ml-1 bg-current animate-pulse" />
+    </span>
+  );
+};
+
 const SleekTemplate = ({ data }) => {
   const { toast } = useToast?.() || { toast: (msg) => alert(msg) };
   const { personalInfo = {}, socialLinks = {}, projects = [], skills = [], education = [], experience = [], certificates = [], sectionsEnabled = {}, username, resumeUrl } = data;
@@ -146,12 +183,23 @@ const SleekTemplate = ({ data }) => {
               <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
                 Hello, I'm <span className="text-indigo-500">{personalInfo.fullName || username}</span>.
               </h1>
-              <p className="text-lg font-medium text-slate-400">{personalInfo.title || 'Full Stack Engineer'}</p>
+              <div className="text-lg font-medium text-slate-400 h-7 flex items-center justify-center md:justify-start">
+                <TypewriterText
+                  words={[
+                    personalInfo.title || 'Full Stack Engineer',
+                    'UI/UX Specialist',
+                    'Systems Engineer',
+                  ]}
+                  colorClass="text-indigo-400 font-bold"
+                />
+              </div>
 
               {/* Mobile Profile Photo (Placed below heading and title, above bio) */}
               {personalInfo.avatar && (
                 <div className="md:hidden flex justify-center py-2">
-                  <img
+                  <motion.img
+                    animate={{ y: [0, -8, 0] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
                     src={personalInfo.avatar}
                     alt={personalInfo.fullName}
                     className="w-44 h-44 rounded-3xl object-cover shadow-2xl ring-4 ring-indigo-500/20"
@@ -215,7 +263,9 @@ const SleekTemplate = ({ data }) => {
             </div>
 
             {personalInfo.avatar && (
-              <img
+              <motion.img
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
                 src={personalInfo.avatar}
                 alt={personalInfo.fullName}
                 className="w-44 h-44 rounded-3xl object-cover shadow-2xl ring-4 ring-indigo-500/20 hidden md:block"

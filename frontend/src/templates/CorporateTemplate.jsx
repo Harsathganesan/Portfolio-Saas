@@ -4,6 +4,43 @@ import { analyticsService } from '../services/analyticsService';
 import { portfolioService } from '../services/portfolioService';
 import { useToast } from '../components/Toast';
 
+// Typewriter Animation Component
+const TypewriterText = ({ words, colorClass = "text-indigo-400" }) => {
+  const [index, setIndex] = useState(0);
+  const [subIndex, setSubIndex] = useState(0);
+  const [reverse, setReverse] = useState(false);
+
+  useEffect(() => {
+    if (!words || words.length === 0) return;
+    const current = words[index] || '';
+
+    if (subIndex === current.length + 1 && !reverse) {
+      const timeout = setTimeout(() => setReverse(true), 1500);
+      return () => clearTimeout(timeout);
+    }
+
+    if (subIndex === 0 && reverse) {
+      setReverse(false);
+      setIndex((prev) => (prev + 1) % words.length);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setSubIndex((prev) => prev + (reverse ? -1 : 1));
+    }, reverse ? 40 : 80);
+
+    return () => clearTimeout(timeout);
+  }, [subIndex, index, reverse, words]);
+
+  const current = words[index] || '';
+  return (
+    <span className={`inline-flex items-center ${colorClass}`}>
+      <span>{current.substring(0, subIndex)}</span>
+      <span className="inline-block w-0.5 h-5 sm:h-6 ml-1 bg-current animate-pulse" />
+    </span>
+  );
+};
+
 const CorporateTemplate = ({ data }) => {
   const { toast } = useToast?.() || { toast: (msg) => alert(msg) };
   const { personalInfo = {}, socialLinks = {}, projects = [], skills = [], education = [], experience = [], certificates = [], sectionsEnabled = {}, username, resumeUrl } = data;
@@ -147,11 +184,26 @@ const CorporateTemplate = ({ data }) => {
         <aside className="space-y-6 md:col-span-1">
           <div className={`p-6 rounded-2xl border text-center space-y-4 ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
             {personalInfo.avatar && (
-              <img src={personalInfo.avatar} alt={personalInfo.fullName} className="w-32 h-32 rounded-full mx-auto object-cover ring-4 ring-indigo-500/20 hidden md:block" />
+              <motion.img
+                animate={{ y: [0, -8, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                src={personalInfo.avatar}
+                alt={personalInfo.fullName}
+                className="w-32 h-32 rounded-full mx-auto object-cover ring-4 ring-indigo-500/20 hidden md:block"
+              />
             )}
             <div>
               <h1 className="text-2xl font-bold">{personalInfo.fullName || username}</h1>
-              <p className="text-xs font-semibold text-indigo-500">{personalInfo.title || 'Executive Leader'}</p>
+              <div className="text-xs font-semibold text-indigo-500 h-5 flex items-center justify-center">
+                <TypewriterText
+                  words={[
+                    personalInfo.title || 'Executive Leader',
+                    'Full Stack Strategist',
+                    'Engineering Lead',
+                  ]}
+                  colorClass="text-indigo-400 font-bold"
+                />
+              </div>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">{personalInfo.bio}</p>
 
