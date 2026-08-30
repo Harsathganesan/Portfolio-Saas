@@ -179,6 +179,9 @@ class MockStore {
 
   // Project CRUD
   async addProject(projData) {
+    const git = projData.githubUrl || projData.github || projData.gitUrl || projData.repoUrl || projData.github_url || '';
+    const demo = projData.liveUrl || projData.demoUrl || projData.link || '';
+    const img = projData.thumbnail || projData.image || projData.imageUrl || '';
     const proj = {
       _id: 'mock_proj_' + Date.now(),
       userId: projData.userId,
@@ -186,15 +189,38 @@ class MockStore {
       title: projData.title,
       description: projData.description || '',
       techStack: projData.techStack || [],
-      githubUrl: projData.githubUrl || '',
-      liveUrl: projData.liveUrl || '',
-      thumbnail: projData.thumbnail || '',
-      category: projData.category || 'Web App',
+      githubUrl: git,
+      github: git,
+      liveUrl: demo,
+      demoUrl: demo,
+      link: demo,
+      thumbnail: img,
+      image: img,
+      imageUrl: img,
+      category: projData.category || 'Web Application',
       isFeatured: projData.isFeatured || false,
       clicks: 0,
       createdAt: new Date(),
     };
     this.projects.push(proj);
+    return proj;
+  }
+
+  async updateProject(id, updates) {
+    const proj = this.projects.find((p) => p._id.toString() === id.toString());
+    if (!proj) return null;
+    const git = updates.githubUrl || updates.github || updates.gitUrl || updates.repoUrl;
+    const demo = updates.liveUrl || updates.demoUrl || updates.link;
+    const img = updates.thumbnail || updates.image || updates.imageUrl;
+
+    if (updates.title) proj.title = updates.title;
+    if (updates.description !== undefined) proj.description = updates.description;
+    if (updates.techStack) proj.techStack = updates.techStack;
+    if (git !== undefined) { proj.githubUrl = git; proj.github = git; }
+    if (demo !== undefined) { proj.liveUrl = demo; proj.demoUrl = demo; proj.link = demo; }
+    if (img !== undefined) { proj.thumbnail = img; proj.image = img; proj.imageUrl = img; }
+    if (updates.category) proj.category = updates.category;
+    if (updates.isFeatured !== undefined) proj.isFeatured = updates.isFeatured;
     return proj;
   }
 

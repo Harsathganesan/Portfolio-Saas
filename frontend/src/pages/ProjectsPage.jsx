@@ -197,14 +197,14 @@ const ProjectsPage = () => {
 
               {/* GitHub & Live Demo Preview Links on Card */}
               <div className="flex flex-wrap items-center gap-2 pt-1 text-xs font-semibold">
-                {(proj.githubUrl || proj.github) ? (
+                {(proj.githubUrl || proj.github || proj.gitUrl || proj.repoUrl) ? (
                   <a
-                    href={proj.githubUrl || proj.github}
+                    href={proj.githubUrl || proj.github || proj.gitUrl || proj.repoUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-1.5 text-slate-700 hover:text-blue-600 bg-slate-100 hover:bg-blue-50 px-2.5 py-1 rounded-lg border border-slate-200 hover:border-blue-200 transition"
+                    className="flex items-center gap-1.5 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-200 transition font-bold"
                   >
-                    <Github className="w-3.5 h-3.5 text-slate-700" />
+                    <Github className="w-3.5 h-3.5 text-blue-600" />
                     <span>GitHub Repo</span>
                   </a>
                 ) : (
@@ -300,8 +300,8 @@ const ProjectsPage = () => {
                   <label className="block text-slate-700 mb-1.5 font-semibold">GitHub Repository URL</label>
                   <input
                     type="text"
-                    value={form.githubUrl}
-                    onChange={(e) => setForm({ ...form, githubUrl: e.target.value })}
+                    value={form.githubUrl || form.github || ''}
+                    onChange={(e) => setForm({ ...form, githubUrl: e.target.value, github: e.target.value })}
                     placeholder="https://github.com/..."
                     className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                   />
@@ -310,8 +310,8 @@ const ProjectsPage = () => {
                   <label className="block text-slate-700 mb-1.5 font-semibold">Live Demo URL</label>
                   <input
                     type="text"
-                    value={form.liveUrl}
-                    onChange={(e) => setForm({ ...form, liveUrl: e.target.value })}
+                    value={form.liveUrl || form.demoUrl || ''}
+                    onChange={(e) => setForm({ ...form, liveUrl: e.target.value, demoUrl: e.target.value, link: e.target.value })}
                     placeholder="https://example.com"
                     className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                   />
