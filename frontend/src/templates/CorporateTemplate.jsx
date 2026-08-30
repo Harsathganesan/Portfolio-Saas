@@ -196,11 +196,13 @@ const CorporateTemplate = ({ data }) => {
               <h1 className="text-2xl font-bold">{personalInfo.fullName || username}</h1>
               <div className="text-xs font-semibold text-indigo-500 h-5 flex items-center justify-center">
                 <TypewriterText
-                  words={[
-                    personalInfo.title || 'Executive Leader',
-                    'Full Stack Strategist',
-                    'Engineering Lead',
-                  ]}
+                  words={
+                    personalInfo.title
+                      ? (personalInfo.title.includes(',')
+                          ? personalInfo.title.split(',').map(s => s.trim()).filter(Boolean)
+                          : [personalInfo.title.trim()])
+                      : ['Executive Leader']
+                  }
                   colorClass="text-indigo-400 font-bold"
                 />
               </div>

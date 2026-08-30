@@ -188,12 +188,13 @@ const CyberTemplate = ({ data }) => {
               <div className="text-sm text-emerald-500/80 flex items-center gap-1.5 h-6 font-mono">
                 <span>&gt; ROLE:</span>
                 <TypewriterText
-                  words={[
-                    personalInfo.title || 'CYBER ARCHITECT',
-                    'FULL STACK DEVELOPER',
-                    'SYSTEM DESIGNER',
-                    'PROTOCOL ENGINEER',
-                  ]}
+                  words={
+                    personalInfo.title
+                      ? (personalInfo.title.includes(',')
+                          ? personalInfo.title.split(',').map(s => s.trim()).filter(Boolean)
+                          : [personalInfo.title.trim()])
+                      : ['CYBER ARCHITECT']
+                  }
                   colorClass="text-emerald-400 font-bold"
                 />
               </div>

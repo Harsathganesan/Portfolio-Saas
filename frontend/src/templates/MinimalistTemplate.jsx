@@ -369,12 +369,13 @@ const MinimalistTemplate = ({ data }) => {
               {/* Subtitle / Role with Typewriter Animation */}
               <h2 className="text-xl sm:text-2xl font-bold text-slate-700 h-8 flex items-center justify-center lg:justify-start">
                 <TypewriterText
-                  words={[
-                    personalInfo.title || 'Full Stack Developer',
-                    'UI/UX Enthusiast',
-                    'Problem Solver',
-                    'Creative Engineer',
-                  ]}
+                  words={
+                    personalInfo.title
+                      ? (personalInfo.title.includes(',')
+                          ? personalInfo.title.split(',').map(s => s.trim()).filter(Boolean)
+                          : [personalInfo.title.trim()])
+                      : ['Full Stack Developer']
+                  }
                   primaryColor={primaryColor}
                 />
               </h2>

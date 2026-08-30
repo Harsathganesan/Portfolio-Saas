@@ -185,11 +185,13 @@ const SleekTemplate = ({ data }) => {
               </h1>
               <div className="text-lg font-medium text-slate-400 h-7 flex items-center justify-center md:justify-start">
                 <TypewriterText
-                  words={[
-                    personalInfo.title || 'Full Stack Engineer',
-                    'UI/UX Specialist',
-                    'Systems Engineer',
-                  ]}
+                  words={
+                    personalInfo.title
+                      ? (personalInfo.title.includes(',')
+                          ? personalInfo.title.split(',').map(s => s.trim()).filter(Boolean)
+                          : [personalInfo.title.trim()])
+                      : ['Full Stack Engineer']
+                  }
                   colorClass="text-indigo-400 font-bold"
                 />
               </div>

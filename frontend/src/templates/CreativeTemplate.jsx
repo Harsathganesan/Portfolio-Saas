@@ -311,12 +311,13 @@ const CreativeTemplate = ({ data }) => {
                 <div className="text-2xl sm:text-3xl font-bold flex items-center justify-center md:justify-start gap-2 h-10">
                   <span className={isDark ? 'text-slate-200' : 'text-slate-800'}>A</span>
                   <TypewriterText
-                    words={[
-                      personalInfo.title || 'Software Developer',
-                      'Full Stack Engineer',
-                      'UI/UX Craftsman',
-                      'Tech Enthusiast',
-                    ]}
+                    words={
+                      personalInfo.title
+                        ? (personalInfo.title.includes(',')
+                            ? personalInfo.title.split(',').map(s => s.trim()).filter(Boolean)
+                            : [personalInfo.title.trim()])
+                        : ['Software Developer']
+                    }
                     colorClass="text-purple-600 font-bold"
                   />
                 </div>
