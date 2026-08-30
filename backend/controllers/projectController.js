@@ -29,6 +29,9 @@ export const getProjects = async (req, res) => {
 export const createProject = async (req, res) => {
   try {
     const { title, description, techStack, githubUrl, liveUrl, thumbnail, category, isFeatured } = req.body;
+    const gitLink = githubUrl || req.body.github || '';
+    const demoLink = liveUrl || req.body.demoUrl || req.body.link || '';
+    const imgUrl = thumbnail || req.body.image || req.body.imageUrl || '';
 
     if (isInMemoryFallback) {
       const portfolio = await mockStore.findPortfolioByUserId(req.user._id);
@@ -40,9 +43,9 @@ export const createProject = async (req, res) => {
         title,
         description,
         techStack: Array.isArray(techStack) ? techStack : techStack ? techStack.split(',').map((t) => t.trim()) : [],
-        githubUrl,
-        liveUrl,
-        thumbnail,
+        githubUrl: gitLink,
+        liveUrl: demoLink,
+        thumbnail: imgUrl,
         category: category || 'Web Application',
         isFeatured: isFeatured || false,
       });
@@ -59,9 +62,9 @@ export const createProject = async (req, res) => {
       title,
       description,
       techStack: Array.isArray(techStack) ? techStack : techStack ? techStack.split(',').map((t) => t.trim()) : [],
-      githubUrl,
-      liveUrl,
-      thumbnail,
+      githubUrl: gitLink,
+      liveUrl: demoLink,
+      thumbnail: imgUrl,
       category: category || 'Web Application',
       isFeatured: isFeatured || false,
     });
@@ -77,6 +80,9 @@ export const createProject = async (req, res) => {
 export const updateProject = async (req, res) => {
   try {
     const { title, description, techStack, githubUrl, liveUrl, thumbnail, category, isFeatured } = req.body;
+    const gitLink = githubUrl !== undefined ? githubUrl : (req.body.github !== undefined ? req.body.github : undefined);
+    const demoLink = liveUrl !== undefined ? liveUrl : (req.body.demoUrl !== undefined ? req.body.demoUrl : (req.body.link !== undefined ? req.body.link : undefined));
+    const imgUrl = thumbnail !== undefined ? thumbnail : (req.body.image !== undefined ? req.body.image : (req.body.imageUrl !== undefined ? req.body.imageUrl : undefined));
 
     if (isInMemoryFallback) {
       const proj = mockStore.projects.find((p) => p._id.toString() === req.params.id);
@@ -84,9 +90,9 @@ export const updateProject = async (req, res) => {
         if (title) proj.title = title;
         if (description !== undefined) proj.description = description;
         if (techStack) proj.techStack = Array.isArray(techStack) ? techStack : techStack.split(',').map((t) => t.trim());
-        if (githubUrl !== undefined) proj.githubUrl = githubUrl;
-        if (liveUrl !== undefined) proj.liveUrl = liveUrl;
-        if (thumbnail !== undefined) proj.thumbnail = thumbnail;
+        if (gitLink !== undefined) proj.githubUrl = gitLink;
+        if (demoLink !== undefined) proj.liveUrl = demoLink;
+        if (imgUrl !== undefined) proj.thumbnail = imgUrl;
       }
       return res.json({ success: true, message: 'Project updated', project: proj });
     }
@@ -101,9 +107,9 @@ export const updateProject = async (req, res) => {
     if (title) project.title = title;
     if (description !== undefined) project.description = description;
     if (techStack) project.techStack = Array.isArray(techStack) ? techStack : techStack.split(',').map((t) => t.trim());
-    if (githubUrl !== undefined) project.githubUrl = githubUrl;
-    if (liveUrl !== undefined) project.liveUrl = liveUrl;
-    if (thumbnail !== undefined) project.thumbnail = thumbnail;
+    if (gitLink !== undefined) project.githubUrl = gitLink;
+    if (demoLink !== undefined) project.liveUrl = demoLink;
+    if (imgUrl !== undefined) project.thumbnail = imgUrl;
     if (category) project.category = category;
     if (isFeatured !== undefined) project.isFeatured = isFeatured;
 

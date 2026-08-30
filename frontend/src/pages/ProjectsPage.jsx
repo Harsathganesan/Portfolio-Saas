@@ -63,8 +63,8 @@ const ProjectsPage = () => {
       title: proj.title || '',
       description: proj.description || '',
       techStack: Array.isArray(proj.techStack) ? proj.techStack.join(', ') : proj.techStack || '',
-      githubUrl: proj.githubUrl || '',
-      liveUrl: proj.liveUrl || '',
+      githubUrl: proj.githubUrl || proj.github || '',
+      liveUrl: proj.liveUrl || proj.demoUrl || proj.link || '',
       thumbnail: proj.thumbnail || proj.image || proj.imageUrl || '',
       category: proj.category || 'Web Application',
       isFeatured: proj.isFeatured || false,
@@ -95,11 +95,17 @@ const ProjectsPage = () => {
       toast('Project title is required', 'error');
       return;
     }
+    const gitLink = ensureUrlProtocol(form.githubUrl);
+    const demoLink = ensureUrlProtocol(form.liveUrl);
     const imgUrl = ensureUrlProtocol(form.thumbnail);
+
     const payload = {
       ...form,
-      githubUrl: ensureUrlProtocol(form.githubUrl),
-      liveUrl: ensureUrlProtocol(form.liveUrl),
+      githubUrl: gitLink,
+      github: gitLink,
+      liveUrl: demoLink,
+      demoUrl: demoLink,
+      link: demoLink,
       thumbnail: imgUrl,
       image: imgUrl,
       imageUrl: imgUrl,
@@ -179,15 +185,43 @@ const ProjectsPage = () => {
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-base text-slate-900">{proj.title}</h3>
                 <div className="flex items-center space-x-1">
-                  <button onClick={() => handleOpenEdit(proj)} className="p-1.5 text-slate-400 hover:text-blue-600 transition">
+                  <button onClick={() => handleOpenEdit(proj)} className="p-1.5 text-slate-400 hover:text-blue-600 transition" title="Edit Project">
                     <Edit2 className="w-4 h-4" />
                   </button>
-                  <button onClick={() => handleDelete(proj._id)} className="p-1.5 text-slate-400 hover:text-rose-600 transition">
+                  <button onClick={() => handleDelete(proj._id)} className="p-1.5 text-slate-400 hover:text-rose-600 transition" title="Delete Project">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
               <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed font-medium">{proj.description}</p>
+
+              {/* GitHub & Live Demo Preview Links on Card */}
+              <div className="flex flex-wrap items-center gap-2 pt-1 text-xs font-semibold">
+                {(proj.githubUrl || proj.github) ? (
+                  <a
+                    href={proj.githubUrl || proj.github}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-1.5 text-slate-700 hover:text-blue-600 bg-slate-100 hover:bg-blue-50 px-2.5 py-1 rounded-lg border border-slate-200 hover:border-blue-200 transition"
+                  >
+                    <Github className="w-3.5 h-3.5 text-slate-700" />
+                    <span>GitHub Repo</span>
+                  </a>
+                ) : (
+                  <span className="text-slate-400 text-[11px] font-normal">No GitHub Link</span>
+                )}
+                {(proj.liveUrl || proj.demoUrl || proj.link) && (
+                  <a
+                    href={proj.liveUrl || proj.demoUrl || proj.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-1.5 text-emerald-700 hover:text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 transition"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>Live Demo</span>
+                  </a>
+                )}
+              </div>
             </div>
 
             {proj.techStack && proj.techStack.length > 0 && (
