@@ -6,7 +6,6 @@ import { Code2, Plus, Trash2, Edit2, Loader2, X, Sparkles, Save } from 'lucide-r
 import SectionPublishBar from '../components/SectionPublishBar';
 
 const SkillsPage = () => {
-
   const { portfolio, fetchPortfolio, addSkillToContext, removeSkillFromContext } = usePortfolio();
   const { toast } = useToast();
 
@@ -16,14 +15,13 @@ const SkillsPage = () => {
 
   // Batch Skill Tag Input State
   const [tagInput, setTagInput] = useState('');
-  const [tagCategory, setTagCategory] = useState('Frontend');
   const [tagLevel, setTagLevel] = useState(85);
   const [draftTags, setDraftTags] = useState([]);
   const [savingBatch, setSavingBatch] = useState(false);
 
   const [form, setForm] = useState({
     name: '',
-    category: 'Frontend',
+    category: 'General',
     proficiencyLevel: 85,
   });
 
@@ -39,7 +37,7 @@ const SkillsPage = () => {
     }
     setDraftTags((prev) => [
       ...prev,
-      { id: Date.now(), name, category: tagCategory, proficiencyLevel: tagLevel },
+      { id: Date.now(), name, category: 'General', proficiencyLevel: tagLevel },
     ]);
     setTagInput('');
   };
@@ -55,7 +53,7 @@ const SkillsPage = () => {
       for (const skill of draftTags) {
         const res = await portfolioService.createSkill({
           name: skill.name,
-          category: skill.category,
+          category: skill.category || 'General',
           proficiencyLevel: skill.proficiencyLevel,
         });
         if (res.success && res.skill) {
@@ -74,7 +72,7 @@ const SkillsPage = () => {
 
   const handleOpenAdd = () => {
     setEditingId(null);
-    setForm({ name: '', category: 'Frontend', proficiencyLevel: 85 });
+    setForm({ name: '', category: 'General', proficiencyLevel: 85 });
     setModalOpen(true);
   };
 
@@ -82,7 +80,7 @@ const SkillsPage = () => {
     setEditingId(sk._id);
     setForm({
       name: sk.name || '',
-      category: sk.category || 'Frontend',
+      category: sk.category || 'General',
       proficiencyLevel: sk.proficiencyLevel || 85,
     });
     setModalOpen(true);
@@ -132,7 +130,7 @@ const SkillsPage = () => {
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
             <Code2 className="w-6 h-6 text-blue-600" /> Skills & Technical Stack ({skills.length})
           </h1>
-          <p className="text-xs text-slate-500 font-medium">Manage technical proficiencies and category groupings</p>
+          <p className="text-xs text-slate-500 font-medium">Manage technical proficiencies and skills</p>
         </div>
         <button
           onClick={handleOpenAdd}
@@ -162,20 +160,6 @@ const SkillsPage = () => {
             placeholder="Type skill name (e.g. React.js, Node.js, Python, Figma)..."
             className="flex-1 w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-indigo-500 focus:bg-white transition"
           />
-
-          <select
-            value={tagCategory}
-            onChange={(e) => setTagCategory(e.target.value)}
-            className="w-full sm:w-40 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-900 outline-none focus:border-indigo-500 font-medium"
-          >
-            <option value="Frontend">Frontend</option>
-            <option value="Backend">Backend</option>
-            <option value="Database">Database</option>
-            <option value="DevOps">DevOps & Cloud</option>
-            <option value="Tools">Tools & Architecture</option>
-            <option value="Design">UI/UX Design</option>
-            <option value="Other">Other</option>
-          </select>
 
           <button
             type="submit"
@@ -207,7 +191,6 @@ const SkillsPage = () => {
                   className="bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-xl px-3 py-1.5 text-xs font-semibold flex items-center gap-2"
                 >
                   <span>{tag.name}</span>
-                  <span className="text-[10px] text-indigo-400 font-mono">({tag.category})</span>
                   <button
                     type="button"
                     onClick={() => handleRemoveDraftTag(tag.id)}
@@ -252,7 +235,7 @@ const SkillsPage = () => {
 
             <div className="space-y-1">
               <div className="flex justify-between text-[11px] text-slate-500 font-semibold">
-                <span>{sk.category}</span>
+                <span>Proficiency</span>
                 <span className="text-blue-600 font-bold">{sk.proficiencyLevel}%</span>
               </div>
               <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
@@ -270,8 +253,6 @@ const SkillsPage = () => {
       {modalOpen && (
         <div className="fixed inset-0 z-[99999] top-0 left-0 w-screen h-screen bg-slate-900/50 flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white border border-slate-200 rounded-2xl p-6 max-w-md w-full shadow-2xl relative text-slate-900">
-
-
             <button onClick={() => setModalOpen(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700 transition">
               <X className="w-5 h-5" />
             </button>
@@ -288,23 +269,6 @@ const SkillsPage = () => {
                   placeholder="React.js / Node.js"
                   className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                 />
-              </div>
-
-              <div>
-                <label className="block text-slate-700 mb-1.5 font-semibold">Category</label>
-                <select
-                  value={form.category}
-                  onChange={(e) => setForm({ ...form, category: e.target.value })}
-                  className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
-                >
-                  <option value="Frontend">Frontend</option>
-                  <option value="Backend">Backend</option>
-                  <option value="Database">Database</option>
-                  <option value="DevOps">DevOps & Cloud</option>
-                  <option value="Tools">Tools & Architecture</option>
-                  <option value="Design">UI/UX Design</option>
-                  <option value="Other">Other</option>
-                </select>
               </div>
 
               <div>
@@ -338,4 +302,5 @@ const SkillsPage = () => {
 };
 
 export default SkillsPage;
+
 

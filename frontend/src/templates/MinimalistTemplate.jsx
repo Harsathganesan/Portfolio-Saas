@@ -818,13 +818,13 @@ const MinimalistTemplate = ({ data }) => {
                         <div className="flex justify-between items-center">
                           <h3 className="font-extrabold text-lg text-slate-900">{p.title}</h3>
                           <div className="flex items-center space-x-1.5">
-                            {(p.githubUrl || p.github) && (
-                              <a href={p.githubUrl || p.github} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:text-white transition" style={{ hover: themeStyles.primaryBg }} title="GitHub Repository">
+                            {(p.githubUrl || p.github || p.gitUrl || p.repoUrl) && (
+                              <a href={ensureUrlProtocol(p.githubUrl || p.github || p.gitUrl || p.repoUrl)} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:text-white transition" style={{ hover: themeStyles.primaryBg }} title="GitHub Repository">
                                 <Github className="w-4 h-4" />
                               </a>
                             )}
                             {(p.liveUrl || p.demoUrl || p.link) && (
-                              <a href={p.liveUrl || p.demoUrl || p.link} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg bg-slate-100 text-slate-600 transition" title="Live Demo">
+                              <a href={ensureUrlProtocol(p.liveUrl || p.demoUrl || p.link)} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg bg-slate-100 text-slate-600 transition" title="Live Demo">
                                 <ExternalLink className="w-4 h-4" />
                               </a>
                             )}
@@ -1112,9 +1112,9 @@ const MinimalistTemplate = ({ data }) => {
                   )}
                 </div>
                 <div className="flex items-center gap-3">
-                  {(selectedProject.githubUrl || selectedProject.github) && (
+                  {(selectedProject.githubUrl || selectedProject.github || selectedProject.gitUrl || selectedProject.repoUrl) && (
                     <a
-                      href={selectedProject.githubUrl || selectedProject.github}
+                      href={ensureUrlProtocol(selectedProject.githubUrl || selectedProject.github || selectedProject.gitUrl || selectedProject.repoUrl)}
                       target="_blank"
                       rel="noreferrer"
                       className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs hover:border-indigo-600 hover:text-indigo-600 flex items-center gap-1.5 transition"
@@ -1125,7 +1125,7 @@ const MinimalistTemplate = ({ data }) => {
                   )}
                   {(selectedProject.liveUrl || selectedProject.demoUrl || selectedProject.link) && (
                     <a
-                      href={selectedProject.liveUrl || selectedProject.demoUrl || selectedProject.link}
+                      href={ensureUrlProtocol(selectedProject.liveUrl || selectedProject.demoUrl || selectedProject.link)}
                       target="_blank"
                       rel="noreferrer"
                       className="px-4 py-2 rounded-xl text-white font-bold text-xs flex items-center gap-1.5 shadow-md transition"

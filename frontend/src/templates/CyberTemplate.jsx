@@ -4,6 +4,15 @@ import { analyticsService } from '../services/analyticsService';
 import { portfolioService } from '../services/portfolioService';
 import { useToast } from '../components/Toast';
 
+const ensureUrlProtocol = (url) => {
+  if (!url || typeof url !== 'string' || !url.trim()) return '';
+  const clean = url.trim();
+  if (clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('mailto:') || clean.startsWith('tel:')) {
+    return clean;
+  }
+  return `https://${clean}`;
+};
+
 // Typewriter Animation Component
 const TypewriterText = ({ words, colorClass = "text-emerald-400" }) => {
   const [index, setIndex] = useState(0);
@@ -319,13 +328,13 @@ const CyberTemplate = ({ data }) => {
                       <div className="flex justify-between items-center">
                         <h3 className="font-bold text-base text-emerald-200">{proj.title}</h3>
                         <div className="flex items-center space-x-2">
-                          {(proj.githubUrl || proj.github) && (
-                            <a href={proj.githubUrl || proj.github} target="_blank" rel="noreferrer" className="text-emerald-400 hover:text-white p-1" title="GitHub Repository">
+                          {(proj.githubUrl || proj.github || proj.gitUrl || proj.repoUrl) && (
+                            <a href={ensureUrlProtocol(proj.githubUrl || proj.github || proj.gitUrl || proj.repoUrl)} target="_blank" rel="noreferrer" className="text-emerald-400 hover:text-white p-1" title="GitHub Repository">
                               <Github className="w-4 h-4" />
                             </a>
                           )}
                           {(proj.liveUrl || proj.demoUrl || proj.link) && (
-                            <a href={proj.liveUrl || proj.demoUrl || proj.link} target="_blank" rel="noreferrer" className="text-emerald-400 hover:text-white p-1" title="Live Demo">
+                            <a href={ensureUrlProtocol(proj.liveUrl || proj.demoUrl || proj.link)} target="_blank" rel="noreferrer" className="text-emerald-400 hover:text-white p-1" title="Live Demo">
                               <ExternalLink className="w-4 h-4" />
                             </a>
                           )}
@@ -490,9 +499,9 @@ const CyberTemplate = ({ data }) => {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-emerald-500/30 pb-3">
                 <h3 className="text-xl font-bold text-emerald-300">&gt; {selectedProject.title}</h3>
                 <div className="flex items-center gap-2">
-                  {(selectedProject.githubUrl || selectedProject.github) && (
+                  {(selectedProject.githubUrl || selectedProject.github || selectedProject.gitUrl || selectedProject.repoUrl) && (
                     <a
-                      href={selectedProject.githubUrl || selectedProject.github}
+                      href={ensureUrlProtocol(selectedProject.githubUrl || selectedProject.github || selectedProject.gitUrl || selectedProject.repoUrl)}
                       target="_blank"
                       rel="noreferrer"
                       className="px-3 py-1.5 border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/30 text-emerald-300 rounded font-mono flex items-center gap-1"
@@ -503,7 +512,7 @@ const CyberTemplate = ({ data }) => {
                   )}
                   {(selectedProject.liveUrl || selectedProject.demoUrl || selectedProject.link) && (
                     <a
-                      href={selectedProject.liveUrl || selectedProject.demoUrl || selectedProject.link}
+                      href={ensureUrlProtocol(selectedProject.liveUrl || selectedProject.demoUrl || selectedProject.link)}
                       target="_blank"
                       rel="noreferrer"
                       className="px-3 py-1.5 border border-emerald-500 bg-emerald-500/30 hover:bg-emerald-500/50 text-white font-mono rounded flex items-center gap-1"

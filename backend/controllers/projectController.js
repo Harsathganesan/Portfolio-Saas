@@ -29,7 +29,7 @@ export const getProjects = async (req, res) => {
 export const createProject = async (req, res) => {
   try {
     const { title, description, techStack, githubUrl, liveUrl, thumbnail, category, isFeatured } = req.body;
-    const gitLink = githubUrl || req.body.github || '';
+    const gitLink = githubUrl || req.body.github || req.body.gitUrl || req.body.repoUrl || req.body.github_url || '';
     const demoLink = liveUrl || req.body.demoUrl || req.body.link || '';
     const imgUrl = thumbnail || req.body.image || req.body.imageUrl || '';
 
@@ -44,6 +44,7 @@ export const createProject = async (req, res) => {
         description,
         techStack: Array.isArray(techStack) ? techStack : techStack ? techStack.split(',').map((t) => t.trim()) : [],
         githubUrl: gitLink,
+        github: gitLink,
         liveUrl: demoLink,
         thumbnail: imgUrl,
         category: category || 'Web Application',
@@ -80,7 +81,7 @@ export const createProject = async (req, res) => {
 export const updateProject = async (req, res) => {
   try {
     const { title, description, techStack, githubUrl, liveUrl, thumbnail, category, isFeatured } = req.body;
-    const gitLink = githubUrl !== undefined ? githubUrl : (req.body.github !== undefined ? req.body.github : undefined);
+    const gitLink = githubUrl !== undefined ? githubUrl : (req.body.github !== undefined ? req.body.github : (req.body.gitUrl !== undefined ? req.body.gitUrl : req.body.repoUrl));
     const demoLink = liveUrl !== undefined ? liveUrl : (req.body.demoUrl !== undefined ? req.body.demoUrl : (req.body.link !== undefined ? req.body.link : undefined));
     const imgUrl = thumbnail !== undefined ? thumbnail : (req.body.image !== undefined ? req.body.image : (req.body.imageUrl !== undefined ? req.body.imageUrl : undefined));
 

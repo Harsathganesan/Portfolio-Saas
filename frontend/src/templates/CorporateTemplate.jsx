@@ -4,6 +4,15 @@ import { analyticsService } from '../services/analyticsService';
 import { portfolioService } from '../services/portfolioService';
 import { useToast } from '../components/Toast';
 
+const ensureUrlProtocol = (url) => {
+  if (!url || typeof url !== 'string' || !url.trim()) return '';
+  const clean = url.trim();
+  if (clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('mailto:') || clean.startsWith('tel:')) {
+    return clean;
+  }
+  return `https://${clean}`;
+};
+
 // Typewriter Animation Component
 const TypewriterText = ({ words, colorClass = "text-indigo-400" }) => {
   const [index, setIndex] = useState(0);
@@ -349,13 +358,13 @@ const CorporateTemplate = ({ data }) => {
                         <div className="flex justify-between items-center">
                           <h3 className="font-bold text-base text-slate-100">{proj.title}</h3>
                           <div className="flex items-center space-x-1.5">
-                            {(proj.githubUrl || proj.github) && (
-                              <a href={proj.githubUrl || proj.github} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-indigo-600 transition" title="GitHub Repository">
+                            {(proj.githubUrl || proj.github || proj.gitUrl || proj.repoUrl) && (
+                              <a href={ensureUrlProtocol(proj.githubUrl || proj.github || proj.gitUrl || proj.repoUrl)} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-indigo-600 transition" title="GitHub Repository">
                                 <Github className="w-3.5 h-3.5" />
                               </a>
                             )}
                             {(proj.liveUrl || proj.demoUrl || proj.link) && (
-                              <a href={proj.liveUrl || proj.demoUrl || proj.link} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-400 hover:bg-indigo-600 hover:text-white transition" title="Live Demo">
+                              <a href={ensureUrlProtocol(proj.liveUrl || proj.demoUrl || proj.link)} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-400 hover:bg-indigo-600 hover:text-white transition" title="Live Demo">
                                 <ExternalLink className="w-3.5 h-3.5" />
                               </a>
                             )}
@@ -518,9 +527,9 @@ const CorporateTemplate = ({ data }) => {
                   )}
                 </div>
                 <div className="flex items-center gap-3">
-                  {(selectedProject.githubUrl || selectedProject.github) && (
+                  {(selectedProject.githubUrl || selectedProject.github || selectedProject.gitUrl || selectedProject.repoUrl) && (
                     <a
-                      href={selectedProject.githubUrl || selectedProject.github}
+                      href={ensureUrlProtocol(selectedProject.githubUrl || selectedProject.github || selectedProject.gitUrl || selectedProject.repoUrl)}
                       target="_blank"
                       rel="noreferrer"
                       className="px-4 py-2 rounded-xl border border-slate-700 bg-slate-800 text-slate-200 font-bold hover:text-white flex items-center gap-1.5 transition"
@@ -531,7 +540,7 @@ const CorporateTemplate = ({ data }) => {
                   )}
                   {(selectedProject.liveUrl || selectedProject.demoUrl || selectedProject.link) && (
                     <a
-                      href={selectedProject.liveUrl || selectedProject.demoUrl || selectedProject.link}
+                      href={ensureUrlProtocol(selectedProject.liveUrl || selectedProject.demoUrl || selectedProject.link)}
                       target="_blank"
                       rel="noreferrer"
                       className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-500 flex items-center gap-1.5 transition"

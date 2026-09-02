@@ -7,8 +7,6 @@ import { FolderGit2, Plus, Trash2, Edit2, Sparkles, ExternalLink, Github, Upload
 import SectionPublishBar from '../components/SectionPublishBar';
 import AIGeneratorModal from '../components/AIGeneratorModal';
 
-
-
 const ensureUrlProtocol = (url) => {
   if (!url || typeof url !== 'string' || !url.trim()) return '';
   const clean = url.trim();
@@ -63,7 +61,7 @@ const ProjectsPage = () => {
       title: proj.title || '',
       description: proj.description || '',
       techStack: Array.isArray(proj.techStack) ? proj.techStack.join(', ') : proj.techStack || '',
-      githubUrl: proj.githubUrl || proj.github || '',
+      githubUrl: proj.githubUrl || proj.github || proj.gitUrl || proj.repoUrl || '',
       liveUrl: proj.liveUrl || proj.demoUrl || proj.link || '',
       thumbnail: proj.thumbnail || proj.image || proj.imageUrl || '',
       category: proj.category || 'Web Application',
@@ -95,14 +93,16 @@ const ProjectsPage = () => {
       toast('Project title is required', 'error');
       return;
     }
-    const gitLink = ensureUrlProtocol(form.githubUrl);
-    const demoLink = ensureUrlProtocol(form.liveUrl);
-    const imgUrl = ensureUrlProtocol(form.thumbnail);
+    const gitLink = ensureUrlProtocol(form.githubUrl || form.github);
+    const demoLink = ensureUrlProtocol(form.liveUrl || form.demoUrl || form.link);
+    const imgUrl = ensureUrlProtocol(form.thumbnail || form.image || form.imageUrl);
 
     const payload = {
       ...form,
       githubUrl: gitLink,
       github: gitLink,
+      gitUrl: gitLink,
+      repoUrl: gitLink,
       liveUrl: demoLink,
       demoUrl: demoLink,
       link: demoLink,
@@ -166,83 +166,87 @@ const ProjectsPage = () => {
       <SectionPublishBar sectionId="projects" title="Projects Section" itemCount={projects.length} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {projects.map((proj) => {
+          const rawGit = proj.githubUrl || proj.github || proj.gitUrl || proj.repoUrl;
+          const gitUrlFormatted = ensureUrlProtocol(rawGit);
+          const rawLive = proj.liveUrl || proj.demoUrl || proj.link;
+          const liveUrlFormatted = ensureUrlProtocol(rawLive);
 
-        {projects.map((proj) => (
-          <div key={proj._id} className="bg-white border border-slate-100 p-6 rounded-2xl shadow-2xs space-y-4 flex flex-col justify-between">
-            <div className="space-y-3">
-              {proj.thumbnail && (
-                <img
-                  src={proj.thumbnail}
-                  alt={proj.title}
-                  className="w-full h-40 object-cover rounded-xl border border-slate-100"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500&q=80';
-                  }}
-                />
-              )}
+          return (
+            <div key={proj._id} className="bg-white border border-slate-100 p-6 rounded-2xl shadow-2xs space-y-4 flex flex-col justify-between">
+              <div className="space-y-3">
+                {proj.thumbnail && (
+                  <img
+                    src={proj.thumbnail}
+                    alt={proj.title}
+                    className="w-full h-40 object-cover rounded-xl border border-slate-100"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500&q=80';
+                    }}
+                  />
+                )}
 
-              <div className="flex items-center justify-between">
-                <h3 className="font-bold text-base text-slate-900">{proj.title}</h3>
-                <div className="flex items-center space-x-1">
-                  <button onClick={() => handleOpenEdit(proj)} className="p-1.5 text-slate-400 hover:text-blue-600 transition" title="Edit Project">
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => handleDelete(proj._id)} className="p-1.5 text-slate-400 hover:text-rose-600 transition" title="Delete Project">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-base text-slate-900">{proj.title}</h3>
+                  <div className="flex items-center space-x-1">
+                    <button onClick={() => handleOpenEdit(proj)} className="p-1.5 text-slate-400 hover:text-blue-600 transition" title="Edit Project">
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => handleDelete(proj._id)} className="p-1.5 text-slate-400 hover:text-rose-600 transition" title="Delete Project">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed font-medium">{proj.description}</p>
+
+                {/* GitHub & Live Demo Preview Links on Card */}
+                <div className="flex flex-wrap items-center gap-2 pt-1 text-xs font-semibold">
+                  {gitUrlFormatted ? (
+                    <a
+                      href={gitUrlFormatted}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-1.5 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-200 transition font-bold"
+                    >
+                      <Github className="w-3.5 h-3.5 text-blue-600" />
+                      <span>GitHub Repo</span>
+                    </a>
+                  ) : (
+                    <span className="text-slate-400 text-[11px] font-normal">No GitHub Link</span>
+                  )}
+                  {liveUrlFormatted && (
+                    <a
+                      href={liveUrlFormatted}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-1.5 text-emerald-700 hover:text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 transition"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Live Demo</span>
+                    </a>
+                  )}
                 </div>
               </div>
-              <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed font-medium">{proj.description}</p>
 
-              {/* GitHub & Live Demo Preview Links on Card */}
-              <div className="flex flex-wrap items-center gap-2 pt-1 text-xs font-semibold">
-                {(proj.githubUrl || proj.github || proj.gitUrl || proj.repoUrl) ? (
-                  <a
-                    href={proj.githubUrl || proj.github || proj.gitUrl || proj.repoUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-1.5 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-200 transition font-bold"
-                  >
-                    <Github className="w-3.5 h-3.5 text-blue-600" />
-                    <span>GitHub Repo</span>
-                  </a>
-                ) : (
-                  <span className="text-slate-400 text-[11px] font-normal">No GitHub Link</span>
-                )}
-                {(proj.liveUrl || proj.demoUrl || proj.link) && (
-                  <a
-                    href={proj.liveUrl || proj.demoUrl || proj.link}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-1.5 text-emerald-700 hover:text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 transition"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    <span>Live Demo</span>
-                  </a>
-                )}
-              </div>
+              {proj.techStack && proj.techStack.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 pt-3 border-t border-slate-50">
+                  {(Array.isArray(proj.techStack) ? proj.techStack : proj.techStack.split(',')).map((tech) => (
+                    <span key={tech} className="text-[10px] font-mono px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 font-semibold border border-blue-100">
+                      {tech.trim()}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
-
-            {proj.techStack && proj.techStack.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 pt-3 border-t border-slate-50">
-                {(Array.isArray(proj.techStack) ? proj.techStack : proj.techStack.split(',')).map((tech) => (
-                  <span key={tech} className="text-[10px] font-mono px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 font-semibold border border-blue-100">
-                    {tech.trim()}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Light Theme Add / Edit Project Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-[99999] top-0 left-0 w-screen h-screen bg-slate-900/50 flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white border border-slate-200 rounded-2xl p-6 max-w-lg w-full shadow-2xl relative max-h-[90vh] overflow-y-auto text-slate-900">
-
-
             <button onClick={() => setModalOpen(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700 transition">
               <X className="w-5 h-5" />
             </button>
@@ -302,7 +306,7 @@ const ProjectsPage = () => {
                     type="text"
                     value={form.githubUrl || form.github || ''}
                     onChange={(e) => setForm({ ...form, githubUrl: e.target.value, github: e.target.value })}
-                    placeholder="https://github.com/..."
+                    placeholder="https://github.com/yourname/repo"
                     className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                   />
                 </div>
@@ -357,7 +361,7 @@ const ProjectsPage = () => {
       />
     </div>
   );
-
 };
 
 export default ProjectsPage;
+
