@@ -64,7 +64,7 @@ const ForgotPasswordPage = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@example.com"
+                    placeholder=""
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-slate-900 outline-none focus:bg-white focus:border-indigo-600 transition font-medium"
                   />
                 </div>

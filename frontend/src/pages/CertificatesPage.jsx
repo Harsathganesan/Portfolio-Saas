@@ -161,7 +161,7 @@ const CertificatesPage = () => {
                   required
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  placeholder="AWS Solutions Architect"
+                  placeholder=""
                   className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                 />
               </div>
@@ -173,7 +173,7 @@ const CertificatesPage = () => {
                   required
                   value={form.organization}
                   onChange={(e) => setForm({ ...form, organization: e.target.value })}
-                  placeholder="Amazon Web Services"
+                  placeholder=""
                   className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                 />
               </div>
@@ -184,7 +184,7 @@ const CertificatesPage = () => {
                   type="text"
                   value={form.issueDate}
                   onChange={(e) => setForm({ ...form, issueDate: e.target.value })}
-                  placeholder="May 2024"
+                  placeholder=""
                   className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                 />
               </div>
@@ -195,7 +195,7 @@ const CertificatesPage = () => {
                   type="text"
                   value={form.credentialUrl}
                   onChange={(e) => setForm({ ...form, credentialUrl: e.target.value })}
-                  placeholder="https://aws.amazon.com/..."
+                  placeholder=""
                   className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                 />
               </div>
@@ -206,7 +206,7 @@ const CertificatesPage = () => {
                   type="text"
                   value={form.certificateImage}
                   onChange={(e) => setForm({ ...form, certificateImage: e.target.value })}
-                  placeholder="https://example.com/badge.png"
+                  placeholder=""
                   className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                 />
               </div>

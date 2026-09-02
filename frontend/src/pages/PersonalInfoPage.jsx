@@ -192,7 +192,7 @@ const PersonalInfoPage = () => {
                   name="avatar"
                   value={form.avatar}
                   onChange={handleChange}
-                  placeholder="https://images.unsplash.com/photo-..."
+                  placeholder=""
                   className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-indigo-500"
                 />
               </div>
@@ -207,7 +207,7 @@ const PersonalInfoPage = () => {
                 name="fullName"
                 value={form.fullName}
                 onChange={handleChange}
-                placeholder="Alex Rivera"
+                placeholder=""
                 className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-indigo-500"
               />
             </div>
@@ -218,7 +218,7 @@ const PersonalInfoPage = () => {
                 name="title"
                 value={form.title}
                 onChange={handleChange}
-                placeholder="Senior Full Stack Engineer"
+                placeholder=""
                 className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-indigo-500"
               />
             </div>
@@ -240,7 +240,7 @@ const PersonalInfoPage = () => {
               rows={4}
               value={form.bio}
               onChange={handleChange}
-              placeholder="Passionate engineer building web applications with high performance..."
+              placeholder=""
               className="w-full bg-white border border-slate-300 rounded-xl p-3 text-slate-900 outline-none focus:border-indigo-500 leading-relaxed"
             />
           </div>
@@ -253,7 +253,7 @@ const PersonalInfoPage = () => {
                 name="email"
                 value={form.email}
                 onChange={handleChange}
-                placeholder="alex@example.com"
+                placeholder=""
                 className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-indigo-500"
               />
             </div>
@@ -264,7 +264,7 @@ const PersonalInfoPage = () => {
                 name="phone"
                 value={form.phone}
                 onChange={handleChange}
-                placeholder="+1 (555) 000-0000"
+                placeholder=""
                 className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-indigo-500"
               />
             </div>
@@ -275,7 +275,7 @@ const PersonalInfoPage = () => {
                 name="location"
                 value={form.location}
                 onChange={handleChange}
-                placeholder="San Francisco, CA"
+                placeholder=""
                 className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-indigo-500"
               />
             </div>
@@ -296,7 +296,7 @@ const PersonalInfoPage = () => {
                 name="github"
                 value={form.github}
                 onChange={handleChange}
-                placeholder="https://github.com/username"
+                placeholder=""
                 className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-indigo-500"
               />
             </div>
@@ -307,7 +307,7 @@ const PersonalInfoPage = () => {
                 name="linkedin"
                 value={form.linkedin}
                 onChange={handleChange}
-                placeholder="https://linkedin.com/in/username"
+                placeholder=""
                 className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-indigo-500"
               />
             </div>
@@ -319,7 +319,7 @@ const PersonalInfoPage = () => {
                 name="instagram"
                 value={form.instagram}
                 onChange={handleChange}
-                placeholder="https://instagram.com/username"
+                placeholder=""
                 className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-indigo-500"
               />
             </div>

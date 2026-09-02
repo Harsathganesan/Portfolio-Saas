@@ -516,7 +516,7 @@ const SleekTemplate = ({ data }) => {
                       required
                       value={contactForm.senderName}
                       onChange={(e) => setContactForm({ ...contactForm, senderName: e.target.value })}
-                      placeholder="Enter your name"
+                      placeholder=""
                       className={`w-full rounded-xl px-4 py-3 outline-none border transition ${isDark ? 'bg-slate-950 border-slate-800 text-white focus:border-indigo-500' : 'bg-white border-slate-200 text-slate-900 focus:border-indigo-600'}`}
                     />
                   </div>
@@ -527,7 +527,7 @@ const SleekTemplate = ({ data }) => {
                       required
                       value={contactForm.senderEmail}
                       onChange={(e) => setContactForm({ ...contactForm, senderEmail: e.target.value })}
-                      placeholder="Enter your email"
+                      placeholder=""
                       className={`w-full rounded-xl px-4 py-3 outline-none border transition ${isDark ? 'bg-slate-950 border-slate-800 text-white focus:border-indigo-500' : 'bg-white border-slate-200 text-slate-900 focus:border-indigo-600'}`}
                     />
                   </div>
@@ -539,7 +539,7 @@ const SleekTemplate = ({ data }) => {
                     type="text"
                     value={contactForm.subject || ''}
                     onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
-                    placeholder="What is this regarding?"
+                    placeholder=""
                     className={`w-full rounded-xl px-4 py-3 outline-none border transition ${isDark ? 'bg-slate-950 border-slate-800 text-white focus:border-indigo-500' : 'bg-white border-slate-200 text-slate-900 focus:border-indigo-600'}`}
                   />
                 </div>
@@ -551,7 +551,7 @@ const SleekTemplate = ({ data }) => {
                     rows={4}
                     value={contactForm.message}
                     onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                    placeholder="Write your message here..."
+                    placeholder=""
                     className={`w-full rounded-xl px-4 py-3 outline-none border transition ${isDark ? 'bg-slate-950 border-slate-800 text-white focus:border-indigo-500' : 'bg-white border-slate-200 text-slate-900 focus:border-indigo-600'}`}
                   />
                 </div>

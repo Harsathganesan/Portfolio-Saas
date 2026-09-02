@@ -239,7 +239,7 @@ const AdminDashboardPage = () => {
                   value={adminEmail}
                   onChange={(e) => setAdminEmail(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 outline-none focus:border-indigo-600 focus:bg-white transition font-semibold"
-                  placeholder="admin@portfolio.com"
+                  placeholder=""
                 />
               </div>
 
@@ -252,7 +252,7 @@ const AdminDashboardPage = () => {
                     value={adminPassword}
                     onChange={(e) => setAdminPassword(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-4 pr-10 py-3 text-slate-900 outline-none focus:border-indigo-600 focus:bg-white transition font-semibold"
-                    placeholder="••••••••"
+                    placeholder=""
                   />
                   <button
                     type="button"
@@ -694,8 +694,8 @@ const AdminDashboardPage = () => {
                         type="text"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        placeholder="Search username or email..."
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 outline-none focus:border-indigo-600 focus:bg-white font-semibold transition"
+                        placeholder=""
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-900 outline-none focus:border-indigo-600 focus:bg-white font-semibold transition"
                       />
                     </div>
 
@@ -1135,7 +1135,7 @@ const AdminDashboardPage = () => {
                           value={currentPassword}
                           onChange={(e) => setCurrentPassword(e.target.value)}
                           className="w-full bg-white border border-slate-200 rounded-xl pl-4 pr-10 py-2.5 text-slate-900 outline-none focus:border-indigo-600 font-semibold transition"
-                          placeholder="••••••••"
+                          placeholder=""
                         />
                         <button
                           type="button"
@@ -1160,7 +1160,7 @@ const AdminDashboardPage = () => {
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                             className="w-full bg-white border border-slate-200 rounded-xl pl-4 pr-10 py-2.5 text-slate-900 outline-none focus:border-indigo-600 font-semibold transition"
-                            placeholder="Min 6 characters"
+                            placeholder=""
                           />
                           <button
                             type="button"
@@ -1184,7 +1184,7 @@ const AdminDashboardPage = () => {
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             className="w-full bg-white border border-slate-200 rounded-xl pl-4 pr-10 py-2.5 text-slate-900 outline-none focus:border-indigo-600 font-semibold transition"
-                            placeholder="Re-enter password"
+                            placeholder=""
                           />
                           <button
                             type="button"

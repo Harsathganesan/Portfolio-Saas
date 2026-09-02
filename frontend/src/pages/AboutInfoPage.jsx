@@ -146,7 +146,7 @@ const AboutInfoPage = () => {
                   type="text"
                   value={aboutAvatar}
                   onChange={(e) => setAboutAvatar(e.target.value)}
-                  placeholder="https://images.unsplash.com/photo-..."
+                  placeholder=""
                   className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-indigo-500"
                 />
               </div>
@@ -163,8 +163,8 @@ const AboutInfoPage = () => {
             rows={6}
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            placeholder="I am a passionate Full Stack Developer with experience in building web applications..."
-            className="w-full bg-white border border-slate-300 rounded-2xl p-4 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-indigo-500 leading-relaxed font-sans"
+            placeholder=""
+            className="w-full bg-white border border-slate-300 rounded-2xl p-4 text-sm text-slate-900 outline-none focus:border-indigo-500 leading-relaxed font-sans"
           />
           <p className="text-[11px] text-slate-500">
             💡 Changes written in this box will instantly display on your live portfolio's About Me section!

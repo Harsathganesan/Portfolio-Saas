@@ -997,7 +997,6 @@ const MinimalistTemplate = ({ data }) => {
                       required
                       value={contactForm.senderName}
                       onChange={(e) => setContactForm({ ...contactForm, senderName: e.target.value })}
-                      placeholder="Enter your name"
                       className="w-full border border-slate-200 bg-white rounded-xl px-4 py-3 text-xs text-slate-900 outline-none transition font-medium focus:ring-2"
                       style={{ focusRingColor: primaryColor }}
                     />
@@ -1009,7 +1008,6 @@ const MinimalistTemplate = ({ data }) => {
                       required
                       value={contactForm.senderEmail}
                       onChange={(e) => setContactForm({ ...contactForm, senderEmail: e.target.value })}
-                      placeholder="Enter your email"
                       className="w-full border border-slate-200 bg-white rounded-xl px-4 py-3 text-xs text-slate-900 outline-none transition font-medium focus:ring-2"
                     />
                   </div>
@@ -1021,7 +1019,6 @@ const MinimalistTemplate = ({ data }) => {
                     type="text"
                     value={contactForm.subject}
                     onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
-                    placeholder="What is this regarding?"
                     className="w-full border border-slate-200 bg-white rounded-xl px-4 py-3 text-xs text-slate-900 outline-none transition font-medium focus:ring-2"
                   />
                 </div>
@@ -1033,7 +1030,6 @@ const MinimalistTemplate = ({ data }) => {
                     rows={4}
                     value={contactForm.message}
                     onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                    placeholder="Write your message here..."
                     className="w-full border border-slate-200 bg-white rounded-xl px-4 py-3 text-xs text-slate-900 outline-none transition font-medium leading-relaxed focus:ring-2"
                   />
                 </div>

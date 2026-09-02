@@ -204,7 +204,7 @@ const SettingsPage = () => {
                 type="text"
                 value={customDomain}
                 onChange={(e) => setCustomDomain(e.target.value)}
-                placeholder="yourdomain.com"
+                placeholder=""
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-200 outline-none focus:border-indigo-500 font-mono"
               />
             </div>
@@ -221,7 +221,7 @@ const SettingsPage = () => {
               type="text"
               value={metaTitle}
               onChange={(e) => setMetaTitle(e.target.value)}
-              placeholder={`${portfolio?.personalInfo?.fullName || 'User'} | Full Stack Engineer Portfolio`}
+              placeholder=""
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-200 outline-none focus:border-indigo-500"
             />
           </div>
@@ -232,7 +232,7 @@ const SettingsPage = () => {
               rows={3}
               value={metaDescription}
               onChange={(e) => setMetaDescription(e.target.value)}
-              placeholder="Explore software engineering projects, technical skills, and work history..."
+              placeholder=""
               className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-200 outline-none focus:border-indigo-500"
             />
           </div>
@@ -244,7 +244,7 @@ const SettingsPage = () => {
                 type="text"
                 value={keywords}
                 onChange={(e) => setKeywords(e.target.value)}
-                placeholder="developer, react, full stack, engineer, software"
+                placeholder=""
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-200 outline-none focus:border-indigo-500"
               />
             </div>
@@ -255,7 +255,7 @@ const SettingsPage = () => {
                 type="text"
                 value={ogImage}
                 onChange={(e) => setOgImage(e.target.value)}
-                placeholder="https://images.unsplash.com/..."
+                placeholder=""
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-200 outline-none focus:border-indigo-500"
               />
             </div>

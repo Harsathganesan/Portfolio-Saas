@@ -263,7 +263,7 @@ const ProjectsPage = () => {
                   required
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  placeholder="Enterprise AI Gateway"
+                  placeholder=""
                   className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                 />
               </div>
@@ -283,7 +283,7 @@ const ProjectsPage = () => {
                   rows={3}
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  placeholder="Engineered high throughput API routing..."
+                  placeholder=""
                   className="w-full bg-white border border-slate-200 rounded-xl p-3.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                 />
               </div>
@@ -294,7 +294,7 @@ const ProjectsPage = () => {
                   type="text"
                   value={form.techStack}
                   onChange={(e) => setForm({ ...form, techStack: e.target.value })}
-                  placeholder="React, Node.js, MongoDB, Tailwind"
+                  placeholder=""
                   className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-mono text-xs"
                 />
               </div>
@@ -306,7 +306,7 @@ const ProjectsPage = () => {
                     type="text"
                     value={form.githubUrl || form.github || ''}
                     onChange={(e) => setForm({ ...form, githubUrl: e.target.value, github: e.target.value })}
-                    placeholder="https://github.com/yourname/repo"
+                    placeholder=""
                     className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                   />
                 </div>
@@ -316,7 +316,7 @@ const ProjectsPage = () => {
                     type="text"
                     value={form.liveUrl || form.demoUrl || ''}
                     onChange={(e) => setForm({ ...form, liveUrl: e.target.value, demoUrl: e.target.value, link: e.target.value })}
-                    placeholder="https://example.com"
+                    placeholder=""
                     className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                   />
                 </div>
@@ -329,7 +329,7 @@ const ProjectsPage = () => {
                     type="text"
                     value={form.thumbnail}
                     onChange={(e) => setForm({ ...form, thumbnail: e.target.value })}
-                    placeholder="https://images.unsplash.com/..."
+                    placeholder=""
                     className="flex-1 bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                   />
                   <label className="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl cursor-pointer flex items-center gap-1 font-semibold transition border border-slate-200">

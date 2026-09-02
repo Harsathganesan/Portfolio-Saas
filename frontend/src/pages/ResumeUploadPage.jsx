@@ -82,7 +82,7 @@ const ResumeUploadPage = () => {
               type="url"
               value={resumeUrl}
               onChange={(e) => setResumeUrl(e.target.value)}
-              placeholder="https://example.com/my-resume.pdf"
+              placeholder=""
               className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-indigo-600 font-medium"
             />
           </div>

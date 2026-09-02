@@ -133,7 +133,7 @@ const MessagesPage = () => {
                 required
                 value={contactForm.email}
                 onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                placeholder="harsath137@gmail.com"
+                placeholder=""
                 className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 outline-none focus:border-blue-600 font-medium transition"
               />
               <p className="text-[11px] text-slate-400 mt-1 font-medium">Displayed in Contact Me card</p>
@@ -149,7 +149,7 @@ const MessagesPage = () => {
                 type="text"
                 value={contactForm.phone}
                 onChange={(e) => setContactForm({ ...contactForm, phone: e.target.value, whatsapp: e.target.value })}
-                placeholder="+91 6382245266"
+                placeholder=""
                 className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 outline-none focus:border-blue-600 font-medium transition"
               />
               <p className="text-[11px] text-blue-600 mt-1 font-semibold">Visitors clicking "Send Message" will redirect to this WhatsApp number</p>
@@ -165,7 +165,7 @@ const MessagesPage = () => {
                 type="text"
                 value={contactForm.location}
                 onChange={(e) => setContactForm({ ...contactForm, location: e.target.value })}
-                placeholder="Pudukkottai, Tamil Nadu, India"
+                placeholder=""
                 className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 outline-none focus:border-blue-600 font-medium transition"
               />
               <p className="text-[11px] text-slate-400 mt-1 font-medium">City, state, country</p>

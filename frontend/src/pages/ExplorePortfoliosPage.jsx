@@ -50,7 +50,7 @@ const ExplorePortfoliosPage = () => {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search by name, skill, or title..."
+                placeholder=""
                 className="w-full bg-slate-900 border border-slate-800 rounded-2xl pl-11 pr-4 py-3 text-xs text-white outline-none focus:border-indigo-500 shadow-xl"
               />
             </div>

@@ -140,7 +140,7 @@ const EducationPage = () => {
                   required
                   value={form.degree}
                   onChange={(e) => setForm({ ...form, degree: e.target.value })}
-                  placeholder="B.S. in Computer Science"
+                  placeholder=""
                   className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                 />
               </div>
@@ -152,7 +152,7 @@ const EducationPage = () => {
                   required
                   value={form.institution}
                   onChange={(e) => setForm({ ...form, institution: e.target.value })}
-                  placeholder="Stanford University"
+                  placeholder=""
                   className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                 />
               </div>
@@ -164,7 +164,7 @@ const EducationPage = () => {
                     type="text"
                     value={form.duration}
                     onChange={(e) => setForm({ ...form, duration: e.target.value })}
-                    placeholder="2020 - 2024"
+                    placeholder=""
                     className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                   />
                 </div>
@@ -174,7 +174,7 @@ const EducationPage = () => {
                     type="text"
                     value={form.cgpa}
                     onChange={(e) => setForm({ ...form, cgpa: e.target.value })}
-                    placeholder="3.9 / 4.0"
+                    placeholder=""
                     className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                   />
                 </div>
@@ -186,7 +186,7 @@ const EducationPage = () => {
                   rows={2}
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  placeholder="Relevant coursework & honors..."
+                  placeholder=""
                   className="w-full bg-white border border-slate-200 rounded-xl p-3.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                 />
               </div>

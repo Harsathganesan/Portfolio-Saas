@@ -809,7 +809,7 @@ const CreativeTemplate = ({ data }) => {
                         required
                         value={contactForm.senderName}
                         onChange={(e) => setContactForm({ ...contactForm, senderName: e.target.value })}
-                        placeholder="Enter your name"
+                        placeholder=""
                         className={`w-full border rounded-xl px-4 py-3 outline-none focus:border-purple-600 ${isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'}`}
                       />
                     </div>
@@ -820,7 +820,7 @@ const CreativeTemplate = ({ data }) => {
                         required
                         value={contactForm.senderEmail}
                         onChange={(e) => setContactForm({ ...contactForm, senderEmail: e.target.value })}
-                        placeholder="Enter your email"
+                        placeholder=""
                         className={`w-full border rounded-xl px-4 py-3 outline-none focus:border-purple-600 ${isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'}`}
                       />
                     </div>
@@ -831,7 +831,7 @@ const CreativeTemplate = ({ data }) => {
                       type="text"
                       value={contactForm.subject}
                       onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
-                      placeholder="What is this regarding?"
+                      placeholder=""
                       className={`w-full border rounded-xl px-4 py-3 outline-none focus:border-purple-600 ${isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'}`}
                     />
                   </div>
@@ -842,7 +842,7 @@ const CreativeTemplate = ({ data }) => {
                       rows={4}
                       value={contactForm.message}
                       onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                      placeholder="Write your message here..."
+                      placeholder=""
                       className={`w-full border rounded-xl px-4 py-3 outline-none focus:border-purple-600 leading-relaxed ${isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'}`}
                     />
                   </div>

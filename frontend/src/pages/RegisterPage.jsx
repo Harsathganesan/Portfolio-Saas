@@ -76,7 +76,7 @@ const RegisterPage = () => {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
-                  placeholder="alexdev"
+                  placeholder=""
                   className="w-full bg-slate-50 border border-slate-200/90 rounded-2xl pl-9 pr-4 py-3 text-sm text-slate-900 outline-none focus:bg-white focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 transition-all font-mono font-medium"
                 />
               </div>
@@ -91,7 +91,7 @@ const RegisterPage = () => {
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Alex Rivera"
+                  placeholder=""
                   className="w-full bg-slate-50 border border-slate-200/90 rounded-2xl pl-10 pr-4 py-3 text-sm text-slate-900 outline-none focus:bg-white focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 transition-all font-medium"
                 />
               </div>
@@ -106,7 +106,7 @@ const RegisterPage = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="alex@example.com"
+                  placeholder=""
                   className="w-full bg-slate-50 border border-slate-200/90 rounded-2xl pl-10 pr-4 py-3 text-sm text-slate-900 outline-none focus:bg-white focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 transition-all font-medium"
                 />
               </div>
@@ -122,7 +122,7 @@ const RegisterPage = () => {
                   minLength={6}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder=""
                   className="w-full bg-slate-50 border border-slate-200/90 rounded-2xl pl-10 pr-11 py-3 text-sm text-slate-900 outline-none focus:bg-white focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 transition-all font-medium"
                 />
                 <button

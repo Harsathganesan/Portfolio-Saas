@@ -140,7 +140,7 @@ const ExperiencePage = () => {
                   required
                   value={form.position}
                   onChange={(e) => setForm({ ...form, position: e.target.value })}
-                  placeholder="Senior Full Stack Engineer"
+                  placeholder=""
                   className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                 />
               </div>
@@ -152,7 +152,7 @@ const ExperiencePage = () => {
                   required
                   value={form.company}
                   onChange={(e) => setForm({ ...form, company: e.target.value })}
-                  placeholder="Google / Acme Corp"
+                  placeholder=""
                   className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                 />
               </div>
@@ -164,7 +164,7 @@ const ExperiencePage = () => {
                     type="text"
                     value={form.duration}
                     onChange={(e) => setForm({ ...form, duration: e.target.value })}
-                    placeholder="Jan 2022 - Present"
+                    placeholder=""
                     className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                   />
                 </div>
@@ -174,7 +174,7 @@ const ExperiencePage = () => {
                     type="text"
                     value={form.location}
                     onChange={(e) => setForm({ ...form, location: e.target.value })}
-                    placeholder="San Francisco, CA"
+                    placeholder=""
                     className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                   />
                 </div>
@@ -186,7 +186,7 @@ const ExperiencePage = () => {
                   rows={3}
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  placeholder="Led team of 6 building microservices..."
+                  placeholder=""
                   className="w-full bg-white border border-slate-200 rounded-xl p-3.5 text-slate-900 outline-none focus:border-blue-600 font-medium"
                 />
               </div>
